@@ -22,10 +22,11 @@
 
     
     NSInteger locationTime;
-    
+    BOOL noAlert;//没有错误弹出
 }
 
-- (id)initLocation;
+-(id)initLocation;
+-(id)initLocationWithNoAlert;
 -(void)startLocation;
 
 @property (assign, nonatomic) BOOL handleLocationCity;//手动定位当前城市
@@ -33,6 +34,10 @@
 @property (assign, nonatomic) double my_lat;
 @property (assign, nonatomic) double my_lon;
 @property (strong, nonatomic) NSString *my_position;
+@property (strong, nonatomic) NSString *locationProvince;
+
+@property (assign, nonatomic) NSInteger cityCode;
+@property (assign, nonatomic) NSInteger ad_code;
 
 @property (strong, nonatomic) NSString *error_string;
 @property (assign, nonatomic) BOOL goback_city;//回到城市提示

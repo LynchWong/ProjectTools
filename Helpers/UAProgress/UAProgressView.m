@@ -187,7 +187,7 @@ NSString * const UAProgressViewProgressAnimationKey = @"UAProgressViewProgressAn
     animation.duration = self.animationDuration;
     animation.fromValue = @(self.progress);
     animation.toValue = @(progress);
-    animation.delegate = self;
+//    animation.delegate = self;
     [self.progressView.layer addAnimation:animation forKey:UAProgressViewProgressAnimationKey];
     
     // Add timer to update valueLabel

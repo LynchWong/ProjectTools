@@ -22,13 +22,10 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [[[UIApplication sharedApplication].delegate window] bringSubviewToFront:showWaiting];
         showWaiting.showLabel.text = show;
-        [UIView animateWithDuration:0.2f delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                
-                                showWaiting.alpha  = 1;
-                                
-                            }
-                         completion:NULL];
+        [UIView animateWithDuration:0.2f animations:^{
+            showWaiting.alpha  = 1;
+        }];
+        
     });
     
 }
@@ -62,17 +59,10 @@
         [waitingImageview setImage:[UIImage imageNamed:@"waiting.png"]];
         [waitingView addSubview:waitingImageview];
         
-        CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
-        rotationAnimation.duration =1.2;
-        rotationAnimation.cumulative = YES;
-        rotationAnimation.repeatCount = CGFLOAT_MAX;
-        rotationAnimation.removedOnCompletion = NO;//必须加 不然到其他页面后会停止
-        [waitingImageview.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-        rotationAnimation = nil;
+        [APPUtils takeAround:0 duration:1.2 view:waitingImageview];
+      
 
-        
-        _showLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, waitingView.frame.size.height-30, waitingView.frame.size.width, 20)];
+        _showLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, waitingView.height-30, waitingView.width, 20)];
         _showLabel.textAlignment = NSTextAlignmentCenter;
         _showLabel.textColor = [UIColor whiteColor];
         _showLabel.numberOfLines=1;
@@ -91,16 +81,16 @@
         
         
         _cancelView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
-        [_cancelView setFrame:CGRectMake(waitingView.frame.origin.x, waitingView.frame.size.height+waitingView.frame.origin.y, waitingWidth, 30)];
+        [_cancelView setFrame:CGRectMake(waitingView.x, waitingView.height+waitingView.y, waitingWidth, 30)];
         [_cancelView.layer setCornerRadius:4];
         [_cancelView.layer setMasksToBounds:YES];//圆角不被盖住
         [_cancelView setClipsToBounds:YES];//减掉超出部分
         _cancelView.alpha=0;
         [self addSubview:_cancelView];
         
-        [_cancelView addSubview:[APPUtils get_line:0 y:0 width:_cancelView.frame.size.width]];
+        [_cancelView addSubview:[APPUtils get_line:0 y:0 width:_cancelView.width]];
         
-        MyBtnControl *cancelBtn = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, _cancelView.frame.size.width, _cancelView.frame.size.height)];
+        MyBtnControl *cancelBtn = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, _cancelView.width, _cancelView.height)];
         [cancelBtn addLabel:@"取消" color:[UIColor whiteColor] font:[UIFont fontWithName:@"HelveticaNeue" size:12]];
         [_cancelView addSubview:cancelBtn];
         cancelBtn.clickBackBlock = ^(){
@@ -149,19 +139,18 @@
     if(showWaiting.alpha>0){
     
         dispatch_async(dispatch_get_main_queue(), ^{
-            [UIView animateWithDuration:0.35f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                    showWaiting.alpha  = 0;
-                                    showWaiting.progressLabel.alpha=0;
-                                    showWaiting.cancelView.alpha=0;
-                                    if(showWaiting.now_task!=nil){
-                                        showWaiting.now_task = nil;
-                                    }
-                                    if(showWaiting.now_afn!=nil){
-                                        showWaiting.now_afn = nil;
-                                    }
-                                }
-                             completion:NULL];
+            [UIView animateWithDuration:0.35 animations:^{
+                showWaiting.alpha  = 0;
+                showWaiting.progressLabel.alpha=0;
+                showWaiting.cancelView.alpha=0;
+                if(showWaiting.now_task!=nil){
+                    showWaiting.now_task = nil;
+                }
+                if(showWaiting.now_afn!=nil){
+                    showWaiting.now_afn = nil;
+                }
+            }];
+           
         });
        
     }

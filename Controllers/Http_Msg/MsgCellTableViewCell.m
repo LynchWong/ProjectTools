@@ -56,9 +56,9 @@
         timeView.layer.cornerRadius = 3;
         
         
-        UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, timeView.frame.size.width, timeView.frame.size.height)];
+        UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, timeView.width, timeView.height)];
         timeLabel.textColor = [UIColor whiteColor];
-        timeLabel.font = [UIFont systemFontOfSize:12];
+        timeLabel.font = [UIFont fontWithName:textDefaultFont size:12];
         timeLabel.textAlignment = NSTextAlignmentCenter;
         
         timeLabel.text = msg.content;
@@ -90,7 +90,7 @@
         UIImageView *asynImgView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 13, 42, 42)];
       
         [asynImgView sd_setImageWithURL:[NSURL URLWithString:msg.avatar] placeholderImage:[UIImage imageNamed:@"defaultHead.png"]];
-        [asynImgView.layer setCornerRadius:(asynImgView.frame.size.height/2)];
+        [asynImgView.layer setCornerRadius:(asynImgView.height/2)];
         [asynImgView.layer setMasksToBounds:YES];//圆角不被盖住
         [asynImgView setContentMode:UIViewContentModeScaleAspectFill];
         [asynImgView setClipsToBounds:YES];//减掉超出部分
@@ -100,7 +100,7 @@
         [self addSubview:asynImgView];
         
         if(conversation.auth_type==1){
-            UIImageView *auth = [[UIImageView alloc] initWithFrame:CGRectMake(asynImgView.frame.size.width+asynImgView.frame.origin.x-13, asynImgView.frame.origin.y+asynImgView.frame.size.height-14, 18, 18)];
+            UIImageView *auth = [[UIImageView alloc] initWithFrame:CGRectMake(asynImgView.width+asynImgView.x-13, asynImgView.y+asynImgView.height-14, 18, 18)];
             [auth setImage:[UIImage imageNamed:@"auth_paopao.png"]];
             [self addSubview:auth];
             auth = nil;
@@ -135,7 +135,7 @@
             
             UIImageView *sendImageview = [[UIImageView alloc] initWithFrame:CGRectMake(62, 14, maxPicHeight*_msg.imageDirection, maxPicHeight)];
           
-            if(sendImageview.frame.size.height < 42){
+            if(sendImageview.height < 42){
                 CGRect containerFrame = sendImageview.frame;
                 containerFrame.size.height = 42;
                 sendImageview.frame = containerFrame;
@@ -151,7 +151,7 @@
         
 
             //尺寸
-            UILabel *sizeLabel = [[UILabel alloc] initWithFrame:CGRectMake(sendImageview.frame.origin.x, sendImageview.frame.size.height+sendImageview.frame.origin.y, sendImageview.frame.size.width, 15)];
+            UILabel *sizeLabel = [[UILabel alloc] initWithFrame:CGRectMake(sendImageview.x, sendImageview.height+sendImageview.y, sendImageview.width, 15)];
             
             sizeLabel.textColor = [UIColor lightGrayColor];
             sizeLabel.font = [UIFont fontWithName:textDefaultFont size:10];
@@ -211,7 +211,7 @@
             bubbleImageView.frame = CGRectMake(58, 15.0f, addone*recoTime+minWidth, oneLineHeight+17);
             [self addSubview:bubbleImageView];
             
-            _bolang = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.frame.origin.x+13, bubbleImageView.frame.origin.y+(bubbleImageView.frame.size.height-17)/2, 17, 17)];
+            _bolang = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.x+13, bubbleImageView.y+(bubbleImageView.height-17)/2, 17, 17)];
             [_bolang setImage:[UIImage imageNamed:@"white_bolang3.png"]];
             [self addSubview:_bolang];
           
@@ -235,7 +235,7 @@
             };
             
             
-            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.frame.origin.x+bubbleImageView.frame.size.width+6, bubbleImageView.frame.origin.y, 30, voiceControl.frame.size.height)];
+            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x+bubbleImageView.width+6, bubbleImageView.y, 30, voiceControl.height)];
             timeLabel.textColor = [UIColor lightGrayColor];
             timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13];
             timeLabel.textAlignment = NSTextAlignmentLeft;
@@ -249,7 +249,7 @@
                 addX = 40;
             }
             _voiceActivityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-            _voiceActivityIndicator.center = CGPointMake(bubbleImageView.frame.origin.x+bubbleImageView.frame.size.width+addX, bubbleImageView.frame.origin.y+(bubbleImageView.frame.size.height/2));
+            _voiceActivityIndicator.center = CGPointMake(bubbleImageView.x+bubbleImageView.width+addX, bubbleImageView.y+(bubbleImageView.height/2));
             [_voiceActivityIndicator startAnimating];
             _voiceActivityIndicator.alpha=0;
              [self addSubview:_voiceActivityIndicator];
@@ -266,10 +266,10 @@
                 if(recoTime>9){
                     addX = 28;
                 }
-                _unreadRedView = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.frame.origin.x+bubbleImageView.frame.size.width+addX, bubbleImageView.frame.origin.y
-                                                                                     +(bubbleImageView.frame.size.height-5)/2, 5, 5)];
+                _unreadRedView = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.x+bubbleImageView.width+addX, bubbleImageView.y
+                                                                                     +(bubbleImageView.height-5)/2, 5, 5)];
                 [_unreadRedView setBackgroundColor:MAINRED];
-                [_unreadRedView.layer setCornerRadius:(_unreadRedView.frame.size.height/2)];
+                [_unreadRedView.layer setCornerRadius:(_unreadRedView.height/2)];
                 
                 [self addSubview:_unreadRedView];
               
@@ -295,17 +295,17 @@
             
             
             
-            UIImageView *annoImageview = [[UIImageView alloc]initWithFrame:CGRectMake((snapImageview.frame.size.width-25)/2, (snapImageview.frame.size.height-25)/2-25/2, 25, 25)];
+            UIImageView *annoImageview = [[UIImageView alloc]initWithFrame:CGRectMake((snapImageview.width-25)/2, (snapImageview.height-25)/2-25/2, 25, 25)];
             [annoImageview setImage:[UIImage imageNamed:@"begin_anno.png"]];
             [snapImageview addSubview:annoImageview];
             annoImageview = nil;
             
             
-            UIView *addressView  = [[UIView alloc] initWithFrame:CGRectMake(0, snapImageview.frame.size.height-20, snapImageview.frame.size.width, 20)];
+            UIView *addressView  = [[UIView alloc] initWithFrame:CGRectMake(0, snapImageview.height-20, snapImageview.width, 20)];
             addressView.alpha = 0.8;
-            addressView.backgroundColor = [UIColor darkGrayColor];
+            addressView.backgroundColor = [UIColor blackColor];
             
-            UILabel *addressText = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, addressView.frame.size.width-30, addressView.frame.size.height)];
+            UILabel *addressText = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, addressView.width-30, addressView.height)];
             
             addressText.font = [UIFont fontWithName:textDefaultFont size:11];
             addressText.numberOfLines = 1;
@@ -359,7 +359,7 @@
             [self addSubview:broadCastView];
             
             UIImage *quequeImage = [UIImage imageNamed:@"receive_txt.png"];
-            UIImageView *quequeImageview =  [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, broadCastView.frame.size.width, broadCastView.frame.size.height)];
+            UIImageView *quequeImageview =  [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, broadCastView.width, broadCastView.height)];
             quequeImageview.userInteractionEnabled = YES;
             quequeImage = [quequeImage stretchableImageWithLeftCapWidth:floorf(quequeImage.size.width)/2 topCapHeight:floorf(quequeImage.size.height)*0.7];
             
@@ -368,10 +368,10 @@
             quequeImage = nil;
             
             
-            UIImageView *brokenLine = [[UIImageView alloc]initWithFrame:CGRectMake(broadCastView.frame.size.width-42-broadCastView.frame.size.height/2, broadCastView.frame.size.height/2, broadCastView.frame.size.height-1, 1)];
+            UIImageView *brokenLine = [[UIImageView alloc]initWithFrame:CGRectMake(broadCastView.width-42-broadCastView.height/2, broadCastView.height/2, broadCastView.height-1, 1)];
             
             UIGraphicsBeginImageContext(brokenLine.frame.size);   //开始画线
-            [brokenLine.image drawInRect:CGRectMake(0, 0, brokenLine.frame.size.width, brokenLine.frame.size.height)];
+            [brokenLine.image drawInRect:CGRectMake(0, 0, brokenLine.width, brokenLine.height)];
             CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);  //设置线条终点形状
             
             CGFloat lengths[] = {4,2}; //虚实线长度
@@ -391,7 +391,7 @@
             brokenLine = nil;
             
             
-            UILabel *contentLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, broadCastView.frame.size.width-60,  broadCastView.frame.size.height-20)];
+            UILabel *contentLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, broadCastView.width-60,  broadCastView.height-20)];
             contentLabel.backgroundColor = [UIColor clearColor];
             contentLabel.font = [UIFont fontWithName:textDefaultFont size:13];
             contentLabel.textColor = [UIColor whiteColor];
@@ -402,7 +402,7 @@
             contentLabel = nil;
             
             
-            UILabel *checkLabel = [[UILabel alloc] initWithFrame:CGRectMake(broadCastView.frame.size.width-42, 0, 42, quequeImageview.frame.size.height)];
+            UILabel *checkLabel = [[UILabel alloc] initWithFrame:CGRectMake(broadCastView.width-42, 0, 42, quequeImageview.height)];
             checkLabel.backgroundColor = [UIColor clearColor];
             checkLabel.font = [UIFont fontWithName:textDefaultBoldFont size:11];
             checkLabel.textColor = [UIColor whiteColor];
@@ -448,7 +448,7 @@
          //我的头像
         UIImageView *headImageView = [[UIImageView alloc] initWithFrame:CGRectMake(SCREENWIDTH-52, 13, 42, 42)];
         [headImageView sd_setImageWithURL:[NSURL URLWithString:_myAvatarUrl] placeholderImage:[UIImage imageNamed:@"default_head_boy.png"]];
-        [headImageView.layer setCornerRadius:(headImageView.frame.size.height/2)];
+        [headImageView.layer setCornerRadius:(headImageView.height/2)];
         [headImageView.layer setMasksToBounds:YES];//圆角不被盖住
         [headImageView setContentMode:UIViewContentModeScaleAspectFill];
         [headImageView setClipsToBounds:YES];//减掉超出部分
@@ -491,12 +491,12 @@
             if(msg.sendStatus == 3){
                 //文本发送
                 activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                activityIndicator.center = CGPointMake(bubbleView.frame.origin.x-18, bubbleView.frame.origin.y+(bubbleView.frame.size.height/2));
+                activityIndicator.center = CGPointMake(bubbleView.x-18, bubbleView.y+(bubbleView.height/2));
                 
                 
             }else if(msg.sendStatus == 2){
                 //草稿
-                resendView = [[UIView alloc] initWithFrame:CGRectMake(bubbleView.frame.origin.x-40, bubbleView.frame.origin.y, 40, bubbleView.frame.size.height)];
+                resendView = [[UIView alloc] initWithFrame:CGRectMake(bubbleView.x-40, bubbleView.y, 40, bubbleView.height)];
                 
             }
             
@@ -510,7 +510,7 @@
             [sendImageview setBackgroundColor:[UIColor whiteColor]];
             
         
-            if(sendImageview.frame.size.height < 42){
+            if(sendImageview.height < 42){
                 CGRect containerFrame = sendImageview.frame;
                 containerFrame.size.height = 42;
                 sendImageview.frame = containerFrame;
@@ -537,17 +537,17 @@
                 
                 UIView *coverView = [[UIView alloc] initWithFrame:sendImageview.frame];
                 coverView.alpha = 0.7;
-                [coverView setBackgroundColor:[UIColor darkGrayColor]];
+                [coverView setBackgroundColor:[UIColor blackColor]];
                 coverView.layer.cornerRadius = 5;
                 [self addSubview:coverView];
                 
                 UIActivityIndicatorView *picActivityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-                picActivityIndicator.center = CGPointMake(coverView.frame.size.width/2-2, coverView.frame.size.height/2-7);
+                picActivityIndicator.center = CGPointMake(coverView.width/2-2, coverView.height/2-7);
                 [picActivityIndicator startAnimating];
                 [coverView addSubview:picActivityIndicator];
                 picActivityIndicator = nil;
                 
-                progressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, coverView.frame.size.height/2+5, coverView.frame.size.width-2, 20)];
+                progressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, coverView.height/2+5, coverView.width-2, 20)];
                 progressLabel.backgroundColor = [UIColor clearColor];
                 progressLabel.font = [UIFont fontWithName:textDefaultFont size:14];
                 progressLabel.numberOfLines = 0;
@@ -561,7 +561,7 @@
                 
             }else if(msg.sendStatus==2){//发送失败
                 
-                resendView = [[UIView alloc] initWithFrame:CGRectMake(sendImageview.frame.origin.x-50, sendImageview.frame.origin.y+(sendImageview.frame.size.height-50)/2, 50, 50)];
+                resendView = [[UIView alloc] initWithFrame:CGRectMake(sendImageview.x-50, sendImageview.y+(sendImageview.height-50)/2, 50, 50)];
      
             }
 
@@ -614,7 +614,7 @@
             [self addSubview:bubbleImageView];
             bubble = nil;
             
-            _bolang = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.frame.size.width+bubbleImageView.frame.origin.x-30, bubbleImageView.frame.origin.y+(bubbleImageView.frame.size.height-17)/2, 17, 17)];
+            _bolang = [[UIImageView alloc] initWithFrame:CGRectMake(bubbleImageView.width+bubbleImageView.x-30, bubbleImageView.y+(bubbleImageView.height-17)/2, 17, 17)];
             [_bolang setImage:[UIImage imageNamed:@"gray_bolang3.png"]];
             [self addSubview:_bolang];
          
@@ -640,7 +640,7 @@
             
             
             //时长
-            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.frame.origin.x-34, 30, 30, 10)];
+            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x-34, 30, 30, 10)];
             timeLabel.textColor = [UIColor lightGrayColor];
             timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13];
             timeLabel.textAlignment = NSTextAlignmentRight;
@@ -655,13 +655,13 @@
                 if(msg.filesize>9){
                     cutNumber = 33;
                 }
-                activityIndicator.center = CGPointMake(bubbleImageView.frame.origin.x-cutNumber-6, bubbleImageView.frame.size.height/2+bubbleImageView.frame.origin.y);
+                activityIndicator.center = CGPointMake(bubbleImageView.x-cutNumber-6, bubbleImageView.height/2+bubbleImageView.y);
              
                 
             }else if(msg.sendStatus ==2){
                 
                 
-                resendView = [[UIView alloc] initWithFrame:CGRectMake(bubbleImageView.frame.origin.x-40-20, bubbleImageView.frame.origin.y, 40, bubbleImageView.frame.size.height)];
+                resendView = [[UIView alloc] initWithFrame:CGRectMake(bubbleImageView.x-40-20, bubbleImageView.y, 40, bubbleImageView.height)];
        
             }
             
@@ -686,7 +686,7 @@
             if(sendImage == nil){
                 sendImage = [UIImage imageNamed:@"defaultmap.png"];
             }else{
-                UIImageView *annoImageview = [[UIImageView alloc]initWithFrame:CGRectMake((sendImageview.frame.size.width-25)/2, (sendImageview.frame.size.height-25)/2-25/2, 25, 25)];
+                UIImageView *annoImageview = [[UIImageView alloc]initWithFrame:CGRectMake((sendImageview.width-25)/2, (sendImageview.height-25)/2-25/2, 25, 25)];
                 [annoImageview setImage:[UIImage imageNamed:@"begin_anno.png"]];
                 [sendImageview addSubview:annoImageview];
                 annoImageview = nil;
@@ -695,11 +695,11 @@
             [sendImageview setImage:sendImage];
             
             
-            UIView *addressView  = [[UIView alloc] initWithFrame:CGRectMake(0, sendImageview.frame.size.height-20, sendImageview.frame.size.width, 20)];
+            UIView *addressView  = [[UIView alloc] initWithFrame:CGRectMake(0, sendImageview.height-20, sendImageview.width, 20)];
             addressView.alpha = 0.8;
-            addressView.backgroundColor = [UIColor darkGrayColor];
+            addressView.backgroundColor = [UIColor blackColor];
             
-            UILabel *addressText = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, addressView.frame.size.width-30, addressView.frame.size.height)];
+            UILabel *addressText = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, addressView.width-30, addressView.height)];
             
           
             addressText.backgroundColor = [UIColor clearColor];
@@ -726,11 +726,11 @@
             if(msg.sendStatus==3){
                 
                 activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                activityIndicator.center = CGPointMake(sendImageview.frame.origin.x-21, sendImageview.frame.size.height/2+8);
+                activityIndicator.center = CGPointMake(sendImageview.x-21, sendImageview.height/2+8);
     
             }else if(msg.sendStatus==2){
                 
-                resendView = [[UIView alloc] initWithFrame:CGRectMake(sendImageview.frame.origin.x-50, sendImageview.frame.origin.y+(sendImageview.frame.size.height-50)/2, 50, 50)];
+                resendView = [[UIView alloc] initWithFrame:CGRectMake(sendImageview.x-50, sendImageview.y+(sendImageview.height-50)/2, 50, 50)];
      
             }
             
@@ -771,11 +771,11 @@
         //重发
         if(msg.sendStatus==2){
             [self addSubview:resendView];
-            UIImageView *resendImageView = [[UIImageView alloc] initWithFrame:CGRectMake(resendView.frame.size.width-25-5, (resendView.frame.size.height-25)/2, 25, 25)];
+            UIImageView *resendImageView = [[UIImageView alloc] initWithFrame:CGRectMake(resendView.width-25-5, (resendView.height-25)/2, 25, 25)];
             [resendImageView setImage:[UIImage imageNamed:@"resend.png"]];
             [resendView addSubview:resendImageView];
             
-            MyBtnControl *resendControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, resendView.frame.size.width, resendView.frame.size.height)];
+            MyBtnControl *resendControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, resendView.width, resendView.height)];
             resendControl.tag = index;
             resendControl.shareImage =resendImageView;
             [resendView addSubview:resendControl];
@@ -928,7 +928,7 @@
     bubbleText.textAlignment = NSTextAlignmentLeft;
     bubbleText.font = [UIFont fontWithName:textDefaultFont size:13];
     bubbleText.numberOfLines = 0;
-    [bubbleText setTextColor:(fromSelf?[UIColor darkGrayColor]:[UIColor whiteColor])];
+    [bubbleText setTextColor:(fromSelf?TEXTGRAY:[UIColor whiteColor])];
     bubbleText.text = msg.content;
     bubbleText.lineBreakMode = NSLineBreakByWordWrapping;
     
@@ -969,9 +969,9 @@
 
 //打开个人页
 -(void)openPerson:(NSInteger)uid{
-//    PersonPageViewController *pView = [[PersonPageViewController alloc]initWithUid:[NSString stringWithFormat:@"%d",(int)uid]];
-//    [[MainViewController sharedMain].navigationController pushViewController:pView animated:YES];
-//    pView = nil;
+    PersonPageViewController *pView = [[PersonPageViewController alloc]initWithUid:[NSString stringWithFormat:@"%d",(int)uid]];
+    [[MainViewController sharedMain].navigationController pushViewController:pView animated:YES];
+    pView = nil;
 }
 
 

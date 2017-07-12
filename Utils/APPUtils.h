@@ -146,6 +146,10 @@ static NSUserDefaults *user_Defaults;
 +(void)alertShow:(NSString*)string;
 +(void)alertShow:(NSString*)title string:(NSString*)string;
 
++(void)alertShow:(NSString*)string controller:(UIViewController*)controller;
++(void)alertShow:(NSString*)title string:(NSString*)string controller:(UIViewController*)controller;
+
+
 //支持web浏览的文件
 +(BOOL)support_file_check_online:(NSString*)fileType;
 
@@ -217,7 +221,7 @@ static NSUserDefaults *user_Defaults;
 +(BOOL)getReadContactsBookPermission;
 
 //钱的单位
-+(NSString*)getMoneyUnit:(NSInteger)num;
++(NSString*)getMoneyUnit:(NSInteger)num unit:(NSString*)unit;
 
 //钱单位
 +(NSString*)getMoneyUnit_onlyYuan:(NSInteger)num;
@@ -236,4 +240,22 @@ static NSUserDefaults *user_Defaults;
 
 //清理NSUserDefaults
 +(void)userDefaultsDelete:(NSString*)key;
+
+
+//判断两个颜色是否相等
++ (BOOL) isTheSameColor2:(UIColor*)color1 anotherColor:(UIColor*)color2;
+
+//添加阴影
++(void)addShadow:(UIView*)view;
+
+//获取定位按钮
++(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width;
+
+/*将高德地图zoom调整到显示全部anno的值
+ add值越大 zoomlevel就越小
+ */
++(void)zoomToMapPoints:(MAMapView*)mapView annotations:(NSArray*)annotations add:(float)add;
+
+//转圈
++(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view;
 @end

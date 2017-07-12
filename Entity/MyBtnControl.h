@@ -33,7 +33,8 @@
 @property (retain, nonatomic)  NSString* belong2;//隶属页
 
 @property (nonatomic,assign)BOOL back_highlight;//需不需要背景点击闪烁
-@property (nonatomic,assign)BOOL not_highlight;//不需要闪烁
+@property (nonatomic,assign)BOOL not_highlight;//背景不需要闪烁
+@property (nonatomic,assign)BOOL not_ShareHighlight;//所有不需要闪烁
 
 @property (assign, nonatomic)  BOOL no_single_click;//没得单击事件
 @property (assign, nonatomic)  BOOL choosed;//选择中的
@@ -59,9 +60,12 @@ typedef void (^ClickBlock)();
 
 //添加图片
 -(void)addImage:(UIImage*)img frame:(CGRect)frame;
+-(void)addImage2:(UIImage*)img frame:(CGRect)frame;
 -(void)addImage:(UIImage*)img frame:(CGRect)frame url:(NSString*)url;
 -(void)addImage:(UIImage*)img;
 
+
+-(void)btn_action;
 
 -(void)addLongclick;//长按
 typedef void (^LongClickBlock)();

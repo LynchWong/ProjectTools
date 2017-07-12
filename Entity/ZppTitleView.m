@@ -29,7 +29,7 @@
     titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 20, SCREENWIDTH-120, 44)];
     titleLabel.text = title;
     titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.textColor = [UIColor whiteColor];
+    titleLabel.textColor = TITLE_WORD_COLOR;
     titleLabel.font = [UIFont fontWithName:textDefaultBoldFont size:16];
     [self addSubview:titleLabel];
     
@@ -40,8 +40,19 @@
     UIControl *backControl = [[UIControl alloc] initWithFrame:CGRectMake(0, 20, 50, 44)];
     [backControl setBackgroundColor:[UIColor clearColor]];
     
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *appCurName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+    infoDictionary = nil;
+    
+    
     UIImageView *backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, (44-18)/2, 18, 18)];
-    UIImage *back = [UIImage imageNamed:@"goBack_white.png"];
+    UIImage *back;
+    if([appCurName isEqualToString:@"找跑跑"]){
+         back = [UIImage imageNamed:@"beback_gray.png"];
+    }else{
+         back = [UIImage imageNamed:@"goBack_white.png"];
+    }
+   
     [backImageView setImage:back];
     [backImageView setContentMode:UIViewContentModeScaleAspectFill];
     [backControl addTarget:self action:@selector(beback) forControlEvents:UIControlEventTouchUpInside];

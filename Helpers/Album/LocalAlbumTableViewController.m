@@ -44,18 +44,18 @@
     UILabel *nameTitle = [[UILabel alloc] initWithFrame:CGRectMake((SCREENWIDTH-150)/2, 20, 150, 44)];
     nameTitle.textAlignment = NSTextAlignmentCenter;
     nameTitle.textColor = [UIColor whiteColor];
-    nameTitle.font =  [UIFont fontWithName:@"HelveticaNeue-Bold" size:17];
+    nameTitle.font =  [UIFont fontWithName:textDefaultBoldFont  size:17];
     nameTitle.text = @"选择相册";
     [titleView addSubview:nameTitle];
     
     
-    bodyView = [[UIView alloc] initWithFrame:CGRectMake(0, titleView.frame.size.height+titleView.frame.origin.y, SCREENWIDTH, SCREENHEIGHT-titleView.frame.size.height)];
+    bodyView = [[UIView alloc] initWithFrame:CGRectMake(0, titleView.height+titleView.y, SCREENWIDTH, SCREENHEIGHT-titleView.height)];
     
     [bodyView setBackgroundColor:[UIColor getColor:@"EFEEF4"]];
     [self.view addSubview:bodyView];
     
     
-    albumTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, bodyView.frame.size.height)];
+    albumTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, bodyView.height)];
     
     [bodyView addSubview:albumTableView];
     albumTableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero]; //隐藏tableview多余行数的线条

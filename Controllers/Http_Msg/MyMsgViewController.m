@@ -28,7 +28,13 @@
 
 
 - (UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
+    
+    if([APPUtils isTheSameColor2:TITLE_WORD_COLOR anotherColor:[UIColor whiteColor]]){//标题是白色
+        return UIStatusBarStyleLightContent;
+    }else{
+        return UIStatusBarStyleDefault;
+    }
+    
 }
 
 - (void)viewDidLoad {
@@ -81,7 +87,7 @@
     
     
     
-    _smsTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, bodyView.frame.size.height)];
+    _smsTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, bodyView.height)];
     self.edgesForExtendedLayout = UIRectEdgeNone;//tableView 上会多出20个像素 去掉 *
     [_smsTable setBackgroundColor:[UIColor clearColor]];
     [bodyView addSubview:_smsTable];
@@ -106,7 +112,7 @@
     [searchBar setPlaceholder:@"搜索名字"];
     searchBar.alpha=0;
     tableCoverView = [[UIControl alloc] initWithFrame:CGRectMake(0, 41, SCREENWIDTH, SCREENHEIGHT)];
-    [tableCoverView setBackgroundColor:[UIColor darkGrayColor]];
+    [tableCoverView setBackgroundColor:[UIColor blackColor]];
     tableCoverView.alpha = 0.6;
     [tableCoverView addTarget:self action:@selector(clickCover:) forControlEvents:UIControlEventTouchDown];
     [tableCoverView setHidden:YES];
@@ -549,7 +555,7 @@
         UIImageView *asynImgView = [[UIImageView alloc] init];
         asynImgView.frame = CGRectMake(15, 9, 47, 47);
         [asynImgView sd_setImageWithURL:[NSURL URLWithString:conv.avatar] placeholderImage:[UIImage imageNamed:@"defaultHead.png"]];
-        [asynImgView.layer setCornerRadius:(asynImgView.frame.size.height/2)];
+        [asynImgView.layer setCornerRadius:(asynImgView.height/2)];
         [asynImgView.layer setMasksToBounds:YES];//圆角不被盖住
         [asynImgView setContentMode:UIViewContentModeScaleAspectFill];
         [asynImgView setClipsToBounds:YES];//减掉超出部分
@@ -561,7 +567,7 @@
         
         
         if(conv.auth_type==1){
-            UIImageView *auth = [[UIImageView alloc] initWithFrame:CGRectMake(asynImgView.frame.size.width+asynImgView.frame.origin.x-13, asynImgView.frame.origin.y+asynImgView.frame.size.height-14, 18, 18)];
+            UIImageView *auth = [[UIImageView alloc] initWithFrame:CGRectMake(asynImgView.width+asynImgView.x-13, asynImgView.y+asynImgView.height-14, 18, 18)];
             [auth setImage:[UIImage imageNamed:@"auth_paopao.png"]];
             [cellScrollview addSubview:auth];
             auth = nil;
@@ -573,14 +579,14 @@
         if(conv.otheruid == 1){
             nameLabel.textColor = MAINCOLOR;
         }else{
-            nameLabel.textColor = [UIColor darkGrayColor];
+            nameLabel.textColor = TEXTGRAY;
         }
         
         if(conv.otherName.length==0){
             conv.otherName = conv.name;
         }
         
-        nameLabel.font = [UIFont systemFontOfSize:14];
+        nameLabel.font = [UIFont fontWithName:textDefaultFont size:14];
         nameLabel.textAlignment = NSTextAlignmentLeft;
         nameLabel.numberOfLines = 1;
         if(conv.people>2){
@@ -596,7 +602,7 @@
         UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREENWIDTH-71, 11, 50, 23)];
         [timeLabel setBackgroundColor:[UIColor clearColor]];
         timeLabel.textColor = [UIColor lightGrayColor];
-        timeLabel.font = [UIFont systemFontOfSize:12];
+        timeLabel.font = [UIFont fontWithName:textDefaultFont size:12];
         timeLabel.textAlignment = NSTextAlignmentRight;
         timeLabel.numberOfLines = 1;
         timeLabel.text = conv.showTime;
@@ -608,7 +614,7 @@
         UILabel *shortLabel = [[UILabel alloc] initWithFrame:CGRectMake(73, 35, SCREENWIDTH-73-15, 23)];
         [shortLabel setBackgroundColor:[UIColor clearColor]];
         shortLabel.textColor = [UIColor lightGrayColor];
-        shortLabel.font = [UIFont systemFontOfSize:12];
+        shortLabel.font = [UIFont fontWithName:textDefaultFont size:12];
         shortLabel.textAlignment = NSTextAlignmentLeft;
         shortLabel.numberOfLines = 1;
         shortLabel.text = conv.lastmsg;
@@ -619,7 +625,7 @@
         
         UIView *unreadView = [[UIView alloc] initWithFrame:CGRectMake(50, 6, 17, 17)];
         [unreadView setBackgroundColor:MAINRED];
-        [unreadView.layer setCornerRadius:(unreadView.frame.size.height/2)];
+        [unreadView.layer setCornerRadius:(unreadView.height/2)];
         [unreadView.layer setMasksToBounds:YES];//圆角不被盖住
         [unreadView setContentMode:UIViewContentModeScaleAspectFill];
         [unreadView setClipsToBounds:YES];//减掉超出部分
@@ -629,7 +635,7 @@
         UILabel *unreadLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 17, 17)];
         [unreadLabel setBackgroundColor:[UIColor clearColor]];
         unreadLabel.textColor = [UIColor whiteColor];
-        unreadLabel.font = [UIFont systemFontOfSize:9];
+        unreadLabel.font = [UIFont fontWithName:textDefaultFont size:9];
         unreadLabel.textAlignment = NSTextAlignmentCenter;
         
         [unreadView addSubview:unreadLabel];
@@ -654,8 +660,8 @@
                 [unreadLabel setText:@"99+"];
             }
             
-            [unreadView.layer setCornerRadius:(unreadView.frame.size.height/2)];
-            [unreadLabel setFrame:CGRectMake(0, 0, unreadView.frame.size.width, unreadView.frame.size.height)];
+            [unreadView.layer setCornerRadius:(unreadView.height/2)];
+            [unreadLabel setFrame:CGRectMake(0, 0, unreadView.width, unreadView.height)];
             
         }else{
             [unreadView setHidden:YES];
@@ -856,7 +862,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if(isEmpty){
-        return bodyView.frame.size.height;
+        return bodyView.height;
     }else{
         return 65.0;
     }
@@ -875,7 +881,7 @@
         
         [self setIsRead:conv.group_id includeVoice:NO];
         
-        SendMsgViewController *secondView = [[SendMsgViewController alloc] initWithConversation:conv show:YES send2User:@"buyer"];
+        SendMsgViewController *secondView = [[SendMsgViewController alloc] initWithConversation:conv show:YES];
         
         [self.navigationController pushViewController:secondView animated:YES];
         secondView = nil;

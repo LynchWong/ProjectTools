@@ -84,7 +84,7 @@ static NSTimeInterval const duration = 0.3;
     
     //渐变显示
     self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0];
-    if(self.imageView.frame.size.width==0 && self.imageView.frame.size.height==0 && existBigPic){
+    if(self.imageView.width==0 && self.imageView.height==0 && existBigPic){
         CGSize size = [CLPhoto displaySize:self.imageView.image];
         self.imageView.frame = CGRectMake((SCREENWIDTH-size.width)/2, SCREENHEIGHT, size.width, size.height);
     }else{
@@ -170,13 +170,13 @@ static NSTimeInterval const duration = 0.3;
 - (void)didSelectedPhotoBrowserCell:(PhotoBrowserCell *)cell{
 
     
-    if (cell.imageView.frame.size.height > [UIScreen mainScreen].bounds.size.height || cell.imageView.frame.size.width > [UIScreen mainScreen].bounds.size.width) {
+    if (cell.imageView.height > [UIScreen mainScreen].bounds.size.height || cell.imageView.width > [UIScreen mainScreen].bounds.size.width) {
         self.imageView = [[UIImageView alloc] init];
         // 开启图形上下文
         UIGraphicsBeginImageContextWithOptions([UIScreen mainScreen].bounds.size, YES, 0.0);
         
         // 将下载完的image对象绘制到图形上下文
-        CGFloat width = cell.imageView.frame.size.width;
+        CGFloat width = cell.imageView.width;
         CGFloat height = width *  cell.imageView.image.size.height /  cell.imageView.image.size.width;
         [cell.imageView.image drawInRect:CGRectMake(0, 0,  cell.imageView.image.size.width, height)];
         

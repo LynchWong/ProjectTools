@@ -78,7 +78,7 @@
         hpTextView.enablesReturnKeyAutomatically = YES;
         
         
-        placeHolderLabel = [[UILabel alloc] initWithFrame:CGRectMake(hpTextView.frame.origin.x+7,0, SCREENWIDTH, sendViewHeight)];
+        placeHolderLabel = [[UILabel alloc] initWithFrame:CGRectMake(hpTextView.x+7,0, SCREENWIDTH, sendViewHeight)];
         placeHolderLabel.textAlignment = NSTextAlignmentLeft;
         placeHolderLabel.numberOfLines = 1;
         placeHolderLabel.textColor = [UIColor lightGrayColor];
@@ -151,7 +151,7 @@
         
         [changeView addSubview:sBtn];
      
-        [changeView addSubview:[APPUtils get_line:0 y:changeView.frame.size.height-0.5 width:SCREENWIDTH]];
+        [changeView addSubview:[APPUtils get_line:0 y:changeView.height-0.5 width:SCREENWIDTH]];
         
         //图片类型
         if(_addImages){
@@ -301,7 +301,7 @@
 {
     
     if(replyType){
-        diff = (growingTextView.frame.size.height - height);
+        diff = (growingTextView.height - height);
         CGRect r = sendView.frame;
         r.size.height -= diff;
         r.origin.y += diff;
@@ -458,7 +458,7 @@
         
         NSMutableDictionary *imgDic = [imagesDatalist objectAtIndex:i];
         
-        UIView *imgView = [[UIView alloc] initWithFrame:CGRectMake(10+xx*picViewWidth, changeView.frame.size.height-picViewWidth, picViewWidth, picViewWidth)];
+        UIView *imgView = [[UIView alloc] initWithFrame:CGRectMake(10+xx*picViewWidth, changeView.height-picViewWidth, picViewWidth, picViewWidth)];
         [changeView addSubview:imgView];
         
         //显示图片
@@ -524,7 +524,7 @@
                 } @catch (NSException *exception) {}
             };
             
-            [dControl addImage:[UIImage imageNamed:@"delete_user_red.png"] frame:CGRectMake(dControl.frame.size.width-17, 0, 17, 17)];
+            [dControl addImage:[UIImage imageNamed:@"delete_user_red.png"] frame:CGRectMake(dControl.width-17, 0, 17, 17)];
         
             dControl = nil;
         }

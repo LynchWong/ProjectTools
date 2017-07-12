@@ -34,7 +34,7 @@
     _titleLabel.text = self.textString;
     if(_isCancel){
         [_titleLabel setTextColor:MAINRED];
-        _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:15];
+        _titleLabel.font = [UIFont fontWithName:textDefaultBoldFont  size:15];
     }
 }
 

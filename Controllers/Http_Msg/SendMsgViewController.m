@@ -40,19 +40,24 @@ static NSString *CellIdentifier = @"SmsCell";
 
 @synthesize conversation;
 
--(id)initWithConversation:(Conversation*)conv show:(BOOL)show send2User:(NSString*)send2User{
+-(id)initWithConversation:(Conversation*)conv show:(BOOL)show{
     self = [super init];
     if (self) {
         conversation = conv;
         showSendView = show;
-        sendWho = send2User;
 
     }
     return self;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
+    
+    if([APPUtils isTheSameColor2:TITLE_WORD_COLOR anotherColor:[UIColor whiteColor]]){//标题是白色
+        return UIStatusBarStyleLightContent;
+    }else{
+        return UIStatusBarStyleDefault;
+    }
+    
 }
 
 - (void)viewDidLoad {
@@ -78,7 +83,6 @@ static NSString *CellIdentifier = @"SmsCell";
     nickName = [[APPUtils getUserDefaults] stringForKey:@"nickname"];
     realname = [[APPUtils getUserDefaults] stringForKey:@"realname"];
     myAvatarUrl = [[APPUtils getUserDefaults] stringForKey:@"avatar"];
-    [APPUtils userDefaultsSet :sendWho forKey:@"sendWho"];
     [[APPUtils getUserDefaults] synchronize];
     
 }
@@ -217,7 +221,7 @@ static NSString *CellIdentifier = @"SmsCell";
     
     smsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, BODYHEIGHT-sendViewHeight)];
     [smsTableView setBackgroundColor:[UIColor clearColor]];
-    smsTableHeight = smsTableView.frame.size.height;
+    smsTableHeight = smsTableView.height;
     
     [bodyView addSubview:smsTableView];
     smsTableView.separatorStyle = UITableViewCellSeparatorStyleNone; //去掉table分割线
@@ -235,7 +239,7 @@ static NSString *CellIdentifier = @"SmsCell";
     //加载菊花
     tableFootView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 45)];
     UIActivityIndicatorView *loading_juhua = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    loading_juhua.center = CGPointMake(SCREENWIDTH/2, tableFootView.frame.size.height/2);
+    loading_juhua.center = CGPointMake(SCREENWIDTH/2, tableFootView.height/2);
     [loading_juhua startAnimating];
     [tableFootView addSubview:loading_juhua];
     loading_juhua = nil;
@@ -261,29 +265,29 @@ static NSString *CellIdentifier = @"SmsCell";
     changeVoiceBtn.clickBackBlock = ^(){
         [weakSelf change_voice_text];
     };
-    [changeVoiceBtn addImage:[UIImage imageNamed:@"voice_btn_normal.png"] frame:CGRectMake((changeVoiceBtn.frame.size.width-imgWidth)/2, (changeVoiceBtn.frame.size.height-imgWidth)/2, imgWidth, imgWidth)];
+    [changeVoiceBtn addImage:[UIImage imageNamed:@"voice_btn_normal.png"] frame:CGRectMake((changeVoiceBtn.width-imgWidth)/2, (changeVoiceBtn.height-imgWidth)/2, imgWidth, imgWidth)];
     
     
     //打开菜单
-    openMenuBtn = [[MyBtnControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-changeVoiceBtn.frame.size.width, 0, changeVoiceBtn.frame.size.width, sendViewHeight)];
+    openMenuBtn = [[MyBtnControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-changeVoiceBtn.width, 0, changeVoiceBtn.width, sendViewHeight)];
     [sendView addSubview:openMenuBtn];
     openMenuBtn.clickBackBlock = ^(){
         [weakSelf bottomMenuControl];
     };
     
-    [openMenuBtn addImage:[UIImage imageNamed:@"type_select_btn_nor.png"] frame:CGRectMake((openMenuBtn.frame.size.width-imgWidth)/2,(openMenuBtn.frame.size.width-imgWidth)/2, imgWidth, imgWidth)];
+    [openMenuBtn addImage:[UIImage imageNamed:@"type_select_btn_nor.png"] frame:CGRectMake((openMenuBtn.width-imgWidth)/2,(openMenuBtn.width-imgWidth)/2, imgWidth, imgWidth)];
     
     
     
     //语音录制
-    sendVoiceBtn = [[UIControl alloc] initWithFrame:CGRectMake(changeVoiceBtn.frame.size.width, (sendViewHeight-sendViewHeight*0.8)/2, SCREENWIDTH-changeVoiceBtn.frame.size.width*2, sendViewHeight*0.8)];
+    sendVoiceBtn = [[UIControl alloc] initWithFrame:CGRectMake(changeVoiceBtn.width, (sendViewHeight-sendViewHeight*0.8)/2, SCREENWIDTH-changeVoiceBtn.width*2, sendViewHeight*0.8)];
     sendVoiceBtn.layer.cornerRadius = 4;
     sendVoiceBtn.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     sendVoiceBtn.layer.borderWidth = 0.5f;
     sendVoiceBtn.backgroundColor = [UIColor getColor:@"F3F3F6"];
     
-    voiceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, sendVoiceBtn.frame.size.width, sendVoiceBtn.frame.size.height)];
-    voiceLabel.textColor = [UIColor darkGrayColor];
+    voiceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, sendVoiceBtn.width, sendVoiceBtn.height)];
+    voiceLabel.textColor = TEXTGRAY;
     voiceLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
     voiceLabel.textAlignment = NSTextAlignmentCenter;
     voiceLabel.text = @"按住 说话";
@@ -297,7 +301,7 @@ static NSString *CellIdentifier = @"SmsCell";
     
     
     //文本输入
-    textView = [[HPGrowingTextView alloc] initWithFrame:CGRectMake(changeVoiceBtn.frame.size.width, (sendViewHeight-sendViewHeight*0.8)/2+1, SCREENWIDTH-changeVoiceBtn.frame.size.width*2, sendViewHeight*0.8)];
+    textView = [[HPGrowingTextView alloc] initWithFrame:CGRectMake(changeVoiceBtn.width, (sendViewHeight-sendViewHeight*0.8)/2+1, SCREENWIDTH-changeVoiceBtn.width*2, sendViewHeight*0.8)];
     textView.delegate = self;
     [sendView addSubview:textView];
     
@@ -363,18 +367,18 @@ static NSString *CellIdentifier = @"SmsCell";
     UIView *menu_View = [[UIView alloc] initWithFrame:CGRectMake((tag-1)*btnWidth+marginWidth*tag, 0, btnWidth, menuViewHeight)];
     
     
-    CGFloat imageWidth = menu_View.frame.size.width*0.7;
+    CGFloat imageWidth = menu_View.width*0.7;
 
 
-    UILabel *menuLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, menu_View.frame.size.height-20, menu_View.frame.size.width, 20)];
-    menuLabel.textColor = [UIColor darkGrayColor];
+    UILabel *menuLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, menu_View.height-20, menu_View.width, 20)];
+    menuLabel.textColor = TEXTGRAY;
     menuLabel.font = [UIFont fontWithName:textDefaultFont size:12];
     menuLabel.textAlignment = NSTextAlignmentCenter;
     menuLabel.text = name;
     [menu_View addSubview:menuLabel];
     
     
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake((menu_View.frame.size.width-imageWidth)/2, menuViewHeight*0.1+btnWidth/2-imageWidth/2, imageWidth, imageWidth)];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake((menu_View.width-imageWidth)/2, menuViewHeight*0.1+btnWidth/2-imageWidth/2, imageWidth, imageWidth)];
     [imageView setImage:[UIImage imageNamed:icon]];
     [menu_View addSubview:imageView];
     
@@ -587,7 +591,7 @@ static NSString *CellIdentifier = @"SmsCell";
             fromCount = currentPage*onceLoad+now_in_page_add_msgs;
             realMsgCount += loadCount;
             smsTableView.tableFooterView = nil;
-            [smsTableView setContentOffset:CGPointMake(0, smsTableView.contentOffset.y+tableFootView.frame.size.height)];//最后一页会弹一下的处理
+            [smsTableView setContentOffset:CGPointMake(0, smsTableView.contentOffset.y+tableFootView.height)];//最后一页会弹一下的处理
           
         }
         
@@ -783,9 +787,7 @@ static NSString *CellIdentifier = @"SmsCell";
             oneMSg.content_height = size.height;
             
         }
-        
-        
-        oneMSg.sendWho = sendWho;
+    
         oneMSg.group_id =conversation.group_id;
         
     
@@ -879,11 +881,12 @@ static NSString *CellIdentifier = @"SmsCell";
     }
     
     if(smsTableView.alpha == 0){
-        [UIView animateWithDuration:0.1f delay:0.2
-                            options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                smsTableView.alpha =1;
-                            }
-                         completion:NULL];
+        
+        [UIView animateWithDuration:0.1f animations:^{
+            smsTableView.alpha =1;
+        }];
+        
+       
     }
 }
 
@@ -891,7 +894,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //不满一页高的处理
 -(void)checkFullOfTable:(float)addHeight{
     
-    float nowTableContentHeight = smsTableView.contentSize.height-(smsTableView.tableHeaderView==nil?0:smsTableView.tableHeaderView.frame.size.height) + addHeight;
+    float nowTableContentHeight = smsTableView.contentSize.height-(smsTableView.tableHeaderView==nil?0:smsTableView.tableHeaderView.height) + addHeight;
     
     if(nowTableContentHeight < smsTableHeight){
         
@@ -907,7 +910,7 @@ static NSString *CellIdentifier = @"SmsCell";
                 [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, nowKeyboardHeight)];
             }else{
                 //内容不满一页 但是没有被输入法遮盖
-                [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, nowKeyboardHeight+(smsTableView.frame.size.height-nowKeyboardHeight-nowTableContentHeight))];
+                [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, nowKeyboardHeight+(smsTableView.height-nowKeyboardHeight-nowTableContentHeight))];
             }
 
         }else{
@@ -920,11 +923,11 @@ static NSString *CellIdentifier = @"SmsCell";
     }else{
         if(smsTableView.tableHeaderView!=nil){
             //如果菜单展开中切换 需要更新table y
-            if(menuState && smsTableView.frame.origin.y!=-menuViewHeight){
+            if(menuState && smsTableView.y!=-menuViewHeight){
                 
                 [smsTableView setFrame:CGRectMake(0, -menuViewHeight, SCREENWIDTH, smsTableHeight)];
                 
-            }else if(keyboardOpened && smsTableView.frame.origin.y!=-nowKeyboardHeight){
+            }else if(keyboardOpened && smsTableView.y!=-nowKeyboardHeight){
                 //键盘打开中
                 [smsTableView setFrame:CGRectMake(0, -nowKeyboardHeight, SCREENWIDTH, smsTableHeight)];
                  smsTableView.tableHeaderView = nil;
@@ -1160,7 +1163,7 @@ static NSString *CellIdentifier = @"SmsCell";
                 
                 //设置菜单栏位置
                 CGRect containerFrame = control.frame;
-                containerFrame.origin.y = control.frame.origin.y+4;
+                containerFrame.origin.y = control.y+4;
                 [menuController setTargetRect:containerFrame inView:control.superview];
                 
                 
@@ -1184,7 +1187,15 @@ static NSString *CellIdentifier = @"SmsCell";
                 [self.navigationController pushViewController:secondView animated:YES];
                 secondView = nil;
                 
+            }else if([type isEqualToString:@"open_broadcast"]){//看订单 跑跑
+            
+                [self leaveEditMode];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"openOneOrder" object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%ld",(long)ready_handle_msg.orderId],@"order_id",self,@"controller",nil]];
+
             }
+            
+            
             
             
         } @catch (NSException *exception) {
@@ -1216,7 +1227,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //tableview滑动中
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
 
-    if((scrollView.contentOffset.y + smsTableHeight) >= scrollView.contentSize.height-tableFootView.frame.size.height && user_scrolled){
+    if((scrollView.contentOffset.y + smsTableHeight) >= scrollView.contentSize.height-tableFootView.height && user_scrolled){
         if(totalCount > realMsgCount && !loadingOldMsg){
             loadingOldMsg = YES;
             [self performSelector:@selector(prepare2LoadOldMsg) withObject:nil afterDelay:1.0f];
@@ -1264,7 +1275,7 @@ static NSString *CellIdentifier = @"SmsCell";
     
     //不满一页而且会被输入法遮住
    
-    if(smsTableView.tableHeaderView !=nil && (smsTableView.contentSize.height-fillHeaderView.frame.size.height) > (BODYHEIGHT-keyboardBounds.size.height-containerMenuFrame.size.height)){
+    if(smsTableView.tableHeaderView !=nil && (smsTableView.contentSize.height-fillHeaderView.height) > (BODYHEIGHT-keyboardBounds.size.height-containerMenuFrame.size.height)){
         
        [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, keyboardBounds.size.height)];
         
@@ -1306,7 +1317,7 @@ static NSString *CellIdentifier = @"SmsCell";
   
         if(smsTableView.tableHeaderView !=nil){
           
-            [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, smsTableHeight-(smsTableView.contentSize.height-fillHeaderView.frame.size.height))];
+            [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, smsTableHeight-(smsTableView.contentSize.height-fillHeaderView.height))];
             [self changeHeaderView:YES];
         }
     
@@ -1329,7 +1340,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //textview变高后  sendview跟着变
 - (void)growingTextView:(HPGrowingTextView *)growingTextView willChangeHeight:(float)height{
     
-    diff = (growingTextView.frame.size.height - height);
+    diff = (growingTextView.height - height);
 
     CGRect r = sendView.frame;
     r.size.height -= diff;
@@ -1338,7 +1349,7 @@ static NSString *CellIdentifier = @"SmsCell";
 
 //    sendViewHeight = r.size.height;
     
-    if(smsTableView.tableHeaderView !=nil&&(smsTableView.contentSize.height-fillHeaderView.frame.size.height) > r.origin.y){
+    if(smsTableView.tableHeaderView !=nil&&(smsTableView.contentSize.height-fillHeaderView.height) > r.origin.y){
         
         [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, BODYHEIGHT-r.origin.y-sendViewHeight)];
         [self changeHeaderView:YES];
@@ -1423,22 +1434,16 @@ static NSString *CellIdentifier = @"SmsCell";
         menuState = NO;
         [openMenuBtn.shareImage setImage:[UIImage imageNamed:@"type_select_btn_nor.png"]];
 
-        
-        [UIView animateWithDuration:0.3f delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                
-                                if(smsTableView.tableHeaderView!=nil){
-                                    [self checkFullOfTable:0];
-                                }else{
-                                    [smsTableView setFrame:CGRectMake(0, 0, SCREENWIDTH, smsTableHeight)];
-                                }
-                                [sendView setFrame:CGRectMake(0, BODYHEIGHT-sendViewHeight, SCREENWIDTH, sendViewHeight)];
-                                [menuView setFrame:CGRectMake(0, BODYHEIGHT, SCREENWIDTH, menuViewHeight)];
-                                
-                                
-                                
-                            }
-                         completion:NULL];
+        [UIView animateWithDuration:0.3f animations:^{
+            if(smsTableView.tableHeaderView!=nil){
+                [self checkFullOfTable:0];
+            }else{
+                [smsTableView setFrame:CGRectMake(0, 0, SCREENWIDTH, smsTableHeight)];
+            }
+            [sendView setFrame:CGRectMake(0, BODYHEIGHT-sendViewHeight, SCREENWIDTH, sendViewHeight)];
+            [menuView setFrame:CGRectMake(0, BODYHEIGHT, SCREENWIDTH, menuViewHeight)];
+        }];
+
         
     }else{
         
@@ -1456,24 +1461,23 @@ static NSString *CellIdentifier = @"SmsCell";
         }
        
         [self jump2LastLine:YES];
-        [UIView animateWithDuration:0.3f delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                if(smsTableView.tableHeaderView!=nil && (smsTableView.contentSize.height-fillHeaderView.frame.size.height)>BODYHEIGHT-menuViewHeight-sendViewHeight){//不满一页高度 table-高度
-                                   
-                                    [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, menuViewHeight+sendViewHeight)];
-
-                                    [self changeHeaderView:YES];
-                                   
-                                }else if(smsTableView.tableHeaderView == nil){
-                                    [smsTableView setFrame:CGRectMake(0, -(menuViewHeight), SCREENWIDTH, smsTableHeight)];
-                                }
-                                
-                                
-                                [sendView setFrame:CGRectMake(0, BODYHEIGHT-sendViewHeight-menuViewHeight, SCREENWIDTH, sendViewHeight)];
-                                [menuView setFrame:CGRectMake(0, BODYHEIGHT-menuViewHeight, SCREENWIDTH, menuViewHeight)];
-                                
-                            }
-                         completion:NULL];
+        
+        [UIView animateWithDuration:0.3f animations:^{
+            if(smsTableView.tableHeaderView!=nil && (smsTableView.contentSize.height-fillHeaderView.height)>BODYHEIGHT-menuViewHeight-sendViewHeight){//不满一页高度 table-高度
+                
+                [fillHeaderView setFrame:CGRectMake(0, 0, SCREENWIDTH, menuViewHeight+sendViewHeight)];
+                
+                [self changeHeaderView:YES];
+                
+            }else if(smsTableView.tableHeaderView == nil){
+                [smsTableView setFrame:CGRectMake(0, -(menuViewHeight), SCREENWIDTH, smsTableHeight)];
+            }
+            
+            
+            [sendView setFrame:CGRectMake(0, BODYHEIGHT-sendViewHeight-menuViewHeight, SCREENWIDTH, sendViewHeight)];
+            [menuView setFrame:CGRectMake(0, BODYHEIGHT-menuViewHeight, SCREENWIDTH, menuViewHeight)];
+        }];
+      
     }
 }
 
@@ -1993,25 +1997,25 @@ static NSString *CellIdentifier = @"SmsCell";
         voiceView.layer.cornerRadius = 4;
         [self.view addSubview:voiceView];
         
-        voiceShowLabel =  [[UILabel alloc] initWithFrame:CGRectMake(0, 0, voiceView.frame.size.width-30, 25)];
+        voiceShowLabel =  [[UILabel alloc] initWithFrame:CGRectMake(0, 0, voiceView.width-30, 25)];
         voiceShowLabel.textColor = [UIColor whiteColor];
         voiceShowLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
         voiceShowLabel.textAlignment = NSTextAlignmentCenter;
       
         
-        voiceShowLabelView = [[UIView alloc] initWithFrame:CGRectMake(15, voiceView.frame.size.height-35, voiceView.frame.size.width-30, 25)];
+        voiceShowLabelView = [[UIView alloc] initWithFrame:CGRectMake(15, voiceView.height-35, voiceView.width-30, 25)];
         [voiceShowLabelView setBackgroundColor:[UIColor clearColor]];
         voiceShowLabelView.layer.cornerRadius = 4;
         [voiceShowLabelView addSubview:voiceShowLabel];
         
         [voiceView addSubview:voiceShowLabelView];
         
-        voiceShowImage = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, voiceView.frame.size.width-40, voiceView.frame.size.height-40)];
+        voiceShowImage = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, voiceView.width-40, voiceView.height-40)];
         
         [voiceView addSubview:voiceShowImage];
         
         
-        voiceTimeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(0, 0, voiceView.frame.size.width, voiceView.frame.size.height-25)];
+        voiceTimeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(0, 0, voiceView.width, voiceView.height-25)];
         voiceTimeLabel.textColor = [UIColor whiteColor];
         voiceTimeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:70];
         voiceTimeLabel.textAlignment = NSTextAlignmentCenter;
@@ -2138,12 +2142,12 @@ static NSString *CellIdentifier = @"SmsCell";
 }
 
 -(void)hideVoiceShow{
-    [UIView animateWithDuration:0.2f delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                            recordUnderView.alpha = 0;
-                            voiceView.alpha=0;
-                        }
-                     completion:NULL];
+    [UIView animateWithDuration:0.2f animations:^{
+        recordUnderView.alpha = 0;
+        voiceView.alpha=0;
+    }];
+    
+  
 
     
 }
@@ -2224,7 +2228,6 @@ static NSString *CellIdentifier = @"SmsCell";
     OneMsgEntity *thisMsg = [[OneMsgEntity alloc] init];
     thisMsg.sendStatus = 3;
     thisMsg.type = type;
-    thisMsg.sendWho= sendWho;
     thisMsg.msg_uid = [[AFN_util getUserId] integerValue];
     thisMsg.group_id= conversation.group_id;
     thisMsg.user = nickName;

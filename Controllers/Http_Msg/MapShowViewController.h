@@ -31,15 +31,16 @@
     double anno_lon;
     NSString *anno_name;
     
-    UIView *followUnder;
-    UIView *followView;
-    MyBtnControl *followControl;
     
+
     //定位
-    UIControl *llControl;
     LocationUtils * locationUtil;
     MAPointAnnotation *annotationLocation;
 
+    //联系人追踪
+    UIView *followView;
+    
+    
     //跑跑用
     MAPointAnnotation *motorAnnotation;//骑手位置
     MAPointAnnotation *annotationBegin;

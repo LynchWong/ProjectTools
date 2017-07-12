@@ -103,18 +103,18 @@
     [backView.layer setMasksToBounds:YES];
     [bodyView addSubview:backView];
     
-    UIImageView *backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(25, (backView.frame.size.height-18)/2, 18, 18)];
+    UIImageView *backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(25, (backView.height-18)/2, 18, 18)];
     [backImageView setImage:[UIImage imageNamed:@"goBack_white.png"]];
     [backView addSubview:backImageView];
     backImageView = nil;
     
-    UIControl *backControl = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, backView.frame.size.width, backView.frame.size.height)];
+    UIControl *backControl = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, backView.width, backView.height)];
     [backControl addTarget:self action:@selector(beback) forControlEvents:UIControlEventTouchUpInside];
     [backControl addSubview:backImageView];
     [backView addSubview:backControl];
     backControl = nil;
     
-    CGFloat locationYAdd = 0;
+    CGFloat locationYAdd = 60;
     if(desLocation!= nil && desLocation.length>0){
         
         
@@ -136,102 +136,48 @@
         positionLabel = nil;
         bottomView = nil;
         
-        locationYAdd = 35;
+        locationYAdd = 100;
     }
+    
     
     
     //定位按钮
-    UIView *locationUnder = [[UIView alloc] initWithFrame:CGRectMake(12, SCREENHEIGHT-48-locationYAdd, 26, 26)];
-    [locationUnder setBackgroundColor:[UIColor whiteColor]];
-    locationUnder.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
-    locationUnder.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
-    locationUnder.layer.shadowOpacity = 0.5;//阴影透明度，默认0
-    locationUnder.layer.shadowRadius = 3;//阴影半径，默认3
-    [self.view addSubview:locationUnder];
+    UIView *locationView =  [APPUtils getLocationBtn:[UIImage imageNamed:@"location_myself.png"] x:10 y:SCREENHEIGHT-locationYAdd width:0];
+    [bodyView addSubview:locationView];
     
-    
-    llControl = [[UIControl alloc] initWithFrame:CGRectMake(10, SCREENHEIGHT-50-locationYAdd, 30, 30)];
-    [llControl setBackgroundColor:[UIColor whiteColor]];
-    llControl.layer.shouldRasterize = YES;
-    llControl.layer.rasterizationScale = [[UIScreen mainScreen] scale];
-    [llControl.layer setCornerRadius:4];
-    [llControl.layer setMasksToBounds:YES];//圆角不被盖
-    
-    [self.view addSubview:llControl];
-    
-    UIImageView *locationImage = [[UIImageView alloc] initWithFrame:CGRectMake((llControl.frame.size.width-llControl.frame.size.width*0.6)/2-1, (llControl.frame.size.height-llControl.frame.size.height*0.6)/2+1, llControl.frame.size.width*0.6, llControl.frame.size.height*0.6)];
-    [locationImage setImage:[UIImage imageNamed:@"location_myself.png"]];
-    [llControl addSubview:locationImage];
-    
-    
-    
-    MyBtnControl *locationControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, llControl.frame.origin.y, 50, 50)];
-    [self.view addSubview:locationControl];
-    locationControl.shareImage = locationImage;
+    MyBtnControl *locationControl = (MyBtnControl*)[locationView viewWithTag:123];
     locationControl.clickBackBlock = ^(){
         [self location_Myself];
     };
+    locationControl = nil;
     
     
-    
-    //联系人追踪
-    followUnder = [[UIView alloc] initWithFrame:CGRectMake(SCREENWIDTH-26-10, locationUnder.frame.origin.y, locationUnder.frame.size.width, locationUnder.frame.size.height)];
-    [followUnder setBackgroundColor:[UIColor whiteColor]];
-    followUnder.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
-    followUnder.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
-    followUnder.layer.shadowOpacity = 0.5;//阴影透明度，默认0
-    followUnder.layer.shadowRadius = 3;//阴影半径，默认3
-    [self.view addSubview:followUnder];
- 
-    
-    followView = [[UIControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-30-10, llControl.frame.origin.y, llControl.frame.size.width, llControl.frame.size.height)];
-    [followView setBackgroundColor:[UIColor whiteColor]];
-    [followView.layer setCornerRadius:4];
-    followView.layer.shouldRasterize = YES;
-    followView.layer.rasterizationScale = [[UIScreen mainScreen] scale];
-    [followView.layer setMasksToBounds:YES];//圆角不被盖
-    
-    [self.view addSubview:followView];
-   
-    
-    UIImageView *followImage = [[UIImageView alloc] initWithFrame:CGRectMake((followView.frame.size.width-followView.frame.size.width*0.6)/2, (followView.frame.size.height-followView.frame.size.height*0.6)/2+1, followView.frame.size.width*0.6, followView.frame.size.height*0.6)];
- 
-    if(oldLon == 50){
-        [followImage setImage:[UIImage imageNamed:@"begin_anno.png"]];
-    }else{
-        [followImage setImage:[UIImage imageNamed:@"paopao_head.png"]];
-    }
-   
-    
-    [followView addSubview:followImage];
-    
+  
     __weak typeof(self) weakSelf = self;
     
-    followControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-50,followView.frame.origin.y, 50, 50)];
-    followControl.shareImage = followImage;
-    followControl.clickBackBlock = ^(){
-        [weakSelf jump2contactLocation];
-    };
+    //联系人追踪
+    followView =  [APPUtils getLocationBtn:(oldLon == 50)?[UIImage imageNamed:@"begin_anno.png"]:[UIImage imageNamed:@"paopao_head.png"] x:SCREENWIDTH-locationView.width y:locationView.y width:0] ;
+    [bodyView addSubview:followView];
     
-    [self.view addSubview:followControl];
-    followImage = nil;
- 
+    MyBtnControl * followControl = (MyBtnControl*)[followView viewWithTag:123];
+    followControl.clickBackBlock = ^(){
+      [weakSelf jump2contactLocation];
+    };
+    followControl = nil;
+    
     
     [self addAnno];
     
-    locationImage = nil;
-    locationControl = nil;
-    locationUnder = nil;
+   
     
     if(oldLon != 50){
         [self refreshLocation];
     }
     
-    [UIView animateWithDuration:0.2f delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                            _mapView.alpha = 1;
-                        }
-                     completion:NULL];
+    [UIView animateWithDuration:0.2 animations:^{
+        
+        _mapView.alpha = 1;
+    }];
     
 }
 
@@ -296,11 +242,11 @@
             
             [_mapView setCenterCoordinate:CLLocationCoordinate2DMake(paoLat,paoLon) animated:NO];
             
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                    _mapView.alpha  = 1;
-                                }
-                             completion:NULL];
+            [UIView animateWithDuration:0.2 animations:^{
+                
+                _mapView.alpha  = 1;
+            }];
+           
             
             return;
         }
@@ -317,11 +263,11 @@
             [_mapView addAnnotation:annotationEnd];
             
             [_mapView setCenterCoordinate:CLLocationCoordinate2DMake(anno_lat,anno_lon) animated:NO];
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                    _mapView.alpha  = 1;
-                                }
-                             completion:NULL];
+            
+            [UIView animateWithDuration:0.2f animations:^{
+                 _mapView.alpha  = 1;
+            }];
+           
         }
         
     }
@@ -367,14 +313,11 @@
                 [motorRunningTimer invalidate];
                 motorRunningTimer = nil;
             }
-            followUnder.alpha=0;
             followView.alpha=0;
-            followControl.alpha=0;
+       
         }else{
-            followUnder.alpha=1;
             followView.alpha=1;
-            followControl.alpha=1;
-            
+        
             if(oldLon==50){
                 return;
             }
@@ -407,11 +350,9 @@
             
             motorRunningTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(motorRunning) userInfo:nil repeats:YES];
             
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                    _mapView.alpha  = 1;
-                                }
-                             completion:NULL];
+            [UIView animateWithDuration:0.2f animations:^{
+                _mapView.alpha  = 1;
+            }];
         }
         
         
@@ -455,19 +396,21 @@
 //-------------------点击定位--------------------------
 -(void)location_Myself{
     
-    [ShowWaiting showWaiting:@"定位中，请稍后"];
+  
     
     __weak typeof(self) weakSelf = self;
     
     if(locationUtil==nil){
         locationUtil = [[LocationUtils alloc] initLocation];
         locationUtil.callBackBlock = ^(double lat,double lon,NSString*position,NSString *city,BOOL refresh){
-            [ShowWaiting hideWaiting];
-         
-            [weakSelf showLocation:lat lon:lon];
+            if(lat!=-1){
+                  [weakSelf showLocation:lat lon:lon];
+            }
+          
         };
     }
     
+    locationUtil.handleLocationCity=YES;
     [locationUtil startLocation];
     
     
@@ -532,7 +475,7 @@
             }else if([annotation.title isEqualToString:@"终点"]){
                 [annoImage setImage:[UIImage imageNamed:@"end_annotation_full.png"]];
             }else if([annotation.title isEqualToString:@"定位"]){
-                 [annoImage setFrame:CGRectMake(0, 0, 25, 25)];
+                 [annoImage setFrame:CGRectMake(15, 5, 25, 25)];
                 [annoImage setImage:[UIImage imageNamed:@"location_self_icon.png"]];
             }else if([annotation.title isEqualToString:@"跑跑"]){
                 

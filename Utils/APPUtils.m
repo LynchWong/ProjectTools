@@ -770,12 +770,22 @@
 }
 
 //alert
-+(void)alertShow:(NSString*)string{
 
-    [self alertShow:@"" string:string];
++(void)alertShow:(NSString*)string{
+    
+    [self alertShow:@"" string:string controller:nil];
+}
+
++(void)alertShow:(NSString*)string controller:(UIViewController*)controller{
+
+    [self alertShow:@"" string:string controller:controller];
 }
 
 +(void)alertShow:(NSString*)title string:(NSString*)string{
+    [self alertShow:title string:string controller:nil];
+}
+
++(void)alertShow:(NSString*)title string:(NSString*)string controller:(UIViewController*)controller{
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                              message:string
@@ -785,7 +795,14 @@
                                                       handler:^(UIAlertAction *action) {
                                                     
                                                       }]];
-    [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:NULL];
+    
+    if(controller==nil){
+        [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:NULL];
+    }else{
+        [controller presentViewController:alertController animated:YES completion:NULL];
+    }
+    
+    
     
 
 }
@@ -1236,21 +1253,21 @@
 }
 
 //钱的单位
-+(NSString*)getMoneyUnit:(NSInteger)num{
++(NSString*)getMoneyUnit:(NSInteger)num unit:(NSString*)unit{
     NSString *moneyUnit;
     
     
     if(num>=100 && num%100==0){
-        moneyUnit = [NSString stringWithFormat:@"%d",num/100];
+        moneyUnit = [NSString stringWithFormat:@"%d%@",num/100,unit];
     }else{
         float money = num;
-        moneyUnit = [NSString stringWithFormat:@"%.2f",money/100];
+        moneyUnit = [NSString stringWithFormat:@"%.2f%@",money/100,unit];
     }
     
     moneyUnit = [moneyUnit stringByReplacingOccurrencesOfString:@".00" withString:@""];
     
-    if([moneyUnit isEqualToString:@"0.0"]){
-        moneyUnit = @"0";
+    if([moneyUnit isEqualToString:[NSString stringWithFormat:@"0.0%@",unit]]){
+        moneyUnit = [NSString stringWithFormat:@"0%@",unit];
     }
     
     return moneyUnit;
@@ -1366,5 +1383,124 @@
     
 }
 
+//判断颜色是否相等
++ (BOOL) isTheSameColor2:(UIColor*)color1 anotherColor:(UIColor*)color2{
+    return  CGColorEqualToColor(color1.CGColor, color2.CGColor);
+}
 
+
+//添加阴影
++(void)addShadow:(UIView*)view{
+
+//    [view.layer setMasksToBounds:YES];
+    
+    UIView *detailUnder = [[UIView alloc] initWithFrame:CGRectMake(0, 12, SCREENWIDTH, 2)];//阴影
+    [detailUnder setBackgroundColor:[UIColor whiteColor]];
+    detailUnder.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
+    detailUnder.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
+    detailUnder.layer.shadowOpacity = 0.7;//阴影透明度，默认0
+    detailUnder.layer.shadowRadius = 5;//阴影半径，默认3
+    [view addSubview:detailUnder];
+    detailUnder = nil;
+    
+    
+    
+    UIView *detailBackground = [[UIView alloc] initWithFrame:CGRectMake(0, 10, SCREENWIDTH, SCREENHEIGHT)];
+    [detailBackground setBackgroundColor:[UIColor whiteColor]];
+    [view addSubview:detailBackground];
+    [detailBackground addSubview:[APPUtils get_line:0 y:0 width:SCREENWIDTH]];
+    detailBackground = nil;
+    
+}
+
+//获取定位按钮
++(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width{
+   
+    
+    
+    UIView *locationView =  [[UIView alloc] initWithFrame:CGRectMake(x, y, 40, 40)];
+    
+    UIView *locationUnder = [[UIView alloc] initWithFrame:CGRectMake((locationView.width-31)/2, (locationView.height-31)/2, 31, 31)];
+    [locationUnder setBackgroundColor:[UIColor whiteColor]];
+    locationUnder.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
+    locationUnder.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
+    locationUnder.layer.shadowOpacity = 0.5;//阴影透明度，默认0
+    locationUnder.layer.shadowRadius = 3;//阴影半径，默认3
+    [locationView addSubview:locationUnder];
+    
+    
+    UIView *llControl = [[UIView alloc] initWithFrame:CGRectMake((locationView.width-35)/2, (locationView.height-35)/2, 35, 35)];
+    [llControl setBackgroundColor:[UIColor whiteColor]];
+    llControl.layer.shouldRasterize = YES;
+    llControl.layer.rasterizationScale = [[UIScreen mainScreen] scale];
+    [llControl.layer setCornerRadius:4];
+    [llControl.layer setMasksToBounds:YES];//圆角不被盖
+    [locationView addSubview:llControl];
+    
+    float offet = 0;
+    if(width == 0){
+        width = 20;
+        offet = 1;
+    }
+    
+    UIImageView *locationImage = [[UIImageView alloc] initWithFrame:CGRectMake((llControl.width-width)/2-offet, (llControl.height-width)/2+offet, width, width)];
+    locationImage.layer.shouldRasterize = YES;
+    locationImage.layer.rasterizationScale = [[UIScreen mainScreen] scale];
+    [locationImage setImage:img];
+    [llControl addSubview:locationImage];
+    
+    
+    
+    MyBtnControl *locationControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, locationView.width, locationView.height)];
+    locationControl.tag = 123;
+    [locationView addSubview:locationControl];
+    locationControl.shareImage = locationImage;
+    
+    locationImage = nil;
+    locationControl = nil;
+    llControl = nil;
+    locationUnder = nil;
+    
+    return locationView;
+}
+
+
+
+/*将高德地图zoom调整到显示全部anno的值
+ add值越大 zoomlevel就越小
+ */
++(void)zoomToMapPoints:(MAMapView*)mapView annotations:(NSArray*)annotations add:(float)add{
+    double minLat = 360.0f, maxLat = -360.0f;
+    double minLon = 360.0f, maxLon = -360.0f;
+    for (MAPointAnnotation *annotation in annotations) {
+        if ( annotation.coordinate.latitude  < minLat ) minLat = annotation.coordinate.latitude;
+        if ( annotation.coordinate.latitude  > maxLat ) maxLat = annotation.coordinate.latitude;
+        if ( annotation.coordinate.longitude < minLon ) minLon = annotation.coordinate.longitude;
+        if ( annotation.coordinate.longitude > maxLon ) maxLon = annotation.coordinate.longitude;
+    }
+    
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((minLat + maxLat) / 2.0, (minLon + maxLon) / 2.0);
+    MACoordinateSpan span = MACoordinateSpanMake((maxLat - minLat)+add, (maxLon - minLon)+add);//
+    MACoordinateRegion region = MACoordinateRegionMake(center, span);
+    [mapView setRegion:region animated:YES];
+}
+
+
+//转圈
++(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view{
+    
+    if(count==0){
+        count = CGFLOAT_MAX;
+    }
+    
+    CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
+    rotationAnimation.duration =duration;
+    rotationAnimation.cumulative = YES;
+    rotationAnimation.repeatCount = count;
+    rotationAnimation.removedOnCompletion = NO;//必须加 不然到其他页面后会停止
+    [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    rotationAnimation = nil;
+    
+}
 @end

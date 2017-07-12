@@ -8,7 +8,7 @@
 
 #import "AboutUsViewController.h"
 #import "MainViewController.h"
-#import "WebViewController.h"
+
 @interface AboutUsViewController ()
 
 @end
@@ -35,7 +35,13 @@
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
+    
+    if([APPUtils isTheSameColor2:TITLE_WORD_COLOR anotherColor:[UIColor whiteColor]]){//标题是白色
+        return UIStatusBarStyleLightContent;
+    }else{
+        return UIStatusBarStyleDefault;
+    }
+    
 }
 
 -(void)initViews{
@@ -64,7 +70,7 @@
     
     
     UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake((SCREENWIDTH-80)/2, SCREENHEIGHT<=480?15:50, 80, 80)];
-    logoImageView.layer.cornerRadius = logoImageView.frame.size.height/2;
+    logoImageView.layer.cornerRadius = logoImageView.height/2;
     [logoImageView.layer setMasksToBounds:YES];
     [logoImageView setImage:icon];
     [bodyView addSubview:logoImageView];
@@ -75,7 +81,7 @@
     NSString *appCurName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
     infoDictionary = nil;
     
-    UILabel *versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, logoImageView.frame.size.height+logoImageView.frame.origin.y+10, SCREENWIDTH, 20)];
+    UILabel *versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, logoImageView.height+logoImageView.y+10, SCREENWIDTH, 20)];
     versionLabel.text = [NSString stringWithFormat:@"%@ v%@",appCurName,version];
     versionLabel.textAlignment = NSTextAlignmentCenter;
     versionLabel.textColor = TEXTGRAY;
@@ -83,11 +89,10 @@
     [bodyView addSubview:versionLabel];
 
    
-    
-    
+
     
     //打电话
-    MyBtnControl *teleControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, versionLabel.frame.origin.y+(SCREENHEIGHT<=480?30:70), SCREENWIDTH, 50)];
+    MyBtnControl *teleControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, versionLabel.y+(SCREENHEIGHT<=480?30:70), SCREENWIDTH, 50)];
     [teleControl setBackgroundColor:[UIColor whiteColor]];
     teleControl.clickBackBlock = ^(){
         CCActionSheet *actionSheet = [[CCActionSheet alloc] initWithTitle:@"呼叫 博文软件开发有限公司客服?" clickedAtIndex:^(NSInteger index) {
@@ -111,11 +116,11 @@
     [teleControl addLabel:@"拨打客服电话" color:TEXTGRAY font:[UIFont fontWithName:textDefaultFont size:14] txtAlignment:NSTextAlignmentLeft x:15];
     
  
-    [teleControl addSubview:[APPUtils get_forward:teleControl.frame.size.height x:SCREENWIDTH-30]];
+    [teleControl addSubview:[APPUtils get_forward:teleControl.height x:SCREENWIDTH-30]];
  
     
     //进网站
-    MyBtnControl *webControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, teleControl.frame.origin.y+50, SCREENWIDTH, 50)];
+    MyBtnControl *webControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, teleControl.y+50, SCREENWIDTH, 50)];
     [webControl setBackgroundColor:[UIColor whiteColor]];
     webControl.clickBackBlock = ^(){
         WebViewController *webview = [[WebViewController alloc] initWithtitle:@"博文软件官方网站" url:@"http://www.myncic.com"];
@@ -134,7 +139,7 @@
    
     
 
-    [webControl addSubview:[APPUtils get_forward:webControl.frame.size.height x:SCREENWIDTH-30]];
+    [webControl addSubview:[APPUtils get_forward:webControl.height x:SCREENWIDTH-30]];
  
 
   
@@ -153,7 +158,7 @@
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, showString.length)];
     
     
-    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, bodyView.frame.size.height-50, SCREENWIDTH, 50)];
+    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, bodyView.height-50, SCREENWIDTH, 50)];
     nameLabel.attributedText = attributedString;
     nameLabel.textAlignment = NSTextAlignmentCenter;
     nameLabel.textColor = [UIColor lightGrayColor];

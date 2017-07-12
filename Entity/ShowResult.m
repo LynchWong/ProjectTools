@@ -63,16 +63,16 @@
         [self addSubview:payResultView];
         
         
-        paySImageView = [[UIImageView alloc] initWithFrame:CGRectMake((payResultView.frame.size.width-shareS_MWidth)/2, (payResultView.frame.size.width-shareS_MWidth)/2-8, shareS_MWidth, shareS_MWidth)];
+        paySImageView = [[UIImageView alloc] initWithFrame:CGRectMake((payResultView.width-shareS_MWidth)/2, (payResultView.width-shareS_MWidth)/2-8, shareS_MWidth, shareS_MWidth)];
         
         
         
         [payResultView addSubview:paySImageView];
         
         
-        pay_result_Label = [[UILabel alloc] initWithFrame:CGRectMake(0,payResultView.frame.size.height-32,payResultView.frame.size.width,30)];
+        pay_result_Label = [[UILabel alloc] initWithFrame:CGRectMake(0,payResultView.height-32,payResultView.width,30)];
         pay_result_Label.textColor = [UIColor whiteColor];
-        pay_result_Label.font =  [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
+        pay_result_Label.font =  [UIFont fontWithName:textDefaultBoldFont size:13];
         pay_result_Label.textAlignment = NSTextAlignmentCenter;
         [payResultView addSubview:pay_result_Label];
         [self addSubview:payResultView];

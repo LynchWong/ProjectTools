@@ -92,13 +92,13 @@
 }
 
 - (void)initControlBtn {
-    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 50.0f, 100, 50)];
+    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, self.view.height - 50.0f, 100, 50)];
     [cancelBtn setBackgroundColor:[UIColor whiteColor]];
     [cancelBtn setTitleColor:MAINCOLOR forState:UIControlStateNormal];
     [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
     cancelBtn.layer.cornerRadius = 4;
     cancelBtn.alpha = 0.9;
-    [cancelBtn.titleLabel setFont: [UIFont fontWithName:@"HelveticaNeue-Bold" size:18]];
+    [cancelBtn.titleLabel setFont: [UIFont fontWithName:textDefaultBoldFont size:18]];
     [cancelBtn.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [cancelBtn.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [cancelBtn.titleLabel setNumberOfLines:0];
@@ -106,13 +106,13 @@
     [cancelBtn addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:cancelBtn];
     
-    UIButton *confirmBtn = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 100.0f, self.view.frame.size.height - 50.0f, 100, 50)];
+    UIButton *confirmBtn = [[UIButton alloc] initWithFrame:CGRectMake(self.view.width - 100.0f, self.view.height - 50.0f, 100, 50)];
     [confirmBtn setBackgroundColor:[UIColor whiteColor]];
      [confirmBtn setTitleColor:MAINCOLOR forState:UIControlStateNormal];
     [confirmBtn setTitle:@"完成" forState:UIControlStateNormal];
     confirmBtn.layer.cornerRadius = 4;
     confirmBtn.alpha = 0.9;
-    [confirmBtn.titleLabel setFont: [UIFont fontWithName:@"HelveticaNeue-Bold" size:18]];
+    [confirmBtn.titleLabel setFont: [UIFont fontWithName:textDefaultBoldFont size:18]];
     [confirmBtn.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [confirmBtn.titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [confirmBtn.titleLabel setNumberOfLines:0];
@@ -139,23 +139,23 @@
     CGMutablePathRef path = CGPathCreateMutable();
     // Left side of the ratio view
     CGPathAddRect(path, nil, CGRectMake(0, 0,
-                                        self.ratioView.frame.origin.x,
-                                        self.overlayView.frame.size.height));
+                                        self.ratioView.x,
+                                        self.overlayView.height));
     // Right side of the ratio view
     CGPathAddRect(path, nil, CGRectMake(
-                                        self.ratioView.frame.origin.x + self.ratioView.frame.size.width,
+                                        self.ratioView.x + self.ratioView.width,
                                         0,
-                                        self.overlayView.frame.size.width - self.ratioView.frame.origin.x - self.ratioView.frame.size.width,
-                                        self.overlayView.frame.size.height));
+                                        self.overlayView.width - self.ratioView.x - self.ratioView.width,
+                                        self.overlayView.height));
     // Top side of the ratio view
     CGPathAddRect(path, nil, CGRectMake(0, 0,
-                                        self.overlayView.frame.size.width,
-                                        self.ratioView.frame.origin.y));
+                                        self.overlayView.width,
+                                        self.ratioView.y));
     // Bottom side of the ratio view
     CGPathAddRect(path, nil, CGRectMake(0,
-                                        self.ratioView.frame.origin.y + self.ratioView.frame.size.height,
-                                        self.overlayView.frame.size.width,
-                                        self.overlayView.frame.size.height - self.ratioView.frame.origin.y + self.ratioView.frame.size.height));
+                                        self.ratioView.y + self.ratioView.height,
+                                        self.overlayView.width,
+                                        self.overlayView.height - self.ratioView.y + self.ratioView.height));
     maskLayer.path = path;
     self.overlayView.layer.mask = maskLayer;
     CGPathRelease(path);
@@ -200,7 +200,7 @@
         // calculate accelerator
         CGFloat absCenterX = self.cropFrame.origin.x + self.cropFrame.size.width / 2;
         CGFloat absCenterY = self.cropFrame.origin.y + self.cropFrame.size.height / 2;
-        CGFloat scaleRatio = self.showImgView.frame.size.width / self.cropFrame.size.width;
+        CGFloat scaleRatio = self.showImgView.width / self.cropFrame.size.width;
         CGFloat acceleratorX = 1 - ABS(absCenterX - view.center.x) / (scaleRatio * absCenterX);
         CGFloat acceleratorY = 1 - ABS(absCenterY - view.center.y) / (scaleRatio * absCenterY);
         CGPoint translation = [panGestureRecognizer translationInView:view.superview];
@@ -242,7 +242,7 @@
         newFrame.origin.y = self.cropFrame.origin.y + self.cropFrame.size.height - newFrame.size.height;
     }
     // adapt horizontally rectangle
-    if (self.showImgView.frame.size.width > self.showImgView.frame.size.height && newFrame.size.height <= self.cropFrame.size.height) {
+    if (self.showImgView.width > self.showImgView.height && newFrame.size.height <= self.cropFrame.size.height) {
         newFrame.origin.y = self.cropFrame.origin.y + (self.cropFrame.size.height - newFrame.size.height) / 2;
     }
     return newFrame;

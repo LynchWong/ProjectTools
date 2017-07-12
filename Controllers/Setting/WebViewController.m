@@ -19,7 +19,13 @@
 @implementation WebViewController
 
 - (UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleLightContent;
+    
+    if([APPUtils isTheSameColor2:TITLE_WORD_COLOR anotherColor:[UIColor whiteColor]]){//标题是白色
+        return UIStatusBarStyleLightContent;
+    }else{
+        return UIStatusBarStyleDefault;
+    }
+    
 }
 
 -(id)initWithtitle:(NSString*)title url:(NSString*)url{
@@ -44,7 +50,7 @@
 
     hasOpen = YES;
     [self openWebview];
-    
+   
 }
 
 
@@ -75,7 +81,7 @@
     
         closeControl = nil;
         
-        [titletView.titleLabel setFrame:CGRectMake(titletView.titleLabel.frame.origin.x+20, titletView.titleLabel.frame.origin.y, titletView.titleLabel.frame.size.width-20, titletView.titleLabel.frame.size.height)];
+        [titletView.titleLabel setFrame:CGRectMake(titletView.titleLabel.x+20, titletView.titleLabel.y, titletView.titleLabel.width-20, titletView.titleLabel.height)];
     }
     
     
@@ -85,7 +91,7 @@
         MyBtnControl* refreshBtn = [[MyBtnControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-55, 20, 50, 44)];
         
     
-        [refreshBtn addImage:[UIImage imageNamed:@"shareapp.png"] frame:CGRectMake(18.5, (44-18)/2, 18, 18)];
+        [refreshBtn addImage:[UIImage imageNamed:@"shareapp.png"] frame:CGRectMake(20, (44-20)/2, 20, 20)];
         
         refreshBtn.clickBackBlock = ^(){
            [self openShareView];
@@ -222,6 +228,13 @@
 
 //关闭
 -(void)closeWebview{
+    
+    if(_couponType){
+        //刷新代金券
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"getActivity" object:nil userInfo:nil];
+    }
+
+    
     juhua.alpha = 0;
     [myWebView loadHTMLString:@"" baseURL:nil];
     [self.navigationController popViewControllerAnimated:YES];
@@ -260,7 +273,8 @@
            share_Image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:_shareIcon]]];
         }
         if(share_Image == nil){
-            share_Image = [UIImage imageNamed:@"120.png"];
+            
+            share_Image = _shareDefaultIcon==nil?[UIImage imageNamed:@"120.png"]:_shareDefaultIcon;
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -278,13 +292,13 @@
                   share_Image = [APPUtils scaleToSize:share_Image size:CGSizeMake(120, 120)];
             }
             
-//            [MainViewController sharedMain].shareUtils.only_share = YES;
-//            [MainViewController sharedMain].shareUtils.share_title_content= @"分享到";
-//            [MainViewController sharedMain].shareUtils.shareTitle = webTitle;
-//            [MainViewController sharedMain].shareUtils.shareBody = _shareContents;
-//            [MainViewController sharedMain].shareUtils.shareUrl = original_url;
-//            [MainViewController sharedMain].shareUtils.imageStore = share_Image;
-//            [[MainViewController sharedMain].shareUtils openShareView];
+            [MainViewController sharedMain].shareUtils.only_share = YES;
+            [MainViewController sharedMain].shareUtils.share_title_content= @"分享到";
+            [MainViewController sharedMain].shareUtils.shareTitle = _shareTitle==nil?webTitle:_shareTitle;
+            [MainViewController sharedMain].shareUtils.shareBody = _shareContents;
+            [MainViewController sharedMain].shareUtils.shareUrl = original_url;
+            [MainViewController sharedMain].shareUtils.imageStore = share_Image;
+            [[MainViewController sharedMain].shareUtils openShareView];
     
 
         });

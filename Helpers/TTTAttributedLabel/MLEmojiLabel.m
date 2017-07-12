@@ -202,7 +202,7 @@ static CGFloat widthCallback(void *refCon) {
     [super commonInit];
     
     self.numberOfLines = 0;
-    self.font = [UIFont systemFontOfSize:14.0];
+    self.font = [UIFont fontWithName:textDefaultFont size:14.0];
     self.textColor = [UIColor blackColor];
     self.backgroundColor = [UIColor clearColor];
     

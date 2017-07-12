@@ -67,9 +67,12 @@
                                 }completion:NULL];
         }else{
         
-            self.shareImage.alpha=0.7;
-            self.shareLabel.alpha=0.7;
-            self.shareView.alpha=0.7;
+            if(!_not_ShareHighlight){
+                self.shareImage.alpha=0.7;
+                self.shareLabel.alpha=0.7;
+                self.shareView.alpha=0.7;
+            }
+           
             
         }
         
@@ -106,7 +109,7 @@
 //添加文字
 -(void)addLabel:(NSString*)text color:(UIColor*)color font:(UIFont*)font{
 
-    UILabel *lLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+    UILabel *lLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.width, self.height)];
     lLabel.textColor = color;
     lLabel.textAlignment = NSTextAlignmentCenter;
     lLabel.font = font;
@@ -121,7 +124,7 @@
 //添加文字
 -(void)addLabel:(NSString*)text color:(UIColor*)color font:(UIFont*)font txtAlignment:(NSInteger)txtAlignment x:(float)x{
     
-    UILabel *lLabel = [[UILabel alloc] initWithFrame:CGRectMake(x, 0, self.frame.size.width, self.frame.size.height)];
+    UILabel *lLabel = [[UILabel alloc] initWithFrame:CGRectMake(x, 0, self.width, self.height)];
     lLabel.textColor = color;
     lLabel.textAlignment = txtAlignment;
     lLabel.font = font;
@@ -160,8 +163,20 @@
     
 }
 
+-(void)addImage2:(UIImage*)img frame:(CGRect)frame{
+
+    UIImageView *addImg = [[UIImageView alloc] initWithFrame:frame];
+    [addImg setImage:img];
+    [self addSubview:addImg];
+    self.shareImage2=addImg;
+    self.shareImage2.layer.shouldRasterize = YES;
+    self.shareImage2.layer.rasterizationScale = [[UIScreen mainScreen] scale];
+    [self bringSubviewToFront:btnControl];
+    addImg = nil;
+}
+
 -(void)addImage:(UIImage*)img{
-    UIImageView *addImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+    UIImageView *addImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, self.height)];
     [addImg setImage:img];
     [self addSubview:addImg];
     self.shareImage=addImg;

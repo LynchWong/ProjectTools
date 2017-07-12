@@ -20,14 +20,25 @@
 - (id)initLocation{
     self = [super init];
     if (self) {
-    
-        _mapSearcher =  [[AMapSearchAPI alloc] init];
-        _mapSearcher.delegate = self;
-        
+        [self initData];
     }
     return self;
 }
 
+-(id)initLocationWithNoAlert{
+    self = [super init];
+    if (self) {
+        
+        [self initData];
+        noAlert = YES;
+    }
+    return self;
+}
+
+-(void)initData{
+    _mapSearcher =  [[AMapSearchAPI alloc] init];
+    _mapSearcher.delegate = self;
+}
 
 -(void)startLocation{
     
@@ -92,12 +103,18 @@
     [APPUtils userDefaultsDelete:@"location_city"];
     [APPUtils userDefaultsDelete:@"location_province"];
 
+    self.callBackBlock(-1, -1, nil, nil, NO);
     
-    if(_handleLocationCity){
+    
+    if(_handleLocationCity||noAlert){
         
-
-            [ShowWaiting hideWaiting];
         
+        [ShowWaiting hideWaiting];
+        
+        
+        if(noAlert){
+            
+        }else{
             if(_error_string==nil){
                 _error_string = @"定位失败,请开启定位权限重试";
             }
@@ -127,10 +144,7 @@
             cancel = nil;
             confirm = nil;
             alertController = nil;
-        
-//        [[MainViewController sharedMain].citysView closePickerView];
-        
-        
+        }
     }
     _handleLocationCity=NO;
     
@@ -161,6 +175,9 @@
         my_lat = location.coordinate.latitude;
         
       
+        [APPUtils userDefaultsSet:[NSString stringWithFormat:@"%.6f",my_lon] forKey:@"my_lon"];
+        [APPUtils userDefaultsSet:[NSString stringWithFormat:@"%.6f",my_lat] forKey:@"my_lat"];
+        
         //逆地理编码出地理位置
         AMapReGeocodeSearchRequest *regeo = [[AMapReGeocodeSearchRequest alloc] init];
         regeo.location = [AMapGeoPoint locationWithLatitude:my_lat longitude:my_lon];
@@ -185,11 +202,13 @@
     
     if (response.regeocode != nil) {
         
-        NSString *locationProvince = response.regeocode.addressComponent.province;
+        _locationProvince = response.regeocode.addressComponent.province;
         NSString *locationCity = response.regeocode.addressComponent.city;
         
+    
+        _cityCode = [response.regeocode.addressComponent.citycode integerValue];
+        _ad_code = [response.regeocode.addressComponent.adcode integerValue];
         
-       
         
         
         if(locationCity == nil || locationCity.length == 0){
@@ -197,12 +216,14 @@
             locationCity = response.regeocode.addressComponent.province;
         }
         
-        if(locationCity!=nil&&locationProvince!=nil){
-            locationCity = [locationCity stringByReplacingOccurrencesOfString:@"市" withString:@""];
-            locationProvince = [locationCity stringByReplacingOccurrencesOfString:@"省" withString:@""];
+        if(locationCity!=nil&&_locationProvince!=nil){
+            if(!noAlert){
+                locationCity = [locationCity stringByReplacingOccurrencesOfString:@"市" withString:@""];
+            }
             
+           
             [APPUtils userDefaultsSet : locationCity forKey:@"location_city"];//定位城市
-            [APPUtils userDefaultsSet : locationProvince forKey:@"location_province"];//定位省份
+            [APPUtils userDefaultsSet : _locationProvince forKey:@"location_province"];//定位省份
         }
         
         
@@ -213,13 +234,16 @@
             my_position = [my_position stringByReplacingOccurrencesOfString:response.regeocode.addressComponent.city withString:@""];
             my_position = [my_position stringByReplacingOccurrencesOfString:response.regeocode.addressComponent.province withString:@""];
             [APPUtils userDefaultsSet :my_position forKey:@"my_position"];
+            
+            [APPUtils userDefaultsSet :[NSString stringWithFormat:@"%d",(int)[response.regeocode.addressComponent.adcode integerValue]] forKey:@"my_adCode"];
+            
         } @catch (NSException *exception) {
             
         }
         
         
         //切换城市 跑跑用
-        if(_goback_city && check_city!=nil && check_city.length>0 && ![check_city isEqualToString:locationCity]){
+        if(_goback_city && !_handleLocationCity && check_city!=nil && check_city.length>0 && ![check_city isEqualToString:locationCity]){
                 
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
                                                                                          message:[NSString stringWithFormat:@"检测到您当前所在城市为%@,是否切换到该地区",locationCity]
@@ -235,7 +259,8 @@
                     check_city = locationCity;
                     [APPUtils userDefaultsSet :check_city forKey:@"check_city"];
                     
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"refresh_all_news" object:nil userInfo:nil];
+                    self.callBackBlock(my_lat, my_lon, my_position,check_city,YES);
+              
                 }];
                 
                 [alertController addAction:cancel];
@@ -262,21 +287,14 @@
             }
             [APPUtils userDefaultsSet :check_city forKey:@"check_city"];
             
-            self.callBackBlock(my_lat, my_lon, my_position,check_city,refresh);
-            
-            
-            //跑跑用
-//            if(_makeOrderBeforeLocation){//准备下单前定位
-//                _makeOrderBeforeLocation = NO;
-//                [_makeOrder readyMakeOrder];
-//            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"refresh_all_news" object:nil userInfo:nil];
+            self.callBackBlock(my_lat, my_lon, my_position,(noAlert?locationCity:check_city),refresh);
+        
             
         }
         
      
         locationCity = nil;
-        locationProvince = nil;
+     
     }else {
         [ShowWaiting hideWaiting];
         [ToastView showToast:@"抱歉,无法知道您的位置 T_T"];
@@ -284,6 +302,5 @@
     }
     
 }
-
 
 @end

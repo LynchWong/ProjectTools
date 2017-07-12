@@ -66,7 +66,7 @@
                     }
                 }
                 
-                SendMsgViewController *secondView = [[SendMsgViewController alloc] initWithConversation:conv show:YES send2User:@"buyer"];
+                SendMsgViewController *secondView = [[SendMsgViewController alloc] initWithConversation:conv show:YES];
                 
                 [[MainViewController sharedMain].navigationController pushViewController:secondView animated:YES];
                 secondView = nil;
@@ -766,7 +766,7 @@
     }
     
     
-    [afn send_msg:msg.group_id content:contentString sendWho:@"xsq"];
+    [afn send_msg:msg.group_id content:contentString sendWho:SENDWHO];
     
     contentString = nil;
 

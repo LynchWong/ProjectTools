@@ -39,8 +39,8 @@
             pic= Nil;
             pic = [UIButton buttonWithType:UIButtonTypeCustom];
             pic.imageView.contentMode = UIViewContentModeScaleAspectFill;
-            [pic setFrame:CGRectMake(i*self.frame.size.width,0, self.frame.size.width, self.frame.size.height)];
-            UIImageView * tempImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, pic.frame.size.width, pic.frame.size.height)];
+            [pic setFrame:CGRectMake(i*self.width,0, self.width, self.height)];
+            UIImageView * tempImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, pic.width, pic.height)];
             tempImage.contentMode = UIViewContentModeScaleAspectFill;
             [tempImage setClipsToBounds:YES];
             [pic addSubview:tempImage];
@@ -62,7 +62,7 @@
         
       
         
-        [self setContentSize:CGSizeMake(self.frame.size.width*[self.pics count], self.frame.size.height)];
+        [self setContentSize:CGSizeMake(self.width*[self.pics count], self.height)];
         [self setContentOffset:CGPointMake(0, 0) animated:NO];
         
         
@@ -89,7 +89,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     
     
-    currentPage = scrollView.contentOffset.x/self.frame.size.width;
+    currentPage = scrollView.contentOffset.x/self.width;
     [JCdelegate currentPage:currentPage total:[self.pics count]];
     scrollTopicFlag = currentPage;
 }
@@ -101,7 +101,7 @@
         scrollTopicFlag++;
     }
     
-    [self setContentOffset:CGPointMake(self.frame.size.width*scrollTopicFlag, 0) animated:YES];
+    [self setContentOffset:CGPointMake(self.width*scrollTopicFlag, 0) animated:YES];
     
     
 }

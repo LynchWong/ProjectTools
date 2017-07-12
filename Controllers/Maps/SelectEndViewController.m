@@ -13,7 +13,7 @@
 @end
 
 @implementation SelectEndViewController
-@synthesize locationEnable;
+
 
 
 - (id)initWithLocation:(NSString*)address city:(NSString*)city endLon:(CGFloat)endLon endLat:(CGFloat)endLat begin:(BOOL)begin hasData:(BOOL)hasData shop:(BOOL)shop color:(UIColor*)color mType:(NSString*)mType{
@@ -28,11 +28,7 @@
         isShop =shop;
         selectMainColor = color;
         mapType = mType;
-
-        if(defaultData){
-            myCityName = city;
-        }
-    
+       
     }
     return self;
 }
@@ -65,8 +61,6 @@
 
 -(void)initController{
     
-    
-    
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     hasOpened = YES;
@@ -93,7 +87,8 @@
     _mapView.showsIndoorMap = NO;
     _mapView.showsIndoorMapControl=NO;
     [_mapView setRotateEnabled:NO];
-    
+    _mapView.zoomLevel = 16;//默认缩放
+    _mapView.cameraDegree = 40;
     
     //地图上显示标注
     
@@ -101,7 +96,7 @@
     [desPosition_bottom setImage:[UIImage imageNamed:@"des_position_bottom.png"]];
     [self.view addSubview:desPosition_bottom];
     
-    desPosition = [[UIImageView alloc] initWithFrame:CGRectMake((SCREENWIDTH-30)/2, desPosition_bottom.frame.origin.y-24, 30, 30)];
+    desPosition = [[UIImageView alloc] initWithFrame:CGRectMake((SCREENWIDTH-30)/2, desPosition_bottom.y-24, 30, 30)];
     
     [self.view addSubview:desPosition];
     
@@ -138,26 +133,23 @@
  
     
     
-    
-    
-    
-    prompView = [[UIControl alloc] initWithFrame:CGRectMake((SCREENWIDTH-prompWidth)/2, desPosition_bottom.frame.origin.y-prompHeight-20, prompWidth,prompHeight)];
+    prompView = [[UIView alloc] initWithFrame:CGRectMake((SCREENWIDTH-prompWidth)/2, desPosition_bottom.y-prompHeight-20, prompWidth,prompHeight)];
     prompView.alpha=0;
     if(!sendPositionType){
         [self.view addSubview:prompView];
         
-        UIView *promptBlur= [[UIView alloc] initWithFrame:CGRectMake(0, 0, prompWidth, 30)];
+        UIView *promptBlur= [[UIView alloc] initWithFrame:CGRectMake(0, 0, prompWidth, prompHeight-15)];
         [promptBlur.layer setMasksToBounds:YES];//圆角不被盖住
         [promptBlur setClipsToBounds:YES];//减掉超出部分
         [promptBlur setBackgroundColor:selectMainColor];
-        promptBlur.layer.cornerRadius = promptBlur.frame.size.height/2;
+        promptBlur.layer.cornerRadius = promptBlur.height/2;
         [prompView addSubview:promptBlur];
         
-        UIImageView *paoHead = [[UIImageView alloc] initWithFrame:CGRectMake(10, (promptBlur.frame.size.height-21)/2, 21, 21)];
+        UIImageView *paoHead = [[UIImageView alloc] initWithFrame:CGRectMake(10, (promptBlur.height-21)/2, 21, 21)];
         [promptBlur addSubview:paoHead];
       
         
-        UILabel *promptLabel = [[UILabel alloc] initWithFrame:CGRectMake(33, 0, prompWidth, promptBlur.frame.size.height)];
+        UILabel *promptLabel = [[UILabel alloc] initWithFrame:CGRectMake(33, 0, prompWidth, promptBlur.height)];
         promptLabel.textColor = [UIColor whiteColor];
         promptLabel.textAlignment = NSTextAlignmentLeft;
         promptLabel.font = [UIFont fontWithName:textDefaultBoldFont size:12];
@@ -165,7 +157,7 @@
         [promptBlur addSubview:promptLabel];
         
         
-        UIImageView *blueTrungle = [[UIImageView alloc] initWithFrame:CGRectMake((prompWidth-15)/2, promptBlur.frame.size.height, 15, 15)];
+        UIImageView *blueTrungle = [[UIImageView alloc] initWithFrame:CGRectMake((prompWidth-15)/2, promptBlur.height, 15, 15)];
         [prompView addSubview:blueTrungle];
         
         if(isSetBegin){
@@ -208,17 +200,18 @@
         
         promptBlur = nil;
         promptLabel = nil;
-          paoHead = nil;
+        paoHead = nil;
         
-        MyBtnControl *prompControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, prompView.frame.size.width, prompView.frame.size.height)];
+        __weak typeof(self) weakSelf = self;
+        prompControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, prompView.width, prompView.height)];
         prompControl.back_highlight = YES;
         prompControl.clickBackBlock = ^(){
-            [self begin_input_search];
+            [weakSelf begin_input_search];
         };
         
         [prompView addSubview:prompControl];
         
-        prompControl = nil;
+    
     }
     
     
@@ -243,7 +236,7 @@
     [titletView addSubview:backControl];
     
     
-    [titletView addSubview:[APPUtils get_line:0 y:titletView.frame.size.height-0.5 width:SCREENWIDTH]];
+    [titletView addSubview:[APPUtils get_line:0 y:TITLE_HEIGHT-0.5 width:SCREENWIDTH]];
     
     
     
@@ -271,7 +264,7 @@
     [titletView addSubview:searchView];
     
     
-    search_input = [[UITextField alloc] initWithFrame:CGRectMake(10, 0, searchView.frame.size.width-45, searchView.frame.size.height)];
+    search_input = [[UITextField alloc] initWithFrame:CGRectMake(10, 0, searchView.width-45, searchView.height)];
     [search_input setTextColor:TEXTGRAY];
     
     [search_input setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
@@ -291,26 +284,26 @@
     __weak typeof(self) weakSelf = self;
     
     //放大镜
-    search_control = [[MyBtnControl alloc] initWithFrame:(CGRectMake(searchView.frame.size.width-50, 0, 50, searchView.frame.size.height))];
+    search_control = [[MyBtnControl alloc] initWithFrame:(CGRectMake(searchView.width-50, 0, 50, searchView.height))];
     [searchView addSubview:search_control];
     search_control.clickBackBlock = ^(){
         [weakSelf searchByGlass];
         
     };
     
-    [search_control addImage:[UIImage imageNamed:@"searcher.png"] frame:CGRectMake(search_control.frame.size.width-35, (search_control.frame.size.height-23)/2-1, 23, 23)];
+    [search_control addImage:[UIImage imageNamed:@"searcher.png"] frame:CGRectMake(search_control.width-35, (search_control.height-23)/2-1, 23, 23)];
     
     
     
     //删除
-    cleanSeach_control = [[MyBtnControl alloc] initWithFrame:(CGRectMake(searchView.frame.size.width-40, 0, 40, searchView.frame.size.height))];
+    cleanSeach_control = [[MyBtnControl alloc] initWithFrame:(CGRectMake(searchView.width-40, 0, 40, searchView.height))];
     [searchView addSubview:cleanSeach_control];
     cleanSeach_control.clickBackBlock = ^(){
         [weakSelf close_search:YES close:(search_input.text.length>0)?NO:YES];
     };
     cleanSeach_control.alpha = 0;
     
-    [cleanSeach_control addImage:[UIImage imageNamed:@"clean_search.png"] frame:CGRectMake((cleanSeach_control.frame.size.width-13)/2, (cleanSeach_control.frame.size.height-13)/2, 13, 13)];
+    [cleanSeach_control addImage:[UIImage imageNamed:@"clean_search.png"] frame:CGRectMake((cleanSeach_control.width-13)/2, (cleanSeach_control.height-13)/2, 13, 13)];
     
     
     
@@ -323,32 +316,32 @@
     [self.view addSubview:position_under];
     
     
-    UIView *endControlUnder = [[UIView alloc] init];
-    [endControlUnder setBackgroundColor:EMPTYGRAY];
-    [endControlUnder setFrame:CGRectMake(0, SCREENHEIGHT-50, SCREENWIDTH, 50)];
-    [self.view addSubview:endControlUnder];
+    UIView *positionControlUnder = [[UIView alloc] init];
+    [positionControlUnder setBackgroundColor:EMPTYGRAY];
+    [positionControlUnder setFrame:CGRectMake(0, SCREENHEIGHT-50, SCREENWIDTH, 50)];
+    [self.view addSubview:positionControlUnder];
     
     
-    endControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, SCREENHEIGHT-50, SCREENWIDTH, 50)];
-    endControl.not_highlight = YES;
+    positionControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, SCREENHEIGHT-50, SCREENWIDTH, 50)];
+    positionControl.not_highlight = YES;
     
-    endControl.clickBackBlock = ^(){
+    positionControl.clickBackBlock = ^(){
         [weakSelf begin_input_search];
         
     };
     
-    [self.view addSubview:endControl];
+    [self.view addSubview:positionControl];
     
     
     
     
-    end_position_label = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, SCREENWIDTH-90, endControl.frame.size.height)];
+    end_position_label = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, SCREENWIDTH-90, positionControl.height)];
     end_position_label.lineBreakMode = NSLineBreakByWordWrapping;
     end_position_label.textAlignment = NSTextAlignmentLeft;
     end_position_label.numberOfLines = 2;
-    endControl.shareLabel = end_position_label;
+    positionControl.shareLabel = end_position_label;
     end_position_label.font = [UIFont fontWithName:textDefaultFont size:13];
-    [endControl addSubview:end_position_label];
+    [positionControl addSubview:end_position_label];
     
     if(sendPositionType){
         end_position_label.text = @"选择您要发送的位置";
@@ -362,7 +355,7 @@
                 if(isShop){
                     end_position_label.text = @"请设定店铺地址";
                 }else{
-                    end_position_label.text = @"跑跑办完事后将去哪里交货？";
+                    end_position_label.text = @"请设定地点";
                 }
             }else if([mapType isEqualToString:@"寻赏圈"]){
                 end_position_label.text = @"请设置联系地址";
@@ -378,8 +371,9 @@
     
     okControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(SCREENWIDTH-70, 0, 70, 50)];
     [okControl setBackgroundColor:LINECOLOR2];
+    [okControl setEnabled:NO];
     [okControl.layer setMasksToBounds:YES];
-    [endControl addSubview:okControl];
+    [positionControl addSubview:okControl];
     okControl.clickBackBlock = ^(){
         
         [weakSelf selectOk];
@@ -390,7 +384,7 @@
     
     
     UIVisualEffectView * askLabelView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
-    [askLabelView setFrame:CGRectMake(0, endControl.frame.origin.y-30, SCREENWIDTH, 30)];
+    [askLabelView setFrame:CGRectMake(0, positionControl.y-30, SCREENWIDTH, 30)];
     if(!sendPositionType){
         [self.view addSubview:askLabelView];
     }
@@ -399,10 +393,10 @@
     [askLabelView addSubview:[APPUtils get_line:0 y:0 width:SCREENWIDTH]];
     
     
-    [askLabelView addSubview:[APPUtils get_line:0 y:askLabelView.frame.size.height-0.5 width:SCREENWIDTH]];
+    [askLabelView addSubview:[APPUtils get_line:0 y:askLabelView.height-0.5 width:SCREENWIDTH]];
     
     
-    UILabel *askLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, SCREENWIDTH, askLabelView.frame.size.height)];
+    UILabel *askLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, SCREENWIDTH, askLabelView.height)];
     askLabel.textAlignment = NSTextAlignmentLeft;
     askLabel.numberOfLines = 1;
     askLabel.textColor = selectMainColor;
@@ -440,32 +434,11 @@
     search_NoresultView.alpha=0;
     [self.view addSubview:search_NoresultView];
     
-    
-    //定位按钮
-    UIView *locationUnder = [[UIView alloc] initWithFrame:CGRectMake(12, SCREENHEIGHT-(sendPositionType?88:118), 26, 26)];
-    [locationUnder setBackgroundColor:[UIColor whiteColor]];
-    locationUnder.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
-    locationUnder.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
-    locationUnder.layer.shadowOpacity = 0.5;//阴影透明度，默认0
-    locationUnder.layer.shadowRadius = 3;//阴影半径，默认3
-    [self.view addSubview:locationUnder];
-    locationUnder = nil;
-    
-    llview = [[UIView alloc] initWithFrame:CGRectMake(10, SCREENHEIGHT-(sendPositionType?90:120), 30, 30)];
-    [llview setBackgroundColor:[UIColor whiteColor]];
-    [llview.layer setCornerRadius:4];
-    [llview.layer setMasksToBounds:YES];//圆角不被盖
-    
-    [self.view addSubview:llview];
-    
-    locationImage = [[UIImageView alloc] initWithFrame:CGRectMake((llview.frame.size.width-llview.frame.size.width*0.6)/2-1, (llview.frame.size.height-llview.frame.size.height*0.6)/2+1, llview.frame.size.width*0.6, llview.frame.size.height*0.6)];
 
-    
+    UIImage *locationImg;
     if(sendPositionType||isShop){
-        locationImage.layer.shouldRasterize = YES;
-        locationImage.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         
-        [locationImage setImage:[UIImage imageNamed:@"location_myself.png"]];
+        locationImg =[UIImage imageNamed:@"location_myself.png"];
         search_input.placeholder = @"搜索地点";
         
         if(isShop){
@@ -480,12 +453,12 @@
     
         if([mapType isEqualToString:@"找跑跑"]){
             if(isSetBegin){
-                [locationImage setImage:[UIImage imageNamed:@"location_myself.png"]];
+                 locationImg = [UIImage imageNamed:@"location_myself.png"];
                 search_input.placeholder = @"搜索跑跑办事/代购地点";
                 askLabel.text = @"您需要跑跑去哪里办事/代购?";
                 
             }else{
-                [locationImage setImage:[UIImage imageNamed:@"location_myself_red.png"]];
+                locationImg = [UIImage imageNamed:@"location_myself_red.png"];
                 search_input.placeholder = @"搜索跑跑验收/送货地点";
                 askLabel.text = @"您需要跑跑办完事/买完东西后去哪里验收/送货?";
             }
@@ -494,48 +467,47 @@
     
     
     askLabel =nil;
-    [llview addSubview:locationImage];
     
     
-    MyBtnControl *locationControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, llview.frame.origin.y, 50, 50)];
-    locationControl.shareImage = locationImage;
+    //定位按钮
+    UIView *locationView =  [APPUtils getLocationBtn:locationImg x:10 y:(SCREENHEIGHT-(sendPositionType?100:126)) width:0];
+    [self.view  addSubview:locationView];
+    
+    MyBtnControl *locationControl = (MyBtnControl*)[locationView viewWithTag:123];
     locationControl.clickBackBlock = ^(){
         [search_input resignFirstResponder];
-        [self location_Myself];
+        [self startLocation];
     };
+    locationControl = nil;
+  
+
+    if(locationUtil==nil){
+        locationUtil = [[LocationUtils alloc] initLocationWithNoAlert];
+        locationUtil.callBackBlock = ^(double latt,double lonn,NSString*position,NSString *city,BOOL refresh){
+            
+            [weakSelf showLocation:latt lonn:lonn posi:position city:city];
+        };
+    }
     
-    [self.view addSubview:locationControl];
     
+    locationEnable = YES;
     
-    
-    
-    _mapView.zoomLevel = 16;//默认缩放
-    _mapView.cameraDegree = 40;
     if(defaultData){
         move_by_search = YES;
         isSearching = NO;
         
         [_mapView setCenterCoordinate:CLLocationCoordinate2DMake(lat,lon) animated:NO];
-        //搜索该位置的poi
+
+
+        [self setPositionShowView];
         
-        AMapPOIAroundSearchRequest *arequest = [[AMapPOIAroundSearchRequest alloc] init];
-        
-        arequest.location  = [AMapGeoPoint locationWithLatitude:lat longitude:lon];
-        /* 按照距离排序. */
-        arequest.sortrule  = 0;
-        arequest.requireExtension  = YES;
-        
-        [_mapSearcher AMapPOIAroundSearch:arequest];
-        arequest = nil;
-        
-        
-        locationEnable = YES;
-        okEnable = YES;
-        
+         myCityName = [[APPUtils getUserDefaults]objectForKey:@"location_city"];
+         myCityAdcode = [MainViewController sharedMain].locationUtil.ad_code;
     }else{
         locationAddress = @"";
         location_showAddress = @"";
-        [self testLocation];
+        
+        [self startLocation];
     }
     
     
@@ -543,220 +515,107 @@
     [[UITextField appearance] setTintColor:selectMainColor];
     
     
-    goSetLocationControl = [[UIControl alloc] initWithFrame:CGRectMake(0, TITLE_HEIGHT, SCREENWIDTH, 50)];
+    goSetLocationControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, TITLE_HEIGHT, SCREENWIDTH, 50)];
     [goSetLocationControl setBackgroundColor:MAINRED];
     goSetLocationControl.alpha = 0;
     [self.view addSubview:goSetLocationControl];
-    UIImageView *netError = [[UIImageView alloc] initWithFrame:CGRectMake(10, (50-25)/2, 25, 25)];
-    [netError setImage:[UIImage imageNamed:@"location_white.png"]];
-    [goSetLocationControl addSubview:netError];
     
-    UILabel *errLabel = [[UILabel alloc] initWithFrame:CGRectMake(45, 0, SCREENWIDTH-55, 50)];
-    errLabel.text = [NSString stringWithFormat:@"若要指定位置,请允许「%@」访问您的位置 点击去设置->",mapType];
-    errLabel.textAlignment = NSTextAlignmentLeft;
-    errLabel.textColor = [UIColor whiteColor];
-    errLabel.numberOfLines = 2;
-    errLabel.font = [UIFont fontWithName:textDefaultBoldFont size:12];
-    [goSetLocationControl addSubview:errLabel];
-    [goSetLocationControl addTarget:self action:@selector(openLocationSetting) forControlEvents:UIControlEventTouchUpInside];
+    [goSetLocationControl addImage:[UIImage imageNamed:@"location_white.png"] frame:CGRectMake(10, (50-25)/2, 25, 25)];
+    [goSetLocationControl addLabel:[NSString stringWithFormat:@"若要指定位置,请允许「%@」访问您的位置 点击去设置->",mapType] color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:12] txtAlignment:NSTextAlignmentLeft frame:CGRectMake(45, 0, SCREENWIDTH-55, 50)
+     ];
+    goSetLocationControl.shareLabel.numberOfLines=2;
     
-    UIImageView *netErrorLine = [[UIImageView alloc] initWithFrame:CGRectMake(0, 49.5, SCREENWIDTH, 0.5)];
-    [netErrorLine setBackgroundColor:[UIColor lightGrayColor]];
-    [goSetLocationControl addSubview:netErrorLine];
-    netErrorLine = nil;
+    goSetLocationControl.clickBackBlock = ^(){
+        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
+            [[UIApplication sharedApplication] openURL:url];
+            
+        }
+    };
     
-    
-}
-
-//第一次测试定位能不能行
--(void)testLocation{
-    
-    locManager = [[CLLocationManager alloc] init];
-    locManager.delegate = self;
-    locManager.distanceFilter = 100;
-    locManager.desiredAccuracy = kCLLocationAccuracyBest;
-    [locManager requestWhenInUseAuthorization];
+    [APPUtils get_line:0 y:goSetLocationControl.height-0.5 width:SCREENWIDTH];
     
 }
 
 
--(void)openLocationSetting{
-    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
-        [[UIApplication sharedApplication] openURL:url];
-        
+
+
+//定位
+-(void)startLocation{
+    
+    if(locationEnable){
+        [locationUtil startLocation];
     }
 }
 
-//定位错误
-- (void)locationManager: (CLLocationManager *)manager
-       didFailWithError: (NSError *)error {
-    [self stopLocation];
-    [manager stopUpdatingLocation];
-    isLocationing =  NO;
-    NSLog(@"获取定位失败");
+
+//定位结果
+-(void)showLocation:(double)latt lonn:(double)lonn posi:(NSString*)posi city:(NSString*)city{
+
     
-    NSLog(@"Error: %@",[error localizedDescription]);
-}
-
-
-
-- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
-    
-    if(status == kCLAuthorizationStatusAuthorizedWhenInUse){
-        [self startLocation];
-        goSetLocationControl.alpha = 0;
-        locationEnable = YES;
-    }else{
+    if(latt == -1){
+        
         goSetLocationControl.alpha = 1;
         locationEnable = NO;
-    }
-}
-
-
-
-
-//点击定位
--(void)location_Myself{
-    
-    if(isLocationing){
-        return;
-    }
-    
-    if ([CLLocationManager locationServicesEnabled] &&
-        ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse
-         || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)) {
-            //定位功能可用，开始定位
-            [search_input resignFirstResponder];
-            [self startLocation];
-            
-        }
-    else if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
-                                                                                 message:[NSString stringWithFormat:@"若要定位，请在Iphone的 <设置> 选项中，允许 <%@> 访问您的位置",mapType]
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [self setDataEnable:NO];
         
-        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
-        
-        
-        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
-            
-            [self openLocationSetting];
-        }];
-        
-        [alertController addAction:cancel];
-        [alertController addAction:confirm];
-        
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-        cancel = nil;
-        confirm = nil;
-        alertController = nil;
-    }
-    
-}
-
-
--(void)startLocation
-{
-    
-    
-    isLocationing = YES;
-    
-    [ShowWaiting showWaiting:@"正在定位..."];
-    
-    [UIView animateWithDuration:0.2f delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                            
-                            desPosition_bottom.alpha = 0;
-                            desPosition.alpha = 0;
-                            prompView.alpha = 0;
-                        }
-                     completion:NULL];
-    
-    
-    
-    
-    //只要开启定位开关（MAMapView的showsUserLocation属性）就可以开始定位
-    _mapView.showsUserLocation = YES;
-    
-    _mapView.userTrackingMode = MAUserTrackingModeFollow;
-    
-    
-    
-}
-
-//停止定位
--(void)stopLocation
-{
-    NSLog(@"停止定位");
-    
-    _mapView.showsUserLocation = NO;
-    
-    
-    [ShowWaiting hideWaiting];
-    
-}
-
-
-
-
-
-
-
-//定位数据代理
--(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
-updatingLocation:(BOOL)updatingLocation
-{
-    
-    [self stopLocation];
-    
-    if(updatingLocation)
-    {
-        //取出当前位置的坐标
-        
-        move_by_search = YES;
-        
-        
-        if(userLocation.coordinate.latitude>0 && userLocation.coordinate.longitude>0){
-            
-            
-            
-            
-            NSLog(@"定位位置： lat %f,long %f",userLocation.location.coordinate.latitude,userLocation.location.coordinate.longitude);
-            
-            lon = userLocation.location.coordinate.longitude;
-            lat = userLocation.location.coordinate.latitude;
-            
-            
-            
-            move_by_search = NO;
-            
-            
-            [_mapView setCenterCoordinate:CLLocationCoordinate2DMake(lat,lon) animated:YES];
-            
-            
-            
-            //逆地理编码出地理位置
-            AMapReGeocodeSearchRequest *regeo = [[AMapReGeocodeSearchRequest alloc] init];
-            regeo.location = [AMapGeoPoint locationWithLatitude:lat longitude:lon];
-            regeo.requireExtension = YES;
-            //发起逆地理编码
-            [_mapSearcher AMapReGoecodeSearch:regeo];
-            regeo = nil;
-            
-            
-        }else{
-            
-            //定位失败
-            
-            [ToastView showToast:@"定位失败,请移动地图重新获取位置"];
-            
-        }
     }else{
+        lat = latt;
+        lon = lonn;
+        myCityName = city;
+        location_showAddress = posi;
+        myProvinceName = locationUtil.locationProvince;
         
-        [ToastView showToast:@"定位失败,请重试"];
+        myCityCode = locationUtil.cityCode;
+        myCityAdcode = locationUtil.ad_code;
+        
+        goSetLocationControl.alpha = 0;
+        locationEnable = YES;
+        
+        [self setPositionShowView];
+        
+        [_mapView setCenterCoordinate:CLLocationCoordinate2DMake(latt,lonn) animated:(_mapView.alpha==0?NO:YES)];
+        
+        [self showMap];
+    }
+ 
+
+}
+
+//显示地图
+-(void)showMap{
+    [UIView animateWithDuration:0.2 animations:^{
+        prompView.alpha=0.9;
+        _mapView.alpha = 1;
+        desPosition_bottom.alpha = 1;
+        desPosition.alpha = 1;
+        
+    }];
+    
+    
+}
+
+//位置是否可用
+-(void)setDataEnable:(BOOL)enable{
+
+    if(enable){
+        end_position_label.textColor = TEXTGRAY;
+        [positionControl setEnabled:YES];
+         okControl.alpha=1;
+        [okControl setBackgroundColor:selectMainColor];
+        [okControl setEnabled:YES];
+        [prompControl setEnabled:YES];
+     
+    }else{
+   
+        end_position_label.textColor = [UIColor lightGrayColor];
+        [okControl setBackgroundColor:LINECOLOR];
+        [okControl setEnabled:NO];
+        [positionControl setEnabled:NO];
+        prompView.alpha=0.2;
+         [prompControl setEnabled:NO];
+        
     }
 }
 
@@ -768,58 +627,36 @@ updatingLocation:(BOOL)updatingLocation
     
     if (response.regeocode != nil) {
         
-        get_address_fail = NO;
-        
-        
         myCityName = response.regeocode.addressComponent.city;
-        myProvinceName  = response.regeocode.addressComponent.province;
-        
-        myCityCode = [response.regeocode.addressComponent.citycode integerValue];
+        myProvinceName = response.regeocode.addressComponent.province;
+        if(myCityName == nil || myCityName.length == 0){
+            myCityName = myProvinceName;
+        }
         myCityAdcode = [response.regeocode.addressComponent.adcode integerValue];
         
-        if(myCityName == nil || myCityName.length == 0){
-            //对于直辖市，response.regeocode.addressComponent对象的city属性值为空，province属性中是直辖市名称。
-            myCityName = response.regeocode.addressComponent.province;
-        }
-        
-        
-        
-        end_position_label.textColor = TEXTGRAY;
-        [endControl setEnabled:YES];
-        [endControl setEnabled:YES];
-        
-        
         if([mapType isEqualToString:@"找跑跑"]){
-            currentCityCode = [response.regeocode.addressComponent.citycode integerValue];
-            currentCityAdcode = [response.regeocode.addressComponent.adcode integerValue];
+            
+            thisCityCode = [response.regeocode.addressComponent.citycode integerValue];
+            thisCityAdcode = [response.regeocode.addressComponent.adcode integerValue];
             
     
             adcodeDifference =18;
             
-            if(currentCityCode>0 && currentCityAdcode>0 && myCityCode>0 && myCityAdcode>0){
-                if(!sendPositionType && ( currentCityCode!=myCityCode || (abs(myCityAdcode-currentCityAdcode))>adcodeDifference)){
+            if(thisCityCode>0 && thisCityAdcode>0 && myCityCode>0 && myCityAdcode>0){
+                if(!sendPositionType && ( thisCityCode!=myCityCode || (abs(myCityAdcode-thisCityAdcode))>adcodeDifference)){
+                    
+                    [self setDataEnable:NO];
                     
                     [ToastView showToast:@"抱歉,暂不支持跨城服务,请回到您的所在城市"];
-                    end_position_label.textColor = [UIColor lightGrayColor];
                     end_position_label.text = @"抱歉,暂不支持跨城服务,请回到您的所在城市";
-                    okEnable = NO;
-                    okControl.alpha=0.7;
-                    [endControl setEnabled:NO];
-                    
-                    prompView.alpha=0.2;
-                    isLocationing =  NO;
+                   
                     return;
-                }else{
-                    end_position_label.textColor = TEXTGRAY;
-                    [endControl setEnabled:YES];
-                    okEnable = YES;
-                    
-                    okControl.alpha=1;
                 }
             }
-
         }
         
+        [self showMap];
+    
         @try {
             
             if([response.regeocode.pois count]>0){
@@ -834,11 +671,7 @@ updatingLocation:(BOOL)updatingLocation
                     
                     locationAddress = [NSString stringWithFormat:@"%@%@",response.regeocode.addressComponent.district,poiInfo.address];;
                     location_showAddress = poiInfo.name;
-                    
-                    
-                    NSLog(@"poi-> %@ 距离%@ %d米",location_showAddress,locationAddress,(int)poiInfo.distance);
-                    
-                    
+                   
                     poiInfo = nil;
                     
                 }else{
@@ -856,56 +689,23 @@ updatingLocation:(BOOL)updatingLocation
                 
             }
             
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                    prompView.alpha=0.9;
-                                    _mapView.alpha = 1;
-                                    desPosition_bottom.alpha = 1;
-                                    desPosition.alpha = 1;
-                                    
-                                }
-                             completion:NULL];
-            
-            [ShowWaiting hideWaiting];
-            
-            
-            
+        
             //去掉省市名字
             locationAddress = [locationAddress stringByReplacingOccurrencesOfString:response.regeocode.addressComponent.city withString:@""];
             locationAddress = [locationAddress stringByReplacingOccurrencesOfString:response.regeocode.addressComponent.province withString:@""];
             
             
-        } @catch (NSException *exception) {
-            [ShowWaiting hideWaiting];
-        }
+        } @catch (NSException *exception) {}
         
-        
-        
+    
     }else {
         
-        [okControl setBackgroundColor:LINECOLOR2];
-        okEnable = NO;
-        [endControl setEnabled:YES];
-        get_address_fail = YES;
         myCityName = @"";
         locationAddress = @"";
         
         NSLog(@"未找到逆地理编码结果");
-        [UIView animateWithDuration:0.2f delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                _mapView.alpha = 1;
-                                desPosition_bottom.alpha = 1;
-                                desPosition.alpha = 1;
-                                prompView.alpha=0.9;
-                            }
-                         completion:NULL];
-        
-        [ShowWaiting hideWaiting];
-        
     }
-    
-    
-    isLocationing =  NO;
+
     [self setPositionShowView];
     
 }
@@ -921,22 +721,13 @@ updatingLocation:(BOOL)updatingLocation
     
     
     [search_input resignFirstResponder];
-    okEnable = NO;
-    [endControl setEnabled:NO];
-    [UIView animateWithDuration:0.2f
-                          delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|
-                                 UIViewAnimationOptionBeginFromCurrentState)
-                     animations:^(void) {
-                         
-                         if(!move_by_search){
-                             prompView.alpha=0.2;
-                         }
-                         
-                     }
-                     completion:^(BOOL finished) {
-                         
-                     }];
+ 
+    [UIView animateWithDuration:0.2 animations:^{
+        if(!move_by_search){
+            prompView.alpha=0.2;
+        }
+        
+    }];
 }
 
 
@@ -947,7 +738,6 @@ updatingLocation:(BOOL)updatingLocation
  */
 
 -(void)mapView:(MAMapView *)mapView mapDidMoveByUser:(BOOL)wasUserAction{
-    
     
     
     if(!move_by_search){
@@ -968,28 +758,9 @@ updatingLocation:(BOOL)updatingLocation
         
         
     }else{
-        okEnable = YES;
-        [endControl setEnabled:YES];
+  
         move_by_search = NO;
-        [UIView animateWithDuration:0.2f
-                              delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction|
-                                     UIViewAnimationOptionBeginFromCurrentState)
-                         animations:^(void) {
-                             prompView.alpha=0.2;
-                         }
-                         completion:^(BOOL finished){
-                             [UIView animateWithDuration:0.2f
-                                                   delay:0
-                                                 options:(UIViewAnimationOptionAllowUserInteraction|
-                                                          UIViewAnimationOptionBeginFromCurrentState)
-                                              animations:^(void) {
-                                                  prompView.alpha=0.9;
-                                              }
-                                              completion:NULL];
-                         }];
     }
-    
     
     
     //中心坐标跳一下
@@ -998,10 +769,10 @@ updatingLocation:(BOOL)updatingLocation
                         options:(UIViewAnimationOptionAllowUserInteraction|
                                  UIViewAnimationOptionBeginFromCurrentState)
                      animations:^(void) {
-                         
-                         
+                       
+                        
                          CGRect containerFrame = desPosition.frame;
-                         containerFrame.origin.y = desPosition_bottom.frame.origin.y-28;
+                         containerFrame.origin.y = desPosition_bottom.y-28;
                          desPosition.frame = containerFrame;
                          
                          
@@ -1010,8 +781,10 @@ updatingLocation:(BOOL)updatingLocation
                          
                          [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
                              
+                            
+                             
                              CGRect containerFrame = desPosition.frame;
-                             containerFrame.origin.y = desPosition_bottom.frame.origin.y-24;
+                             containerFrame.origin.y = desPosition_bottom.y-24;
                              desPosition.frame = containerFrame;
                              
                              
@@ -1019,45 +792,29 @@ updatingLocation:(BOOL)updatingLocation
                      }];
 }
 
+
+
 -(void)setPositionShowView {
     
     
-    
-    [UIView animateWithDuration:0.2f
-                          delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|
-                                 UIViewAnimationOptionBeginFromCurrentState)
-                     animations:^(void) {
-                         
-                         prompView.alpha=0.9;
-                     }
-                     completion:NULL];
-    
-    
+    [UIView animateWithDuration:0.2 animations:^{
+         prompView.alpha=0.9;
+    }];
     
     
     if(defaultLocationString != nil && defaultLocationString.length>0){
-        
         end_position_label.text = defaultLocationString;
         defaultLocationString = @"";
     }else{
-        
         end_position_label.text = [NSString stringWithFormat:@"%@%@",locationAddress,location_showAddress];
-        
-        
     }
+    
     
     if(end_position_label.text.length>0){
-        [okControl setBackgroundColor:selectMainColor];
-        okEnable = YES;
-        [endControl setEnabled:YES];
+        [self setDataEnable:YES];
     }else{
-        [okControl setBackgroundColor:LINECOLOR2];
-        okEnable = NO;
-        [endControl setEnabled:NO];
+         [self setDataEnable:NO];
     }
-    
-    
 }
 
 
@@ -1111,15 +868,14 @@ updatingLocation:(BOOL)updatingLocation
     
     isSearching = YES;
     
-    [UIView animateWithDuration:0.3f delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                            search_control.alpha = 0;
-                            cleanSeach_control.alpha = 0.4;
-                            tableUnderBlur.alpha=1;
-                            searchTable.alpha =1;
-                            
-                        }
-                     completion:NULL];
+    [UIView animateWithDuration:0.3f animations:^{
+        search_control.alpha = 0;
+        cleanSeach_control.alpha = 0.4;
+        tableUnderBlur.alpha=1;
+        searchTable.alpha =1;
+        
+    }];
+  
     
 }
 
@@ -1228,17 +984,16 @@ updatingLocation:(BOOL)updatingLocation
             isEmpty = YES;
         }
         
-        
-        [UIView transitionWithView:searchTable duration: 0.2f options: UIViewAnimationOptionTransitionCrossDissolve
-                        animations: ^(void){
-                            if(isEmpty){
-                                [self.view bringSubviewToFront:search_NoresultView];
-                                search_NoresultView.alpha=1;
-                            }else{
-                                search_NoresultView.alpha=0;
-                            }
-                            [searchTable reloadData];
-                        }completion: NULL];
+        [UIView animateWithDuration:0.2f animations:^{
+            if(isEmpty){
+                [self.view bringSubviewToFront:search_NoresultView];
+                search_NoresultView.alpha=1;
+            }else{
+                search_NoresultView.alpha=0;
+            }
+            [searchTable reloadData];
+        }];
+   
         
         
     }else{//选择地点后的poi更新
@@ -1304,11 +1059,13 @@ updatingLocation:(BOOL)updatingLocation
         
     }
     
-    [UIView transitionWithView:searchTable duration: 0.2f options: UIViewAnimationOptionTransitionCrossDissolve
-                    animations: ^(void){
-                        search_NoresultView.alpha=0;
-                        [searchTable reloadData];
-                    }completion: NULL];
+    [UIView animateWithDuration:0.2 animations:^{
+        
+        search_NoresultView.alpha=0;
+        [searchTable reloadData];
+    }];
+    
+
 }
 
 
@@ -1412,7 +1169,7 @@ updatingLocation:(BOOL)updatingLocation
             
             UILabel *showNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, SCREENWIDTH-60, 60)];
             showNameLabel.textAlignment = NSTextAlignmentLeft;
-            showNameLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:14];
+            showNameLabel.font = [UIFont fontWithName:textDefaultFont size:14];
             showNameLabel.textColor = TEXTGRAY;
             showNameLabel.text =poi.poiaddress;
             showNameLabel.numberOfLines = 1;
@@ -1564,12 +1321,6 @@ updatingLocation:(BOOL)updatingLocation
 
 //确定选择
 -(void)selectOk{
-    [ShowWaiting hideWaiting];
-    
-    if(!okEnable){
-        return;
-    }
-    
     
     NSMutableDictionary *endDic = [[NSMutableDictionary alloc] init];
     
@@ -1584,18 +1335,17 @@ updatingLocation:(BOOL)updatingLocation
         }
         if(isSetBegin){
             [endDic setObject:@"begin" forKey:@"type"];
+        }else{
+            [endDic setObject:@"end" forKey:@"type"];
         }
     }else{
         [endDic setObject:@"location_ok" forKey:@"type"];
         
         //截图
-        UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.frame.size.height-SCREENWIDTH*0.618)/2, SCREENWIDTH, SCREENWIDTH*0.618)];
+        UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.height-SCREENWIDTH*0.618)/2, SCREENWIDTH, SCREENWIDTH*0.618)];
         [endDic setObject:snap forKey:@"snap"];
         snap = nil;
     }
-    
-    
-    
     
     
     [endDic setObject:location_showAddress forKey:@"poiname"];
@@ -1603,14 +1353,14 @@ updatingLocation:(BOOL)updatingLocation
     
     [endDic setObject:[NSString stringWithFormat:@"%f",lat] forKey:@"lat"];
     [endDic setObject:[NSString stringWithFormat:@"%f",lon] forKey:@"lon"];
-        [endDic setObject:[NSString stringWithFormat:@"%d",(int)currentCityAdcode] forKey:@"adCode"];
-    [endDic setObject:myCityName forKey:@"city"];
+        [endDic setObject:[NSString stringWithFormat:@"%d",(int)thisCityAdcode] forKey:@"adCode"];
+    [endDic setObject:[APPUtils fixString:myCityName] forKey:@"city"];
     
     
     [self.delegate passValue:endDic];
     endDic = nil;
     
-    [self.navigationController popViewControllerAnimated:YES];
+     [self closePage];
     
 }
 
@@ -1623,26 +1373,33 @@ updatingLocation:(BOOL)updatingLocation
 
 - (void)beBack{
     
-    
     hasOpened = NO;
-    [ShowWaiting hideWaiting];
-    
-    _mapView = nil;
-    _mapSearcher = nil;
-    
+
     if(isSearching){
         [self close_search:NO close:YES];
     }else{
+        
+        _mapView = nil;
+        _mapSearcher = nil;
+        
         NSMutableDictionary *endDic = [[NSMutableDictionary alloc] init];
         [endDic setObject:@"end_cancle" forKey:@"type"];
         
         [self.delegate passValue:endDic];
         endDic = nil;
+        
+        [self closePage];
+       
+    }
+
+}
+
+-(void)closePage{
+    if(_presentType){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }else{
         [self.navigationController popViewControllerAnimated:YES];
     }
-    
-    
-    
 }
 
 

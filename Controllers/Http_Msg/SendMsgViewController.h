@@ -126,10 +126,9 @@
     
     NSTimer *refreshTimer;
     
-    NSString *sendWho;
 }
 
--(id)initWithConversation:(Conversation*)conv show:(BOOL)show send2User:(NSString*)send2User;
+-(id)initWithConversation:(Conversation*)conv show:(BOOL)show;
 
 @property (strong, nonatomic) Conversation *conversation;//打开的绘画组
 @property (assign, nonatomic) BOOL send2User;//发给客户

@@ -32,8 +32,14 @@
 
 
 @property (assign,nonatomic) BOOL share_type;//需要分享
+@property (retain,nonatomic) NSString *shareTitle;//分享标题
 @property (retain,nonatomic) NSString *shareContents;//分享内容
 @property (retain,nonatomic) NSString *shareIcon;//分享图标
+@property (retain,nonatomic) UIImage *shareDefaultIcon;//默认分享图标
+
+//跑跑用
+
+@property (assign,nonatomic) BOOL couponType;//代金券类型
 
 @end
 

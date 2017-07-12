@@ -58,7 +58,7 @@
     titleLabel = [[UILabel alloc] initWithFrame:CGRectMake((SCREENWIDTH-150)/2, 20, 150, 44)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = [UIColor whiteColor];
-    titleLabel.font =  [UIFont fontWithName:@"HelveticaNeue-Bold" size:17];
+    titleLabel.font =  [UIFont fontWithName:textDefaultBoldFont size:17];
     titleLabel.text = @"选择照片";
     [titleView addSubview:titleLabel];
     
@@ -76,7 +76,7 @@
     
     
     
-    bodyView = [[UIView alloc] initWithFrame:CGRectMake(0, titleView.frame.size.height+titleView.frame.origin.y, SCREENWIDTH, SCREENHEIGHT-titleView.frame.size.height)];
+    bodyView = [[UIView alloc] initWithFrame:CGRectMake(0, titleView.height+titleView.y, SCREENWIDTH, SCREENHEIGHT-titleView.height)];
     
     [bodyView setBackgroundColor:[UIColor whiteColor]];
     [self.view addSubview:bodyView];
@@ -91,9 +91,9 @@
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
     
     if(self.isTuya){
-        collection = [[UICollectionView alloc]initWithFrame:CGRectMake(5, 5, SCREENWIDTH-10,bodyView.frame.size.height-10) collectionViewLayout:flowLayout];
+        collection = [[UICollectionView alloc]initWithFrame:CGRectMake(5, 5, SCREENWIDTH-10,bodyView.height-10) collectionViewLayout:flowLayout];
     }else{
-        collection = [[UICollectionView alloc]initWithFrame:CGRectMake(5, 5, SCREENWIDTH-10,bodyView.frame.size.height-55) collectionViewLayout:flowLayout];
+        collection = [[UICollectionView alloc]initWithFrame:CGRectMake(5, 5, SCREENWIDTH-10,bodyView.height-55) collectionViewLayout:flowLayout];
     }
     
     
@@ -107,7 +107,7 @@
     
     
     if(!self.isTuya){
-        bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, bodyView.frame.size.height-45, SCREENWIDTH, 45)];
+        bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, bodyView.height-45, SCREENWIDTH, 45)];
         
         UIImageView *bottomLine = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 0.5)];
         [bottomLine setBackgroundColor:[UIColor lightGrayColor]];

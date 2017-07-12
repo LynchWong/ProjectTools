@@ -72,7 +72,7 @@ typedef void (^DownloadResultBlock)(NSInteger downloading); //语音下载进度
 -(void)sendMsg;//发送消息
 @property (strong, nonatomic) MsgUtil *msgUtil;
 @property (assign, nonatomic) BOOL sending;//发送中
-@property (copy, nonatomic) NSString *sendWho;//发给哪边
+
 
 
 //检查语音下载

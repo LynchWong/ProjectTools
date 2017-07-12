@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <MAMapKit/MAMapKit.h>
-#import <AMapSearchKit/AMapSearchKit.h>
 #import "APIKey.h"
 #import "PassValueDelegate.h"
+#import "LocationUtils.h"
 @class MyBtnControl;
-@interface SelectEndViewController : UIViewController<UITextFieldDelegate,MAMapViewDelegate, AMapSearchDelegate,UITableViewDataSource,UITableViewDelegate,CLLocationManagerDelegate>{
+@class LocationUtils;
+@interface SelectEndViewController : UIViewController<UITextFieldDelegate,MAMapViewDelegate,AMapSearchDelegate, UITableViewDataSource,UITableViewDelegate>{
     
     NSString *mapType;//使用app
     
@@ -20,28 +21,28 @@
     AMapSearchAPI *_mapSearcher;//搜索类
     BOOL hasOpened;
     
-    NSString *myCityName;
-    NSString *myProvinceName;
-    NSInteger myCityCode;
-    NSInteger myCityAdcode;
     
     UIImageView *desPosition;
     UIImageView *desPosition_bottom;
     
     //标注提示
     UIView *prompView;
-    
-    
+    MyBtnControl *prompControl;
     
     //定位
-    UIView *llview;
-    UIImageView *locationImage;
-    BOOL isLocationing;
+    BOOL locationEnable;
+    LocationUtils * locationUtil;
+    NSInteger myCityCode;
+    NSInteger myCityAdcode;
     
+    NSInteger thisCityCode;
+    NSInteger thisCityAdcode;
     
     CGFloat lon;//选择坐标
     CGFloat lat;
     NSString *locationAddress;//目标地址
+    NSString *myProvinceName;
+    NSString *myCityName;
     NSString *location_showAddress;//poi名字
     NSInteger adcodeDifference;
     
@@ -62,7 +63,7 @@
     
     
     UILabel *end_position_label;
-    MyBtnControl *endControl;
+    MyBtnControl *positionControl;
     MyBtnControl*okControl;
     
     
@@ -73,7 +74,7 @@
     
     BOOL locationAsking;//未给定位权限提示中
     BOOL move_by_search;//只显示当前名字 map移动后不做geo地理查询
-    BOOL get_address_fail;//获取位置失败
+
     
     
     BOOL defaultData;
@@ -84,15 +85,9 @@
     NSString *defaultLocationString;
     
     
-    CLLocationManager *locManager;
     
-    NSInteger currentCityCode;
-    NSInteger currentCityAdcode;
-    
-    UIControl *goSetLocationControl;//开启定位
-    
-    BOOL okEnable;
-    
+    MyBtnControl *goSetLocationControl;//开启定位
+ 
     BOOL sendPositionType;//发送位置类型
     BOOL isShop;
   
@@ -101,7 +96,7 @@
 
 @property(nonatomic,assign) NSObject<PassValueDelegate> *delegate;
 @property(nonatomic,strong) NSMutableArray *addressArr;//历史记录
-@property(nonatomic,assign) BOOL locationEnable;
+@property(nonatomic,assign) BOOL presentType;//控制器类型
 
 
 typedef void (^MapDeleteBlock)(NSString *addressId);
@@ -112,6 +107,7 @@ typedef void (^MapDeleteBlock)(NSString *addressId);
 
 
 - (id)initWithSendPostion:(UIColor*)color;
+
 
 
 @end
