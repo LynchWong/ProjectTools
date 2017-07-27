@@ -80,7 +80,7 @@
         
     }
     
-    if(!_not_highlight){
+    if(!_not_highlight && !_not_ShareHighlight){
         self.alpha=0.7;
     }
    
@@ -245,7 +245,7 @@
         
     }
     
-    if(!_not_highlight){
+    if(!_not_highlight && !_not_ShareHighlight){
         self.alpha=1;
     }
 }

@@ -93,7 +93,9 @@
     [_mapView setRotateEnabled:NO];
     
     
-    
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+    infoDictionary = nil;
     
     //返回
     backView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
@@ -142,7 +144,7 @@
     
     
     //定位按钮
-    UIView *locationView =  [APPUtils getLocationBtn:[UIImage imageNamed:@"location_myself.png"] x:10 y:SCREENHEIGHT-locationYAdd width:0];
+    UIView *locationView =  [APPUtils getLocationBtn:[anno_name isEqualToString:@"终点"]?[UIImage imageNamed:@"location_myself_red.png"]:[UIImage imageNamed:@"location_myself.png"] x:10 y:SCREENHEIGHT-locationYAdd width:0];
     [bodyView addSubview:locationView];
     
     MyBtnControl *locationControl = (MyBtnControl*)[locationView viewWithTag:123];
@@ -156,7 +158,7 @@
     __weak typeof(self) weakSelf = self;
     
     //联系人追踪
-    followView =  [APPUtils getLocationBtn:(oldLon == 50)?[UIImage imageNamed:@"begin_anno.png"]:[UIImage imageNamed:@"paopao_head.png"] x:SCREENWIDTH-locationView.width y:locationView.y width:0] ;
+    followView =  [APPUtils getLocationBtn:(oldLon == 50)?([anno_name isEqualToString:@"终点"]?[UIImage imageNamed:@"end_anno.png"]:[UIImage imageNamed:@"begin_anno.png"]):([appName isEqualToString:@"找跑跑"]?[UIImage imageNamed:@"paopao_head.png"]:[UIImage imageNamed:@"default_head_boy_60.png"]) x:SCREENWIDTH-locationView.width y:locationView.y width:0] ;
     [bodyView addSubview:followView];
     
     MyBtnControl * followControl = (MyBtnControl*)[followView viewWithTag:123];
@@ -343,12 +345,16 @@
             
             
             
+   
+                
             if(motorRunningTimer.isValid){
                 [motorRunningTimer invalidate];
                 motorRunningTimer = nil;
             }
             
             motorRunningTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(motorRunning) userInfo:nil repeats:YES];
+            
+            
             
             [UIView animateWithDuration:0.2f animations:^{
                 _mapView.alpha  = 1;
@@ -367,21 +373,31 @@
         
         if(motorRunningCounter==0){
             
-            if(direction == 1){
-                [motorRunningImageView setImage:[UIImage imageNamed:@"left_motor1.png"]];
+            if([appName isEqualToString:@"找跑跑"]){
+                if(direction == 1){
+                    [motorRunningImageView setImage:[UIImage imageNamed:@"left_motor1.png"]];
+                }else{
+                    [motorRunningImageView setImage:[UIImage imageNamed:@"motor1.png"]];
+                }
             }else{
-                [motorRunningImageView setImage:[UIImage imageNamed:@"motor1.png"]];
+                [motorRunningImageView setImage:[UIImage imageNamed:@"default_head_boy_60_left.png"]];
             }
+            
             
             
             motorRunningCounter = 1;
         }else{
             
-            if(direction == 1){
-                [motorRunningImageView setImage:[UIImage imageNamed:@"left_motor2.png"]];
+            if([appName isEqualToString:@"找跑跑"]){
+                if(direction == 1){
+                    [motorRunningImageView setImage:[UIImage imageNamed:@"left_motor2.png"]];
+                }else{
+                    [motorRunningImageView setImage:[UIImage imageNamed:@"motor2.png"]];
+                }
             }else{
-                [motorRunningImageView setImage:[UIImage imageNamed:@"motor2.png"]];
+                [motorRunningImageView setImage:[UIImage imageNamed:@"default_head_boy_60_right.png"]];
             }
+           
             
             motorRunningCounter = 0;
         }
@@ -481,11 +497,16 @@
                 
                 [annoImage setFrame:CGRectMake(14.5, 14.5, 25, 25)];
                 
-                if(direction == 1){
-                    [annoImage setImage:[UIImage imageNamed:@"left_motor1.png"]];
+                if([appName isEqualToString:@"找跑跑"]){
+                    if(direction == 1){
+                        [annoImage setImage:[UIImage imageNamed:@"left_motor1.png"]];
+                    }else{
+                        [annoImage setImage:[UIImage imageNamed:@"motor1.png"]];
+                    }
                 }else{
-                    [annoImage setImage:[UIImage imageNamed:@"motor1.png"]];
+                    [annoImage setImage:[UIImage imageNamed:@"default_head_boy_60.png"]];
                 }
+                
                 
                 motorRunningImageView = annoImage;
                 

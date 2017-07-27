@@ -259,10 +259,10 @@
         if(msgsArray == nil || [msgsArray isEqual:[NSNull null]] || [msgsArray count]==0){//单一分组的消息下载完毕
             
             @try {
-                //更新当前下载的分组 更新lastid
-                Conversation *conv = [_unreadMsgGroupArray objectAtIndex:0];
-                [self checkGroupExist:conv];
-                conv = nil;
+//                //更新当前下载的分组 更新lastid
+//                Conversation *conv = [_unreadMsgGroupArray objectAtIndex:0];
+//                [self checkGroupExist:conv];
+//                conv = nil;
                 
                 [_unreadMsgGroupArray removeObjectAtIndex:0];
                 
@@ -296,7 +296,13 @@
                         resultSet=nil;
                         sqlQuery = nil;
                         
+                        @try {
+                            
+                             [[NSNotificationCenter defaultCenter] postNotificationName:@"showBroadCast" object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:openOrderId,@"openOrderId",showContent,@"showContent",nil]];
+                            
+                        } @catch (NSException *exception) {}
                         
+                       
                         
                         
                         openOrderId = nil;
@@ -587,8 +593,8 @@
 +(NSString*)getSave2MsgGroupListSql:(Conversation*)conv{
     
    
-    NSString *nickName = [[APPUtils getUserDefaults] stringForKey:@"nickname"];
-    NSString *realName = [[APPUtils getUserDefaults] stringForKey:@"realname"];
+    NSString *nickName = [APPUtils get_ud_string:@"nickname"];
+    NSString *realName = [APPUtils get_ud_string:@"realname"];
     
     if(nickName!=nil){
         nickName = @"";
@@ -641,8 +647,8 @@
 +(NSString*)getUpdateMsgGroupListSql:(Conversation*)conv{
     
    
-    NSString *nickName = [[APPUtils getUserDefaults] stringForKey:@"nickname"];
-    NSString * realName = [[APPUtils getUserDefaults] stringForKey:@"realname"];
+    NSString *nickName = [APPUtils get_ud_string:@"nickname"];
+    NSString * realName = [APPUtils get_ud_string:@"realname"];
     
     
     if(conv.people==2){
@@ -661,21 +667,12 @@
         }
         
     }
-    
-    NSString *sqlQuery = [NSString stringWithFormat:@"select sum(unread_news_count) from MsgGroupList where username='%@';",[AFN_util getUserId]];
-    FMResultSet *rs = [[MainViewController getDatabase] queryDatabase:sqlQuery];
-    NSInteger unreadMsgCount=0;
-    while ([rs next]) {
-        unreadMsgCount =  [rs intForColumnIndex:0];
-        break;
-    }
-    [rs close];
-    rs = nil;
-    sqlQuery = nil;
+
+ 
     
     
     NSString *sqlString = [NSString stringWithFormat:@"update MsgGroupList set avatar = '%@',last_news_id = '%d', lastmsg = '%@', lasttime = '%d',lastuid = '%d',lastuser = '%@', name = '%@',otheruid = '%d',people = '%d',uid = '%d',unread_news_count = '%d' ,user = '%@',avatar_md5 = '%@' where group_id='%d' and username = '%@';",
-                           conv.avatar,(int)conv.last_news_id,conv.lastmsg,(int)conv.lasttime,(int)conv.lastuid,conv.lastuser,conv.otherName,(int)conv.otheruid,(int)conv.people,(int)conv.uid,(int)conv.unread_news_count+unreadMsgCount,conv.user,@"",(int)conv.group_id,[AFN_util getUserId]];
+                           conv.avatar,(int)conv.last_news_id,conv.lastmsg,(int)conv.lasttime,(int)conv.lastuid,conv.lastuser,conv.otherName,(int)conv.otheruid,(int)conv.people,(int)conv.uid,(int)conv.unread_news_count,conv.user,@"",(int)conv.group_id,[AFN_util getUserId]];
     
     return sqlString;
 }
@@ -807,8 +804,7 @@
         for (NSString *tempID in sendingIdsArr) {
             @try {
                 
-                 NSDictionary *tempDic = [[APPUtils getUserDefaults] objectForKey:tempID];
-                
+                NSDictionary *tempDic =  [[APPUtils getUserDefault] objectForKey:tempID];
                 if(tempDic!=nil && ![tempDic isEqual:[NSNull null]]){
                    
                     NSInteger sendingStatus = [[tempDic objectForKey:@"id"] integerValue];
@@ -882,11 +878,10 @@
         //转wav才能播放
         if ([VoiceConverter ConvertAmrToWav:[[[MainViewController sharedMain] conversationPaths] stringByAppendingPathComponent:msg.fileName] wavSavePath:playPath]){
             
-           
-            NSString *earState = [[APPUtils getUserDefaults] stringForKey:@"err_setting"];
+        
             
             
-            if(earState!=nil&&[earState isEqualToString:@"on"]){
+            if([APPUtils get_ud_int:@"err_setting"] ==1){
                 //设置听筒模式
                 [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
             }else{

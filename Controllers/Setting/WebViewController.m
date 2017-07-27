@@ -292,15 +292,9 @@
                   share_Image = [APPUtils scaleToSize:share_Image size:CGSizeMake(120, 120)];
             }
             
-            [MainViewController sharedMain].shareUtils.only_share = YES;
-            [MainViewController sharedMain].shareUtils.share_title_content= @"分享到";
-            [MainViewController sharedMain].shareUtils.shareTitle = _shareTitle==nil?webTitle:_shareTitle;
-            [MainViewController sharedMain].shareUtils.shareBody = _shareContents;
-            [MainViewController sharedMain].shareUtils.shareUrl = original_url;
-            [MainViewController sharedMain].shareUtils.imageStore = share_Image;
-            [[MainViewController sharedMain].shareUtils openShareView];
-    
 
+            [[ShareUtils share] openShareView:YES title:@"分享到" share_Title:_shareTitle==nil?webTitle:_shareTitle  share_Body:_shareContents share_Url:original_url shareApp:NO shareImg:share_Image];
+        
         });
         
         

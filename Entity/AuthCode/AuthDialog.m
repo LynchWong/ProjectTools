@@ -49,7 +49,7 @@
         
         //输入
         authInput =  [[UITextField alloc] initWithFrame:CGRectMake(15, 0, authWidth*0.6-30, scodeView.height)];
-        [authInput setTextColor:[UIColor darkGrayColor]];
+        [authInput setTextColor:TEXTGRAY];
         authInput.placeholder = @"请输入右图验证码";
         [authInput setValue:[UIColor lightGrayColor] forKeyPath:@"_placeholderLabel.textColor"];
         [authInput setKeyboardType:UIKeyboardTypeNumberPad];

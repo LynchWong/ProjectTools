@@ -25,6 +25,8 @@ static NSUserDefaults *user_Defaults;
 //获取启动页尺寸
 +(NSString*)getLoadingImageName:(NSInteger)num;
 
+//是否在审核时间
++(BOOL)reviewOk;
 
 //计算NSData 的MD5值
 +(NSString*)getMD5WithData:(NSData*)data;
@@ -130,6 +132,9 @@ static NSUserDefaults *user_Defaults;
 //去掉特殊符号
 +(NSString*)clearSpecialSymbols:(NSString*)string;
 
+//将数组里的电话换成*
++(NSString*)changePhoneNum2Star:(NSString*)string;
+
 //字母顺序
 +(NSInteger)getWordSort:(NSString*)word;
 
@@ -208,6 +213,9 @@ static NSUserDefaults *user_Defaults;
 //获取一行高
 +(CGFloat)getOnelineHeight:(UIFont*)font;
 
+//是否超过一行
++(BOOL)moreThanOneLine:(UIFont*)font width:(float)width words:(NSString*)words;
+
 //根据键盘号码获取字母
 +(NSArray*)getLetterByNum:(NSInteger)num;
 
@@ -219,6 +227,12 @@ static NSUserDefaults *user_Defaults;
 
 //获取通讯录读取权限
 +(BOOL)getReadContactsBookPermission;
+
+//根据字母获取键盘号码
++(NSString*)getNumByLetter:(NSString*)letter;
+
+//获取纯粹的手机号
++(NSString*)get_clear_num:(NSString*)num;
 
 //钱的单位
 +(NSString*)getMoneyUnit:(NSInteger)num unit:(NSString*)unit;
@@ -233,7 +247,10 @@ static NSUserDefaults *user_Defaults;
 +(NSString*)weekdayStringFromDate:(NSDate*)inputDate;
 
 //获得NSUserDefaults
-+(NSUserDefaults*)getUserDefaults;
++(NSUserDefaults*)getUserDefault;
++(NSString*)get_ud_string:(NSString*)key;
++(NSInteger)get_ud_int:(NSString*)key;
+
 
 //设置NSUserDefaults
 +(void)userDefaultsSet:(NSObject*)value forKey:(NSString*)key;
@@ -251,10 +268,7 @@ static NSUserDefaults *user_Defaults;
 //获取定位按钮
 +(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width;
 
-/*将高德地图zoom调整到显示全部anno的值
- add值越大 zoomlevel就越小
- */
-+(void)zoomToMapPoints:(MAMapView*)mapView annotations:(NSArray*)annotations add:(float)add;
+
 
 //转圈
 +(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view;

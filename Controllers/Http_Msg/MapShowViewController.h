@@ -27,6 +27,7 @@
     double oldLon;
     NSString *desLocation;
     
+    NSString *appName;
     double anno_lat;//跑跑用
     double anno_lon;
     NSString *anno_name;

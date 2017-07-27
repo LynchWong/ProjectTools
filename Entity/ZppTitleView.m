@@ -47,7 +47,7 @@
     
     UIImageView *backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, (44-18)/2, 18, 18)];
     UIImage *back;
-    if([appCurName isEqualToString:@"找跑跑"]){
+    if([appCurName hasPrefix:@"找跑跑"]){
          back = [UIImage imageNamed:@"beback_gray.png"];
     }else{
          back = [UIImage imageNamed:@"goBack_white.png"];

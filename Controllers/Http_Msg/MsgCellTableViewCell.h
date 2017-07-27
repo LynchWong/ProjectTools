@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "OneMsgEntity.h"
 #import "Conversation.h"
+#import "PersonPageViewController.h"
 @class MsgCellTableViewCell;
 @class MyBtnControl;
 

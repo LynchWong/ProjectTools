@@ -176,7 +176,7 @@ extern NSString * const WeiboSDKGetAidFailNotification;
 /*
  第三方调用微博短信注册或者登陆
  @param navTitle 为登陆页navigationBar的title，如果为空的话，默认为“验证码登陆”
-*/
+ */
 + (void)messageRegister:(NSString *)navTitle;
 @end
 
@@ -319,7 +319,7 @@ extern NSString * const WeiboSDKGetAidFailNotification;
  当用户没有安装微博客户端或微博客户端过低无法支持SSO的时候是否弹出SDK自带的Webview进行授权
  
  如果设置为YES，当用户没有安装微博客户端或微博客户端过低无法支持SSO的时候会自动弹出SDK自带的Webview进行授权。
-
+ 
  如果设置为NO，会根据 shouldOpenWeiboAppInstallPageIfNotInstalled 属性判断是否弹出安装/更新微博的对话框
  
  默认为YES

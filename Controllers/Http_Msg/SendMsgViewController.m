@@ -78,13 +78,9 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)getuserID{
     
-   
-
-    nickName = [[APPUtils getUserDefaults] stringForKey:@"nickname"];
-    realname = [[APPUtils getUserDefaults] stringForKey:@"realname"];
-    myAvatarUrl = [[APPUtils getUserDefaults] stringForKey:@"avatar"];
-    [[APPUtils getUserDefaults] synchronize];
-    
+    nickName = [APPUtils get_ud_string:@"nickname"];
+    realname = [APPUtils get_ud_string:@"realname"];
+    myAvatarUrl = [APPUtils get_ud_string:@"avatar"];
 }
 
 
@@ -275,7 +271,7 @@ static NSString *CellIdentifier = @"SmsCell";
         [weakSelf bottomMenuControl];
     };
     
-    [openMenuBtn addImage:[UIImage imageNamed:@"type_select_btn_nor.png"] frame:CGRectMake((openMenuBtn.width-imgWidth)/2,(openMenuBtn.width-imgWidth)/2, imgWidth, imgWidth)];
+    [openMenuBtn addImage:[UIImage imageNamed:@"type_select_btn_nor.png"] frame:CGRectMake((openMenuBtn.width-imgWidth)/2,(openMenuBtn.height-imgWidth)/2, imgWidth, imgWidth)];
     
     
     
@@ -2017,7 +2013,7 @@ static NSString *CellIdentifier = @"SmsCell";
         
         voiceTimeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(0, 0, voiceView.width, voiceView.height-25)];
         voiceTimeLabel.textColor = [UIColor whiteColor];
-        voiceTimeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:70];
+        voiceTimeLabel.font = [UIFont fontWithName:textDefaultBoldFont size:70];
         voiceTimeLabel.textAlignment = NSTextAlignmentCenter;
         voiceTimeLabel.alpha=0;
         [voiceView addSubview:voiceTimeLabel];

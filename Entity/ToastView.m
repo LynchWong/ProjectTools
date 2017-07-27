@@ -45,7 +45,7 @@
         
         text = [text_ copy];
         
-        UIFont *font =  [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+        UIFont *font = [UIFont boldSystemFontOfSize:14];
         CGSize textSize = [text sizeWithFont:font
                            constrainedToSize:CGSizeMake(280, MAXFLOAT)
                                lineBreakMode:UILineBreakModeWordWrap];
@@ -184,16 +184,13 @@
 }
 
 +(void)showToast:(NSString*)toastString{
+    if(!toastShowing){
+        toastShowing = YES;
+        ToastView *toast = [[[ToastView alloc] initWithText:toastString] autorelease];
+        [toast setDuration:2.0];
+        [toast showFromBottomOffset:60];
+    }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(!toastShowing){
-            toastShowing = YES;
-            ToastView *toast = [[[ToastView alloc] initWithText:toastString] autorelease];
-            [toast setDuration:2.0];
-            [toast showFromBottomOffset:60];
-        }
-    });
-
 }
 
 @end

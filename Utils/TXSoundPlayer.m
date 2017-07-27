@@ -42,7 +42,7 @@ static TXSoundPlayer* soundplayer=nil;
 }
 
 -(void)stop{
-    _checkVoice = NO;
+ 
     [player stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
     player = nil;
     
@@ -85,10 +85,7 @@ static TXSoundPlayer* soundplayer=nil;
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance *)utteranc
 {
     _tts_playing = NO;
-    if(_checkVoice){
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"checkWindowVoiceAndPlay" object:nil userInfo:nil];//读语音任务
-        _checkVoice = NO;
-    }
+   
     
     if(_playOverAlert){
         self.playOverBlock();

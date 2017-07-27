@@ -127,7 +127,7 @@
                     noticeLabel.textAlignment = NSTextAlignmentLeft;
                     noticeLabel.textColor = wColor;
                     noticeLabel.numberOfLines = 1;
-                    noticeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13];
+                    noticeLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
                     [noticeScrollView addSubview:noticeLabel];
                     
                     NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];

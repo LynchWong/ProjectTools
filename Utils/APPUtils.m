@@ -94,17 +94,47 @@
     NSString *nowVersion = [self getIphoneVersion];
     NSString *loading;
     if([nowVersion isEqualToString:@"iphone4"]){
-        loading = [NSString stringWithFormat:@"ip4_%d",num];
+        loading = [NSString stringWithFormat:@"ip4_%d",(int)num];
     }else if([nowVersion isEqualToString:@"iphone5"]){
-        loading = [NSString stringWithFormat:@"ip5_%d",num];
+        loading = [NSString stringWithFormat:@"ip5_%d",(int)num];
     }else if([nowVersion isEqualToString:@"iphone6"]){
-        loading = [NSString stringWithFormat:@"ip6_%d",num];
+        loading = [NSString stringWithFormat:@"ip6_%d",(int)num];
     }else{
-        loading = [NSString stringWithFormat:@"ip7_%d",num];
+        loading = [NSString stringWithFormat:@"ip7_%d",(int)num];
     }
     return loading;
 }
 
+
+//是否在审核时间
++(BOOL)reviewOk{
+    
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    infoDictionary = nil;
+    
+    NSString *versionString = [version stringByReplacingOccurrencesOfString:@"." withString:@""];
+    
+  
+    NSInteger reviewok = [APPUtils get_ud_int:[NSString stringWithFormat:@"reviewok_%@",versionString]];
+
+                           
+                          
+    if(reviewok==1){
+        return YES;
+    }else{
+        //保障
+        NSInteger nowTime = [[APPUtils GetCurrentTimeString] integerValue];
+        if(nowTime>1491122478){//2017/4/2 16:41:18
+        
+            [APPUtils userDefaultsSet:@"1"  forKey:[NSString stringWithFormat:@"reviewok_%@",versionString]];
+      
+            return YES;
+        }else{
+            return NO;
+        }
+    }
+}
 
 //计算NSData 的MD5值
 + (NSString*)getMD5WithData:(NSData *)data{
@@ -729,6 +759,55 @@
 }
 
 
+//将数组里的电话换成*
++(NSString*)changePhoneNum2Star:(NSString*)string{
+    
+    
+
+    //数字条件
+    NSRegularExpression *tNumRegularExpression = [NSRegularExpression regularExpressionWithPattern:@"[0-9]" options:NSRegularExpressionCaseInsensitive error:nil];
+    
+    //符合数字条件的有几个字节
+    NSUInteger tNumMatchCount = [tNumRegularExpression numberOfMatchesInString:string
+                                                                       options:NSMatchingReportProgress
+                                                                         range:NSMakeRange(0, string.length)];
+    
+    if(tNumMatchCount>0){
+        @try {
+            
+            
+            string = [string stringByReplacingOccurrencesOfString:@" " withString:@""]; //去掉空格
+            
+            NSString *pattern =@"\\d*";
+            NSRegularExpression *regex = [[NSRegularExpression alloc] initWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
+            
+            NSArray *arr = [regex matchesInString:string options:NSMatchingReportProgress range:NSMakeRange(0,string.length)];
+            for(int i=0;i<[arr count];i++){
+                NSTextCheckingResult *result = [arr objectAtIndex:i];
+                if (result.range.length==11) {
+                    
+                    NSString *phone = [string substringWithRange:result.range];
+                    string = [string stringByReplacingOccurrencesOfString:phone withString:@"***"];
+                }
+                result=nil;
+            }
+            
+            arr = nil;
+            return string;
+            
+        } @catch (NSException *exception) {
+            
+            return string;
+        }
+        
+    }else{
+        return string;
+    }
+    
+}
+
+
+
 //字母顺序
 +(NSInteger)getWordSort:(NSString*)word{
     
@@ -1154,6 +1233,24 @@
     return oneLineHeight;
 }
 
+//是否超过一行
++(BOOL)moreThanOneLine:(UIFont*)font width:(float)width words:(NSString*)words{
+
+    NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+    paragraph.alignment = NSLineBreakByWordWrapping;
+    
+    NSDictionary *attribute = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraph};
+    
+    CGSize oneSize = [words boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+    
+    if(oneSize.width<width){
+        return NO;
+    }else{
+        return YES;
+    }
+    
+}
+
 
 //根据键盘号码获取字母
 +(NSArray*)getLetterByNum:(NSInteger)num{
@@ -1248,6 +1345,112 @@
     }else{
         return YES;
     }
+}
+
+
+//根据字母获取键盘号码
++(NSString*)getNumByLetter:(NSString*)letter{
+    
+    NSString *number = @"";
+    if([[letter lowercaseString] isEqualToString:@"a"]||[[letter lowercaseString] isEqualToString:@"b"]||[[letter lowercaseString] isEqualToString:@"c"]){
+        number = @"2";
+    }else if([[letter lowercaseString] isEqualToString:@"d"]||[[letter lowercaseString] isEqualToString:@"e"]||[[letter lowercaseString] isEqualToString:@"f"]){
+        number = @"3";
+    }else if([[letter lowercaseString] isEqualToString:@"g"]||[[letter lowercaseString] isEqualToString:@"h"]||[[letter lowercaseString] isEqualToString:@"i"]){
+        number = @"4";
+    }else if([[letter lowercaseString] isEqualToString:@"j"]||[[letter lowercaseString] isEqualToString:@"k"]||[[letter lowercaseString] isEqualToString:@"l"]){
+        number = @"5";
+    }else if([[letter lowercaseString] isEqualToString:@"m"]||[[letter lowercaseString] isEqualToString:@"n"]||[[letter lowercaseString] isEqualToString:@"o"]){
+        number = @"6";
+    }else if([[letter lowercaseString] isEqualToString:@"p"]||[[letter lowercaseString] isEqualToString:@"q"]||[[letter lowercaseString] isEqualToString:@"r"]||[[letter lowercaseString] isEqualToString:@"s"]){
+        number = @"7";
+    }else if([[letter lowercaseString] isEqualToString:@"t"]||[[letter lowercaseString] isEqualToString:@"u"]||[[letter lowercaseString] isEqualToString:@"v"]){
+        number = @"8";
+    }else if([[letter lowercaseString] isEqualToString:@"w"]||[[letter lowercaseString] isEqualToString:@"x"]||[[letter lowercaseString] isEqualToString:@"y"]||[[letter lowercaseString] isEqualToString:@"z"]){
+        number = @"9";
+    }
+    
+    return number;
+}
+
+
+//获取纯粹的手机号
++(NSString*)get_clear_num:(NSString*)num{
+    
+    //替换开头
+    BOOL ruleExist = NO;
+//    @try {
+//        for(int i=0;i<[[MainViewController getRuleArray] count];i++){
+//            ruleExist = YES;
+//            if([num hasPrefix:[[MainViewController getRuleArray] objectAtIndex:i]]){
+//                NSInteger ruleLength = ((NSString*)[[MainViewController getRuleArray] objectAtIndex:i]).length;
+//                num = [num substringWithRange:NSMakeRange(ruleLength,num.length-ruleLength)];
+//                break;
+//            }
+//        }
+//    } @catch (NSException *exception) {}
+    if(!ruleExist){
+        if([num hasPrefix:@"17951"]){
+            num = [num substringWithRange:NSMakeRange(0,5)];
+        }else if([num hasPrefix:@"+86"]){
+            num = [num substringWithRange:NSMakeRange(0,3)];
+        }else if([num hasPrefix:@"17909"]){
+            num = [num substringWithRange:NSMakeRange(0,5)];
+        }
+        
+    }
+    
+    
+    //替换
+    BOOL replaceExist = NO;
+//    @try {
+//        for(int i=0;i<[[MainViewController getReplaceArray] count];i++){
+//            replaceExist = YES;
+//            num = [num stringByReplacingOccurrencesOfString:[[MainViewController getReplaceArray] objectAtIndex:i] withString:@""];
+//        }
+//    } @catch (NSException *exception) {}
+    
+    if(!replaceExist){
+        num = [num stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        num = [num stringByReplacingOccurrencesOfString:@"+86" withString:@""];
+    }
+    
+    
+    num = [num stringByReplacingOccurrencesOfString:@" " withString:@""];
+    num = [APPUtils clearSpecialSymbols:num];
+    num = [num stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    
+    
+    if(![APPUtils isNumber:num]){
+        NSMutableString *numberString = [[NSMutableString alloc] init];
+        NSString *tempStr;
+        NSScanner *scanner = [NSScanner scannerWithString:num];
+        NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
+        
+        while (![scanner isAtEnd]) {
+            // Throw away characters before the first number.
+            [scanner scanUpToCharactersFromSet:numbers intoString:NULL];
+            
+            // Collect numbers.
+            [scanner scanCharactersFromSet:numbers intoString:&tempStr];
+            @try {
+                if(tempStr!=nil){
+                    [numberString appendString:tempStr];
+                }
+            } @catch (NSException *exception) {}
+            
+            tempStr = nil;
+        }
+        num = [NSString stringWithFormat:@"%@",numberString];
+        numberString = nil;
+    }
+    
+    if(num!=nil && num.length>0){
+        return num;
+    }else{
+        return nil;
+    }
     
     
 }
@@ -1279,7 +1482,7 @@
     NSString *moneyUnit;
     
     if(num>=100 && num%100==0){
-        moneyUnit = [NSString stringWithFormat:@"%ld元",num/100];
+        moneyUnit = [NSString stringWithFormat:@"%d元",num/100];
     }else{
         float money = num;
         moneyUnit = [NSString stringWithFormat:@"%.0f元",money/100];
@@ -1337,14 +1540,24 @@
     
 }
 
+
++(NSString*)get_ud_string:(NSString*)key{
+    return [[APPUtils getUserDefault] objectForKey:key];
+}
+
++(NSInteger)get_ud_int:(NSString*)key{
+
+    return [[APPUtils getUserDefault] integerForKey:key];
+}
+
 //获得NSUserDefaults
-+(NSUserDefaults*)getUserDefaults{
-//    return [[NSUserDefaults alloc] initWithSuiteName:USERDEFAULTS_GROUP];
++(NSUserDefaults*)getUserDefault{
     if(user_Defaults==nil){
         user_Defaults =  [NSUserDefaults standardUserDefaults];
     }
     return user_Defaults;
 }
+
 
 //设置NSUserDefaults
 +(void)userDefaultsSet: (NSObject*)value forKey:(NSString*)key{
@@ -1363,8 +1576,8 @@
     dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.userdefault",DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(concurrentQueue, ^{
     
-        [[APPUtils getUserDefaults] setObject:value forKey:key];
-//        [u synchronize];
+        [[APPUtils getUserDefault] setObject:value forKey:key];
+        [[APPUtils getUserDefault] synchronize];
      
     });
 
@@ -1377,7 +1590,7 @@
     dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.userdefault",DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(concurrentQueue, ^{
    
-        [[APPUtils getUserDefaults] removeObjectForKey:key];
+        [[APPUtils getUserDefault] removeObjectForKey:key];
 //        [u synchronize];
     });
     
@@ -1466,41 +1679,22 @@
 
 
 
-/*将高德地图zoom调整到显示全部anno的值
- add值越大 zoomlevel就越小
- */
-+(void)zoomToMapPoints:(MAMapView*)mapView annotations:(NSArray*)annotations add:(float)add{
-    double minLat = 360.0f, maxLat = -360.0f;
-    double minLon = 360.0f, maxLon = -360.0f;
-    for (MAPointAnnotation *annotation in annotations) {
-        if ( annotation.coordinate.latitude  < minLat ) minLat = annotation.coordinate.latitude;
-        if ( annotation.coordinate.latitude  > maxLat ) maxLat = annotation.coordinate.latitude;
-        if ( annotation.coordinate.longitude < minLon ) minLon = annotation.coordinate.longitude;
-        if ( annotation.coordinate.longitude > maxLon ) maxLon = annotation.coordinate.longitude;
-    }
-    
-    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((minLat + maxLat) / 2.0, (minLon + maxLon) / 2.0);
-    MACoordinateSpan span = MACoordinateSpanMake((maxLat - minLat)+add, (maxLon - minLon)+add);//
-    MACoordinateRegion region = MACoordinateRegionMake(center, span);
-    [mapView setRegion:region animated:YES];
-}
-
-
 //转圈
 +(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view{
     
-    if(count==0){
-        count = CGFLOAT_MAX;
-    }
+
     
     CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
     rotationAnimation.duration =duration;
     rotationAnimation.cumulative = YES;
-    rotationAnimation.repeatCount = count;
+    rotationAnimation.repeatCount = count==0?CGFLOAT_MAX:count;
     rotationAnimation.removedOnCompletion = NO;//必须加 不然到其他页面后会停止
     [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     rotationAnimation = nil;
     
 }
+
+
+
 @end

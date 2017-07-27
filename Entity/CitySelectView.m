@@ -337,7 +337,7 @@
 -(void)refresh_location_city{
     
    
-    location_city = [[APPUtils getUserDefaults] stringForKey:@"location_city"];
+    location_city = [APPUtils get_ud_string:@"location_city"];
     
 
     if(location_city!=nil&&location_city.length>0){

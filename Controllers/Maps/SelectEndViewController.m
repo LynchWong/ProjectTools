@@ -110,7 +110,7 @@
     
     CGFloat prompWidth;
     CGFloat prompHeight;
-    if([mapType isEqualToString:@"找跑跑"]){
+    if([mapType hasPrefix:@"找跑跑"]){
         prompHeight = 55;
         if(isShop||sendPositionType){
             prompWidth = 120;
@@ -167,7 +167,7 @@
         }
         
         
-        if([mapType isEqualToString:@"找跑跑"]){
+        if([mapType hasPrefix:@"找跑跑"]){
             
             if(isSetBegin){
                 if(isShop){
@@ -351,7 +351,7 @@
             end_position_label.text = [NSString stringWithFormat:@"%@%@",locationAddress,location_showAddress];
             end_position_label.textColor = TEXTGRAY;
         }else{
-            if([mapType isEqualToString:@"找跑跑"]){
+            if([mapType hasPrefix:@"找跑跑"]){
                 if(isShop){
                     end_position_label.text = @"请设定店铺地址";
                 }else{
@@ -442,7 +442,7 @@
         search_input.placeholder = @"搜索地点";
         
         if(isShop){
-            if([mapType isEqualToString:@"找跑跑"]){
+            if([mapType hasPrefix:@"找跑跑"]){
                 askLabel.text = @"请在地图上标注您的商铺地址";
             }else if([mapType isEqualToString:@"寻赏圈"]){
                 askLabel.text = @"请在地图上标明您的联系地址";
@@ -451,7 +451,7 @@
         
     }else{
     
-        if([mapType isEqualToString:@"找跑跑"]){
+        if([mapType hasPrefix:@"找跑跑"]){
             if(isSetBegin){
                  locationImg = [UIImage imageNamed:@"location_myself.png"];
                 search_input.placeholder = @"搜索跑跑办事/代购地点";
@@ -501,8 +501,8 @@
 
         [self setPositionShowView];
         
-         myCityName = [[APPUtils getUserDefaults]objectForKey:@"location_city"];
-         myCityAdcode = [MainViewController sharedMain].locationUtil.ad_code;
+         myCityName = [APPUtils get_ud_string:@"location_city"];
+         myCityAdcode = locationUtil.ad_code;
     }else{
         locationAddress = @"";
         location_showAddress = @"";
@@ -634,7 +634,7 @@
         }
         myCityAdcode = [response.regeocode.addressComponent.adcode integerValue];
         
-        if([mapType isEqualToString:@"找跑跑"]){
+        if([mapType hasPrefix:@"找跑跑"]){
             
             thisCityCode = [response.regeocode.addressComponent.citycode integerValue];
             thisCityAdcode = [response.regeocode.addressComponent.adcode integerValue];
@@ -1108,7 +1108,7 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
     if(search_input.text.length==0){
-        if([mapType isEqualToString:@"找跑跑"]){
+        if([mapType hasPrefix:@"找跑跑"]){
             return  [_addressArr count];
         }else{
             return  0;
@@ -1157,7 +1157,7 @@
     
     POIData *poi;
     
-    if([mapType isEqualToString:@"找跑跑"] && search_input.text.length==0){
+    if([mapType hasPrefix:@"找跑跑"] && search_input.text.length==0){
         
         
             @try {
@@ -1269,7 +1269,7 @@
     @try {
         POIData *poi;
         if(search_input.text.length==0){
-            if([mapType isEqualToString:@"找跑跑"]){
+            if([mapType hasPrefix:@"找跑跑"]){
                 poi = [_addressArr objectAtIndex:indexPath.row];
             }else{
                  return nil;

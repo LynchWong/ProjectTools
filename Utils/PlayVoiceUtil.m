@@ -9,33 +9,51 @@
 #import "PlayVoiceUtil.h"
 
 @implementation PlayVoiceUtil
-@synthesize playing;
-@synthesize secondCounter;
-@synthesize circleSeconds;
-@synthesize cellPlayingType;
-@synthesize cellPlayShowVoiceControl;
-@synthesize recordFilePath;
-@synthesize recordTime;
-@synthesize circleProgressView;
+@synthesize playingState;
+@synthesize plan_id;
+@synthesize isPlanType;
+
++ (PlayVoiceUtil*)player{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        playUtil = [[self alloc] init];
+    });
+    
+    return playUtil;
+}
 
 
-@synthesize playView;
-@synthesize voiceLoadingImage;
+-(void)setVoice:(BOOL)plan pid:(NSInteger)pid url:(NSString*)url duration:(double)duration pView:(UIImageView*)pView loading:(UIImageView*)loading btn:(MyBtnControl*)btn{
+
+    isPlanType = plan;
+    plan_id = pid;
+    voiceUrl = url;
+    recordTime = duration;
+    
+    playView = pView;
+    voiceLoadingImage = loading;
+    cellPlayShowVoiceControl = btn;
+    
+    if(isPlanType){
+        recordFileName = [NSString stringWithFormat:@"record_plan_%d.wav",(int)plan_id];
+    }else{
+        recordFileName = [NSString stringWithFormat:@"record_%d.wav",(int)plan_id];
+        
+    }
+    recordFilePath = [[MainViewController sharedMain].voicePaths stringByAppendingPathComponent:recordFileName];
+}
 
 
-
-
-
-
+//准备播放
 -(void)readyPlayVoice{
+    
     [cellPlayShowVoiceControl setEnabled:NO];
     
-    if (![APPUtils fileExist:recordFilePath]) {
+    if (![APPUtils fileExist:recordFilePath]) {//未下载
         
         [APPUtils takeAround:0 duration:1.0 view:voiceLoadingImage];
        
-        
-         cellPlayingType = 1;
+         playingState = 1;
         
         [UIView animateWithDuration:0.1f
                               delay:0
@@ -43,8 +61,7 @@
                                      UIViewAnimationOptionBeginFromCurrentState)
                          animations:^(void) {
                              
-                            
-                             [playView setImage:[UIImage imageNamed:@"just_play_big_empty_shadow.png"]];
+                             [playView setImage:[UIImage imageNamed:@"just_play_empty_small.png"]];
                               voiceLoadingImage.alpha = 1;
                              
                          }
@@ -57,42 +74,40 @@
 
     }else{
          [cellPlayShowVoiceControl setEnabled:YES];
-         [playView setImage:[UIImage imageNamed:@"just_stop_big_shadow.png"]];
+         [playView setImage:[UIImage imageNamed:@"just_stop_small.png"]];
          voiceLoadingImage.alpha = 0;
          [self playVoice];
-
     }
   
 }
 
 -(void)playVoice{
   
-    cellPlayingType = 2;
-    
     if(player != nil && playing){
-        [self stopPlaying:NO];
+        [self stopPlaying];
         return;
     }
     
+    playingState = 2;
     playing = YES;
     [self createCircle];
     [self play];
 }
 
 
-
+//创建圆圈
 - (void)createCircle{
     
     
     circleSeconds = recordTime;
     
     circleProgressView = [[UAProgressView alloc] init];
-    [circleProgressView setFrame:CGRectMake(5, 5, playView.width-10, playView.width-10)];
+    [circleProgressView setFrame:CGRectMake(5, 3.5, playView.width-10, playView.width-10)];
     
     circleProgressView.borderWidth = 0;
     circleProgressView.lineWidth = 0.8;
     circleProgressView.fillOnTouch = NO;
-    circleProgressView.tintColor = _circleColor;
+    circleProgressView.tintColor = MAINYELLOW;
     [playView addSubview:circleProgressView];
     
     if (circleTimer!= nil || circleTimer.isValid) {
@@ -116,6 +131,12 @@
         [circleProgressView removeFromSuperview];
          [playView addSubview:circleProgressView];
     }
+    if(playingState==1){
+        [playView setImage:[UIImage imageNamed:@"just_play_empty_small.png"]];
+        voiceLoadingImage.alpha = 1;
+    }else if(playingState==2){
+        [playView setImage:[UIImage imageNamed:@"just_stop_small.png"]];
+    }
 }
 
 - (void)updateProgress {
@@ -136,13 +157,11 @@
             circleTimer = nil;
 //        }
         
-        
         if(playing){
             [self stopPlaying:YES];
         }
     }
-    }
-
+}
 
 
 
@@ -155,10 +174,7 @@
         player = nil;
         player.delegate = nil;
     }
-    [MainViewController sharedMain].makeOrderPage.playMissionVoice = 1;
 
-
-    
     //设置下扬声器模式
     [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
@@ -190,14 +206,13 @@
     }
     playing = NO;
     
-    secondCounter=self.circleSeconds+10;//关闭圈圈
+    secondCounter=circleSeconds+10;//关闭圈圈
     
-    cellPlayingType = 0;
+    playingState = 0;
     localProgress = 2;
-    [playView setImage: [UIImage imageNamed:@"just_play_big_shadow.png"]];
+    [playView setImage: [UIImage imageNamed:@"just_play_small.png"]];
 
-    [MainViewController sharedMain].makeOrderPage.playMissionVoice = 0;
-    
+
     if(circleProgressView != nil){
         if (circleTimer!= nil || circleTimer.isValid) {
             [circleTimer invalidate];
@@ -205,8 +220,6 @@
         }
         [UIView animateWithDuration:0.2f delay:0
                             options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
-                                
-                                
                                 circleProgressView.alpha=0;
                             }
                          completion:^(BOOL finished){
@@ -223,96 +236,53 @@
 
 
 
-
+//下载语音
 -(void)download_voice{
+
+    NSInteger now_id = plan_id;
     
-    
-    NSString *downloadVoice;
-    NSString *saveName;
-    NSString *now_id;
-    
-    now_id = [NSString stringWithFormat:@"%@",_plan_id];
-    downloadVoice = _voiceUrl;
-    NSArray * parts = [downloadVoice componentsSeparatedByString:@"."];
-    NSString *fileTail = [parts lastObject];
-    if(_isPlanType){
-        saveName = [NSString stringWithFormat:@"record_plan_%@.%@",now_id,fileTail];
-    }else{
-        saveName = [NSString stringWithFormat:@"record_%@.%@",now_id,fileTail];
-    }
-    
-    parts = nil;
-    
-   
-    
-    NSData *voiceData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:downloadVoice]];
-    
-    BOOL notChanged = YES;
-    
-    if(![now_id isEqualToString:_plan_id]){
-        notChanged = NO;
-    }
+    NSData *voiceData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:voiceUrl]];
     
     if(voiceData != nil && voiceData.length>0){
         
-        NSString *saveRecordFilePath = [[MainViewController sharedMain].voicePaths stringByAppendingPathComponent:saveName];
-        [voiceData writeToFile:saveRecordFilePath atomically:NO];
-        
-        if([fileTail isEqualToString:@"amr"]){//如果是amr 必须转换
+       
+        if([voiceUrl hasSuffix:@"amr"]){//如果是amr 必须转换
             NSLog(@"转换 AMR");
             
-            NSString *wavRecordPath;
-            if(_isPlanType){
-                wavRecordPath = [[MainViewController sharedMain].voicePaths stringByAppendingPathComponent:[NSString stringWithFormat:@"record_plan_%@.wav",now_id]];
-            }else{
-                wavRecordPath = [[MainViewController sharedMain].voicePaths stringByAppendingPathComponent:[NSString stringWithFormat:@"record_%@.wav",now_id]];
-            }
+            NSString *tempPath = [[MainViewController sharedMain].voicePaths stringByAppendingPathComponent:@"temp_record.amr"];
+            [voiceData writeToFile:tempPath atomically:YES];
             
             
-            [VoiceConverter ConvertAmrToWav:saveRecordFilePath wavSavePath:wavRecordPath];
+            [VoiceConverter ConvertAmrToWav:tempPath wavSavePath:recordFilePath];
+            [[NSFileManager defaultManager] removeItemAtPath:tempPath error:nil];
+            tempPath = nil;
             
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            [fileManager removeItemAtPath:saveRecordFilePath error:nil];
-            fileManager = nil;
-            recordFilePath = wavRecordPath;
-            wavRecordPath = nil;
-            saveRecordFilePath = nil;
+        }else{
+            
+            [voiceData writeToFile:recordFilePath atomically:YES];
         }
         
-        if(notChanged){
+        if(now_id==plan_id){
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                if(_hasClose){
-                    return;
-                }
+                [cellPlayShowVoiceControl setEnabled:YES];
+                [playView setImage:[UIImage imageNamed:@"just_stop_small.png"]];
+                voiceLoadingImage.alpha = 0;
+                [self playVoice];
                 
-                if(notChanged){
-                    
-                     [cellPlayShowVoiceControl setEnabled:YES];
-                     [playView setImage:[UIImage imageNamed:@"just_stop_big_shadow.png"]];
-                    voiceLoadingImage.alpha = 0;
-                    [self playVoice];
-                }
                 
             });
+
         }
         
     }else{
-        
-        cellPlayingType = 0;
+        playingState = 0;
         dispatch_async(dispatch_get_main_queue(), ^{
-            
-            if(notChanged){
-               
+            if(now_id==plan_id){
                 [ToastView showToast:@"语音下载出错,请重试"];
             }
-            
         });
-        
     }
-    
-    saveName = nil;
-    downloadVoice = nil;
 }
 
 

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MAMapKit/MAMapKit.h>
+#import <AMapSearchKit/AMapSearchKit.h>
 #import "APIKey.h"
 #import "PassValueDelegate.h"
 #import "LocationUtils.h"

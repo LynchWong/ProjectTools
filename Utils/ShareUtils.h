@@ -18,14 +18,16 @@
 #import <ShareSDKExtension/ShareSDK+Extension.h>
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/TencentOAuth.h>
+#import "WXApi.h"
 
+@class ShareUtils;
+@class MyBtnControl;
 
-@class NewsListEntity;
-@class OrderBtnControl;
+static ShareUtils *shareUtil;
+
 @interface ShareUtils : UIView{
   
-    NSInteger clickTime;
-    
+
     //分享
     UIControl *backCoverView;
     UIView *shareView;
@@ -42,26 +44,28 @@
     UIView *shareQRCodeView;
     
    
+    BOOL only_share;//只有分享
+    BOOL share_app;//分享app
+    NSString *share_title_content;//标题
+    
+    NSString *shareTitle;//分享标题
+    NSString *shareBody;//分享内容
+    UIImage *imageStore;//分享图片
 }
 
++ (ShareUtils*)share;
+
+
+
 - (id)initShare;
--(void)openShareView;//打开分享
--(void)shareApp:(NSInteger)index;
 
-//分享
--(void)readyShare:(NSInteger)index;
+//打开分享
+-(void)openShareView:(BOOL)onlyShare title:(NSString*)title share_Title:(NSString*)share_Title share_Body:(NSString*)share_Body share_Url:(NSString*)share_Url shareApp:(BOOL)shareApp shareImg:(UIImage*)shareImg;
 
-@property(nonatomic,strong) NSString *shareTitle;//分享标题
-@property(nonatomic,strong) NSString *shareBody;//分享内容
-@property(nonatomic,strong) NSString *shareUrl;//分享url
-@property(nonatomic,strong) UIImage *imageStore;//分享图片
+
 @property(nonatomic,strong) NSString *shareTitleWithNewsInPYQ;//分享朋友圈的标题
+@property(nonatomic,strong) NSString *shareUrl;//分享url
 
-
-@property(nonatomic,assign)BOOL only_share;//只有分享
-@property(nonatomic,assign)BOOL share_app;//分享app
-
-@property(nonatomic,strong)NSString *share_title_content;//标题
 @property(assign,nonatomic)NSInteger hasFocused;//关注过
 @property(assign,nonatomic)BOOL my_publish;//自己发布的
 

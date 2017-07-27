@@ -59,8 +59,8 @@
 -(void)getuserID{
     
    
-    nickName = [[APPUtils getUserDefaults] stringForKey:@"nickname"];
-    realName = [[APPUtils getUserDefaults] stringForKey:@"realname"];
+    nickName = [APPUtils get_ud_string:@"nickname"];
+    realName = [APPUtils get_ud_string:@"realname"];
          
 }
 
@@ -952,7 +952,6 @@
 -(void)beback{
     
     self.callBackBlock();
-    
     hasOpen = NO;
 
     [self.navigationController popViewControllerAnimated:YES];

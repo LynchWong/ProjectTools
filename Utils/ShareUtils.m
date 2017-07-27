@@ -9,8 +9,18 @@
 #import "ShareUtils.h"
 
 @implementation ShareUtils
-@synthesize only_share;
+@synthesize shareUrl;
 
++ (ShareUtils*)share{
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        shareUtil = [[self alloc] initShare];
+    });
+    
+    return shareUtil;
+    
+}
 - (id)initShare{
     self = [super init];
     if (self) {
@@ -74,19 +84,19 @@
     UIView *wLine = [[UIView alloc] init];
     
     if(only_share){
-        UIView *shareTitle = [[UIView alloc] initWithFrame:CGRectMake(0, 0, mainView.width,tHeight)];
-        [mainView addSubview:shareTitle];
+        UIView *shareTitleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, mainView.width,tHeight)];
+        [mainView addSubview:shareTitleView];
         UILabel *share_title_Label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, mainView.width, tHeight)];
         share_title_Label.textAlignment = NSTextAlignmentCenter;
         share_title_Label.textColor = [UIColor whiteColor];
-        share_title_Label.font = [UIFont fontWithName:textDefaultFont size:14];
-        share_title_Label.text = _share_title_content;
-        [shareTitle addSubview:share_title_Label];
+        share_title_Label.font = [UIFont fontWithName:textDefaultBoldFont size:14];
+        share_title_Label.text = share_title_content;
+        [shareTitleView addSubview:share_title_Label];
         share_title_Label = nil;
         
-        [wLine setFrame:CGRectMake((shareTitle.width-shareTitle.width*0.5)/2, shareTitle.height-0.5, shareTitle.width*0.5, 0.5)];
-        [shareTitle addSubview:wLine];
-        shareTitle = nil;
+        [wLine setFrame:CGRectMake((shareTitleView.width-shareTitleView.width*0.5)/2, shareTitleView.height-0.5, shareTitleView.width*0.5, 0.5)];
+        [shareTitleView addSubview:wLine];
+        shareTitleView = nil;
         
     }else{
         
@@ -109,11 +119,11 @@
     [share_view addSubview:[self getShareControl:203 imageName:@"share_qq_no_press.png" showName:@"QQ"]];
     [share_view addSubview:[self getShareControl:204 imageName:@"share_weibo_no_press.png" showName:@"新浪微博"]];
     
-    if(_share_app){
+    if(share_app){
         [share_view addSubview:[self getShareControl:205 imageName:@"share_msg_no_press" showName:@"短信"]];
         [share_view addSubview:[self getShareControl:206 imageName:@"share_qrcode_no_press" showName:@"二维码"]];
     }
-    _share_app = NO;
+    
     
     if(!only_share){
         xPositionShare=0;
@@ -168,18 +178,17 @@
     }
     
     
-    
     UIView *sView = [[UIView alloc] initWithFrame:CGRectMake(shareViewMargin+xPositionShare*shareWidth, lineShare*shareHeight, shareWidth, shareHeight)];
     
     
-    UIImageView *shareImage =[[UIImageView alloc] initWithFrame:CGRectMake((shareWidth-share_imageWidth)/2, (shareHeight-share_imageWidth)/2-7, share_imageWidth, share_imageWidth)];
+    UIImageView *shareImage =[[UIImageView alloc] initWithFrame:CGRectMake((shareWidth-share_imageWidth)/2, (shareHeight-share_imageWidth)/2-10, share_imageWidth, share_imageWidth)];
     shareImage.layer.shouldRasterize = YES;
     shareImage.layer.rasterizationScale = [[UIScreen mainScreen] scale];
     [shareImage setImage:[UIImage imageNamed:name]];
     [sView addSubview:shareImage];
     
     
-    UILabel *share_Label = [[UILabel alloc] initWithFrame:CGRectMake(0, shareHeight-23, shareWidth, 20)];
+    UILabel *share_Label = [[UILabel alloc] initWithFrame:CGRectMake(0, shareHeight-24, shareWidth, 20)];
     share_Label.textAlignment = NSTextAlignmentCenter;
     share_Label.textColor = [UIColor whiteColor];
     share_Label.text = showName;
@@ -210,11 +219,20 @@
     return sView;
 }
 
-//分享文章
--(void)openShareView{
+//分享
+-(void)openShareView:(BOOL)onlyShare title:(NSString*)title share_Title:(NSString*)share_Title share_Body:(NSString*)share_Body share_Url:(NSString*)share_Url shareApp:(BOOL)shareApp shareImg:(UIImage*)shareImg{
+    
+    only_share = onlyShare;
+    share_title_content =title;
+    share_app = shareApp;
+    shareTitle = share_Title;
+    shareBody = share_Body;
+    shareUrl = share_Url;
+    imageStore = shareImg;
+    
+    
     [self createView];
     
-    _share_app = NO;
     backCoverView.alpha = 0.1;
     [backCoverView setBackgroundColor:[UIColor whiteColor]];
     
@@ -225,16 +243,6 @@
 
 }
 
-//分享app
--(void)shareApp:(NSInteger)index{
-    
-    _shareTitle = @"给您分享「寻赏圈」手机APP";
-    _shareBody = @"寻赏圈-海量人脉的悬赏帮找平台";
-    _shareUrl = [AFN_util getShareIpadd];
-    _imageStore = [UIImage imageNamed:@"120.png"];
-    _share_app = YES;
-    [self readyShare:index];
-}
 
 
 //分享
@@ -269,7 +277,7 @@
     
     
     
-    NSArray* imageArray = @[_imageStore];
+    NSArray* imageArray = @[imageStore];
     
     
     //创建分享参数（必要）
@@ -280,9 +288,9 @@
     
     if(index == 205){//短信
         
-        [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@。 %@ 下载地址:%@",_shareTitle,_shareBody,_shareUrl]
+        [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@。 %@ 下载地址:%@",shareTitle,shareBody,shareUrl]
                                          images:nil
-                                            url:[NSURL URLWithString:_shareUrl]
+                                            url:[NSURL URLWithString:shareUrl]
                                           title:nil
                                            type:SSDKContentTypeAuto];
         
@@ -298,7 +306,7 @@
         }else if(index == 202){ //发朋友圈
             
             if(_shareTitleWithNewsInPYQ!=nil && _shareTitleWithNewsInPYQ.length>0){
-                _shareTitle = _shareTitleWithNewsInPYQ;
+                shareTitle = _shareTitleWithNewsInPYQ;
             }
             _shareTitleWithNewsInPYQ = @"";
             
@@ -311,21 +319,21 @@
         }else if(index ==204){//新浪微博
             
             
-            if(_share_app){
+            if(share_app){
                 imageArray = @[[UIImage imageNamed:@"share_sina.jpeg"]];
-                _shareBody = [NSString stringWithFormat:@"%@。%@ 下载地址:%@",_shareTitle,_shareBody,_shareUrl];
+                shareBody = [NSString stringWithFormat:@"%@。%@ 下载地址:%@",shareTitle,shareBody,shareUrl];
             }else{
-                _shareBody = [NSString stringWithFormat:@"%@。%@ 链接:%@",_shareTitle,_shareBody,_shareUrl];
+                shareBody = [NSString stringWithFormat:@"%@。%@ 链接:%@",shareTitle,shareBody,shareUrl];
             }
             
             shareType = SSDKPlatformTypeSinaWeibo;
             
         }
         
-        [shareParams SSDKSetupShareParamsByText:_shareBody
+        [shareParams SSDKSetupShareParamsByText:shareBody
                                          images:imageArray
-                                            url:[NSURL URLWithString:_shareUrl]
-                                          title:_shareTitle
+                                            url:[NSURL URLWithString:shareUrl]
+                                          title:shareTitle
                                            type:SSDKContentTypeAuto];
     }
     

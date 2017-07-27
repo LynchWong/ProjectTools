@@ -200,6 +200,8 @@
     [self becomeFirstResponder];
     [self registerKeyboard];
     [hpTextView becomeFirstResponder];
+    
+    [[[UIApplication sharedApplication].delegate window] bringSubviewToFront:self];
 }
 
 //普通显示

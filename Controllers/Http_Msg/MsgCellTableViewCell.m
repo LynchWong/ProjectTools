@@ -237,7 +237,7 @@
             
             UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x+bubbleImageView.width+6, bubbleImageView.y, 30, voiceControl.height)];
             timeLabel.textColor = [UIColor lightGrayColor];
-            timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13];
+            timeLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
             timeLabel.textAlignment = NSTextAlignmentLeft;
             timeLabel.text = [NSString stringWithFormat:@"%.0f%@",fabs(recoTime),@"\""];
             [self addSubview:timeLabel];
@@ -447,7 +447,7 @@
         
          //我的头像
         UIImageView *headImageView = [[UIImageView alloc] initWithFrame:CGRectMake(SCREENWIDTH-52, 13, 42, 42)];
-        [headImageView sd_setImageWithURL:[NSURL URLWithString:_myAvatarUrl] placeholderImage:[UIImage imageNamed:@"default_head_boy.png"]];
+        [headImageView sd_setImageWithURL:[NSURL URLWithString:_myAvatarUrl] placeholderImage:[UIImage imageNamed:@"defaultHead.png"]];
         [headImageView.layer setCornerRadius:(headImageView.height/2)];
         [headImageView.layer setMasksToBounds:YES];//圆角不被盖住
         [headImageView setContentMode:UIViewContentModeScaleAspectFill];
@@ -642,7 +642,7 @@
             //时长
             UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x-34, 30, 30, 10)];
             timeLabel.textColor = [UIColor lightGrayColor];
-            timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13];
+            timeLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
             timeLabel.textAlignment = NSTextAlignmentRight;
             timeLabel.text = [NSString stringWithFormat:@"%.0f%@",fabs(recoTime),@"\""];
             [self addSubview:timeLabel];
@@ -804,7 +804,7 @@
             
             
            
-            NSDictionary *tempdic = [[APPUtils getUserDefaults] objectForKey:_msg.msg_id];
+            NSDictionary *tempdic = [[APPUtils getUserDefault] objectForKey: _msg.msg_id];
             
             @try {
                 if(tempdic==nil||[tempdic isEqual:[NSNull null]]){

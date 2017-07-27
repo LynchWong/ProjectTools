@@ -227,7 +227,7 @@
         }
         
         
-        check_city = [[APPUtils getUserDefaults] objectForKey:@"check_city"];
+        check_city = [APPUtils get_ud_string:@"check_city"];
         
         my_position = response.regeocode.formattedAddress;
         @try {
