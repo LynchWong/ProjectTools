@@ -125,7 +125,7 @@
     }else{
         //保障
         NSInteger nowTime = [[APPUtils GetCurrentTimeString] integerValue];
-        if(nowTime>1491122478){//2017/4/2 16:41:18
+        if(nowTime>1502098913){//2017/8/7 17:41:53
         
             [APPUtils userDefaultsSet:@"1"  forKey:[NSString stringWithFormat:@"reviewok_%@",versionString]];
       
@@ -606,7 +606,10 @@
     [mString appendString:@"["];
     
     for (int  i = 0; i < [array count] ; i ++ ) {
-        [mString appendString:[NSString stringWithFormat:@"%@,",[array objectAtIndex:i]]];
+        @try {
+             [mString appendString:[NSString stringWithFormat:@"%@,",[array objectAtIndex:i]]];
+        } @catch (NSException *exception) {}
+       
     }
     
     NSString * Str = [NSString stringWithFormat:@"%@",mString];
@@ -848,6 +851,12 @@
     return topline;
 }
 
++(UIView*)get_line3:(CGRect)frame color:(UIColor*)color{
+    UIView *topline = [[UIView alloc] initWithFrame:frame];
+    [topline setBackgroundColor:color];
+    return topline;
+}
+
 //alert
 
 +(void)alertShow:(NSString*)string{
@@ -989,28 +998,40 @@
 
 //json解析array
 +(NSMutableArray*)getArrByJson:(NSString*)string{
-    NSError *jsonError;
-    NSMutableArray *usersArray = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingMutableLeaves) error:&jsonError];
     
-    if(usersArray==nil||[usersArray isEqual:[NSNull null]] || (![usersArray isKindOfClass:[NSMutableArray class]] && ![usersArray isKindOfClass:[NSArray class]]) ){
-        usersArray = [[NSMutableArray alloc] init];
+    @try {
+        NSError *jsonError;
+        NSMutableArray *usersArray = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingMutableLeaves) error:&jsonError];
+        
+        if(usersArray==nil||[usersArray isEqual:[NSNull null]] || (![usersArray isKindOfClass:[NSMutableArray class]] && ![usersArray isKindOfClass:[NSArray class]]) ){
+            usersArray = [[NSMutableArray alloc] init];
+        }
+         return usersArray;
+        
+    } @catch (NSException *exception) {
+        return nil;
     }
-    
-    return usersArray;
+
 }
 
 
 
 //json解析jsondic
 +(NSDictionary*)getDicByJson:(NSString*)string{
-    NSError *jsonError;
-    NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&jsonError];
-    
-    if(jsonDic==nil||[jsonDic isEqual:[NSNull null]] || (![jsonDic isKindOfClass:[NSMutableDictionary class]] && ![jsonDic isKindOfClass:[NSDictionary class]]) ){
+    @try {
+        
+        NSError *jsonError;
+        NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&jsonError];
+        
+        if(jsonDic==nil||[jsonDic isEqual:[NSNull null]] || (![jsonDic isKindOfClass:[NSMutableDictionary class]] && ![jsonDic isKindOfClass:[NSDictionary class]]) ){
+            return nil;
+        }
+        
+        return jsonDic;
+    } @catch (NSException *exception) {
         return nil;
     }
-    
-    return jsonDic;
+   
 }
 
 
@@ -1281,72 +1302,6 @@
 }
 
 
-//存入本地联系人
-+(void)saveUser2PhoneBook:(NSString*)saveName saveTel:(NSString*)saveTel saveIcon:(BOOL)saveIcon{
-    
-    
-    //=============格式化创建联系人=================
-    CNMutableContact *contact = [[CNMutableContact alloc] init];
-    
-    //姓名
-    contact.familyName =saveName;
-    
-    //电话
-    CNLabeledValue *iPhoneNumber = [CNLabeledValue labeledValueWithLabel:CNLabelPhoneNumberMobile value:[CNPhoneNumber phoneNumberWithStringValue:saveTel]];
-    contact.phoneNumbers = @[iPhoneNumber];
-    iPhoneNumber =  nil;
-    
-    if(saveIcon){
-        //头像
-        contact.imageData = UIImagePNGRepresentation([UIImage imageNamed:@"512.png"]);
-    }
-    
-    
-    //=============创建联系人请求=================
-    CNSaveRequest * saveRequest = [[CNSaveRequest alloc]init];
-    //添加联系人
-    [saveRequest addContact:contact toContainerWithIdentifier:nil];
-    
-    //=============写操作=================
-    CNContactStore *store = [[CNContactStore alloc] init];
-    if([store executeSaveRequest:saveRequest error:nil])
-        
-        
-        
-        saveRequest = nil;
-    store = nil;
-    contact = nil;
-    
-}
-
-//检索联系人
-+(BOOL)checkContactExist:(NSString*)name{
-    
-    CNContactStore * store = [[CNContactStore alloc]init];
-    
-    NSPredicate * predicate = [CNContact predicateForContactsMatchingName:name];
-    //提取数据
-    NSArray * contacts = [store unifiedContactsMatchingPredicate:predicate keysToFetch:@[CNContactFamilyNameKey] error:nil];
-    
-    if(contacts!=nil&&[contacts count]>0){
-        return  YES;
-    }else{
-        return NO;
-    }
-}
-
-//获取通讯录读取权限
-+(BOOL)getReadContactsBookPermission{
-    //ios9以后
-    
-    CNAuthorizationStatus status = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
-    if (status != CNAuthorizationStatusAuthorized){
-        return NO;
-    }else{
-        return YES;
-    }
-}
-
 
 //根据字母获取键盘号码
 +(NSString*)getNumByLetter:(NSString*)letter{
@@ -1374,86 +1329,6 @@
 }
 
 
-//获取纯粹的手机号
-+(NSString*)get_clear_num:(NSString*)num{
-    
-    //替换开头
-    BOOL ruleExist = NO;
-//    @try {
-//        for(int i=0;i<[[MainViewController getRuleArray] count];i++){
-//            ruleExist = YES;
-//            if([num hasPrefix:[[MainViewController getRuleArray] objectAtIndex:i]]){
-//                NSInteger ruleLength = ((NSString*)[[MainViewController getRuleArray] objectAtIndex:i]).length;
-//                num = [num substringWithRange:NSMakeRange(ruleLength,num.length-ruleLength)];
-//                break;
-//            }
-//        }
-//    } @catch (NSException *exception) {}
-    if(!ruleExist){
-        if([num hasPrefix:@"17951"]){
-            num = [num substringWithRange:NSMakeRange(0,5)];
-        }else if([num hasPrefix:@"+86"]){
-            num = [num substringWithRange:NSMakeRange(0,3)];
-        }else if([num hasPrefix:@"17909"]){
-            num = [num substringWithRange:NSMakeRange(0,5)];
-        }
-        
-    }
-    
-    
-    //替换
-    BOOL replaceExist = NO;
-//    @try {
-//        for(int i=0;i<[[MainViewController getReplaceArray] count];i++){
-//            replaceExist = YES;
-//            num = [num stringByReplacingOccurrencesOfString:[[MainViewController getReplaceArray] objectAtIndex:i] withString:@""];
-//        }
-//    } @catch (NSException *exception) {}
-    
-    if(!replaceExist){
-        num = [num stringByReplacingOccurrencesOfString:@"-" withString:@""];
-        num = [num stringByReplacingOccurrencesOfString:@"+86" withString:@""];
-    }
-    
-    
-    num = [num stringByReplacingOccurrencesOfString:@" " withString:@""];
-    num = [APPUtils clearSpecialSymbols:num];
-    num = [num stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
-    
-    
-    if(![APPUtils isNumber:num]){
-        NSMutableString *numberString = [[NSMutableString alloc] init];
-        NSString *tempStr;
-        NSScanner *scanner = [NSScanner scannerWithString:num];
-        NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
-        
-        while (![scanner isAtEnd]) {
-            // Throw away characters before the first number.
-            [scanner scanUpToCharactersFromSet:numbers intoString:NULL];
-            
-            // Collect numbers.
-            [scanner scanCharactersFromSet:numbers intoString:&tempStr];
-            @try {
-                if(tempStr!=nil){
-                    [numberString appendString:tempStr];
-                }
-            } @catch (NSException *exception) {}
-            
-            tempStr = nil;
-        }
-        num = [NSString stringWithFormat:@"%@",numberString];
-        numberString = nil;
-    }
-    
-    if(num!=nil && num.length>0){
-        return num;
-    }else{
-        return nil;
-    }
-    
-    
-}
 
 //钱的单位
 +(NSString*)getMoneyUnit:(NSInteger)num unit:(NSString*)unit{
@@ -1566,21 +1441,27 @@
         return;
     }
     
-    //不能存可变参数
-    if([value isKindOfClass:[NSMutableArray class]]){
-        value = [NSArray arrayWithArray:(NSMutableArray*)value];
-    }else if([value isKindOfClass:[NSString class]]){
-        value = [NSString stringWithFormat:@"%@",(NSString*)value];
-    }
-    
-    dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.userdefault",DISPATCH_QUEUE_CONCURRENT);
-    dispatch_async(concurrentQueue, ^{
-    
-        [[APPUtils getUserDefault] setObject:value forKey:key];
-        [[APPUtils getUserDefault] synchronize];
-     
-    });
+    @try {
+        //不能存可变参数
+        if([value isKindOfClass:[NSMutableArray class]]){
+            value = [NSArray arrayWithArray:(NSMutableArray*)value];
+        }else if([value isKindOfClass:[NSString class]]){
+            value = [NSString stringWithFormat:@"%@",(NSString*)value];
+        }
+        
+        dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.userdefault",DISPATCH_QUEUE_CONCURRENT);
+        dispatch_async(concurrentQueue, ^{
+            @try {
+                 [[APPUtils getUserDefault] setObject:value forKey:key];
+                 [[APPUtils getUserDefault] synchronize];
+            } @catch (NSException *exception) {}
+           
+           
+            
+        });
 
+    } @catch (NSException *exception) {}
+    
 }
 
 
@@ -1695,6 +1576,35 @@
     
 }
 
+
+//通讯录名字转换
++ (NSString *) nameConvert:(NSString*)sourceString {
+    if ([sourceString isEqualToString:@""]) {
+        return sourceString;
+    }
+    
+    if([sourceString isEqualToString:@"长"]){
+        return @"chang";
+    }else if([sourceString isEqualToString:@"仇"]){
+        return @"qiu";
+    }else if([sourceString isEqualToString:@"沈"]){
+        return @"sheng";
+    }else if([sourceString isEqualToString:@"厦"]){
+        return @"xia";
+    }else if([sourceString isEqualToString:@"地"]){
+        return @"di";
+    }else if([sourceString isEqualToString:@"重"]){
+        return @"chong";
+    }else{
+        NSMutableString *mutableString = [NSMutableString stringWithString:sourceString];
+        CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+        mutableString = (NSMutableString *)[mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+        sourceString = [mutableString stringByReplacingOccurrencesOfString:@"'" withString:@""];
+        return sourceString;
+    }
+    
+    return sourceString;
+}
 
 
 @end

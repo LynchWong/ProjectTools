@@ -22,7 +22,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self)
     {
-        [self initSubViews];
+//        [self initSubViews];
     }
     return self;
 }
@@ -40,9 +40,16 @@
 
 - (void)initSubViews{
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, [UIScreen mainScreen].bounds.size.width -30,self.bounds.size.height )];
-    _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:15];
     _titleLabel.textAlignment = NSTextAlignmentCenter;
-    [_titleLabel setTextColor:[UIColor getColor:@"64676E"]];
+    
+    if(_vipColor!=nil){
+        _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:15];
+        [_titleLabel setTextColor:_vipColor];
+    }else{
+        _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:15];
+        [_titleLabel setTextColor:[UIColor getColor:@"64676E"]];
+    }
+    
     [self.contentView addSubview:_titleLabel];
     
     

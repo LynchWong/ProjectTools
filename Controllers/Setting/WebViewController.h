@@ -41,6 +41,8 @@
 
 @property (assign,nonatomic) BOOL couponType;//代金券类型
 
+@property (assign,nonatomic) BOOL activity_type;//活动类型（可铃）
+
 @end
 
 

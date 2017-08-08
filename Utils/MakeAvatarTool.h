@@ -26,6 +26,7 @@ typedef void (^VideoBlock)(NSData *video_data);
 -(void)openAlbum;
 
 @property (nonatomic,assign)BOOL not_avatar;//非头像类型
+@property (nonatomic,assign)BOOL backCamera;//后摄像头
 @property (nonatomic,assign)BOOL support_video;//支持录像
 @property (nonatomic,assign)NSInteger record_time;//最大录制时长
 @property (nonatomic,assign)NSInteger record_quality;//录制质量

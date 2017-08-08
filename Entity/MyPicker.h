@@ -12,7 +12,7 @@
 
     NSInteger default_index;
     
-    UIView *pickerView;
+    UIView *picker_View;
     UIControl *backCoverView;
     UIPickerView *picker;
     NSArray *picker_arr;

@@ -69,7 +69,7 @@
     
     
     //有关闭按钮
-    if(_share_type){
+    if(_share_type||_activity_type){
         
         MyBtnControl *closeControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(40, 20, 50, 44)];
         [titletView addSubview:closeControl];
@@ -81,7 +81,7 @@
     
         closeControl = nil;
         
-        [titletView.titleLabel setFrame:CGRectMake(titletView.titleLabel.x+20, titletView.titleLabel.y, titletView.titleLabel.width-20, titletView.titleLabel.height)];
+        [titletView.titleLabel setFrame:CGRectMake(titletView.titleLabel.x+20, titletView.titleLabel.y, titletView.titleLabel.width-40, titletView.titleLabel.height)];
     }
     
     
@@ -235,6 +235,11 @@
     }
 
     
+    if(_activity_type){
+        //刷新可铃设置页
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"refresh_setting" object:nil userInfo:nil];
+    }
+    
     juhua.alpha = 0;
     [myWebView loadHTMLString:@"" baseURL:nil];
     [self.navigationController popViewControllerAnimated:YES];
@@ -306,7 +311,7 @@
 - (void)beBack{
     hasOpen = NO;
     
-    if(_share_type){
+    if(_share_type||_activity_type){
         
         if([myWebView canGoBack]){
             [self web_goback];

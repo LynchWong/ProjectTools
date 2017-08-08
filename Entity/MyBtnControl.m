@@ -61,10 +61,10 @@
         if(_functype){
             shareImg_originalFrame = self.shareImage.frame;
             
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState)animations:^(void) {
-                                    [self.shareImage setFrame: _shareImg_clickFrame];
-                                }completion:NULL];
+            [UIView animateWithDuration:0.2 animations:^{
+                [self.shareImage setFrame: _shareImg_clickFrame];
+            }];
+            
         }else{
         
             if(!_not_ShareHighlight){
@@ -92,13 +92,14 @@
     [self restore];
    
     
-
-    NSInteger timeString = [[APPUtils GetCurrentTimeString] integerValue];
-    if(timeString-clicktime<1){
-        return;
+    if(!_no_time_interval){
+        NSInteger timeString = [[APPUtils GetCurrentTimeString] integerValue];
+        if(timeString-clicktime<1){
+            return;
+        }
+        clicktime = timeString;
     }
-    
-    clicktime = timeString;
+   
     
     if(!_no_single_click){
         self.clickBackBlock();
@@ -232,10 +233,10 @@
         
         if(_functype){
         
-            [UIView animateWithDuration:0.2f delay:0
-                                options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState)animations:^(void) {
-                                    [self.shareImage setFrame: shareImg_originalFrame];
-                                }completion:NULL];
+            [UIView animateWithDuration:0.2f animations:^{
+                 [self.shareImage setFrame: shareImg_originalFrame];
+            }];
+      
         }
         
         self.shareImage.alpha=1;

@@ -4,7 +4,6 @@
 #import <AVFoundation/AVCaptureDevice.h>
 #import <AVFoundation/AVMediaFormat.h>
 #import <UIKit/UIKit.h>
-#import <Contacts/Contacts.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "sys/utsname.h"
@@ -145,6 +144,7 @@ static NSUserDefaults *user_Defaults;
 //获取线条
 +(UIView*)get_line:(float)x y:(float)y width:(float)width;
 +(UIView*)get_line2:(CGRect)frame;
++(UIView*)get_line3:(CGRect)frame color:(UIColor*)color;
 
 //alert
 
@@ -219,20 +219,9 @@ static NSUserDefaults *user_Defaults;
 //根据键盘号码获取字母
 +(NSArray*)getLetterByNum:(NSInteger)num;
 
-//存入本地联系人
-+(void)saveUser2PhoneBook:(NSString*)saveName saveTel:(NSString*)saveTel saveIcon:(BOOL)saveIcon;
-
-//检索联系人
-+(BOOL)checkContactExist:(NSString*)name;
-
-//获取通讯录读取权限
-+(BOOL)getReadContactsBookPermission;
 
 //根据字母获取键盘号码
 +(NSString*)getNumByLetter:(NSString*)letter;
-
-//获取纯粹的手机号
-+(NSString*)get_clear_num:(NSString*)num;
 
 //钱的单位
 +(NSString*)getMoneyUnit:(NSInteger)num unit:(NSString*)unit;
@@ -268,8 +257,9 @@ static NSUserDefaults *user_Defaults;
 //获取定位按钮
 +(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width;
 
-
-
 //转圈
 +(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view;
+
+//通讯录名字转换
++ (NSString *) nameConvert:(NSString*)sourceString;
 @end

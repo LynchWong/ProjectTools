@@ -2085,7 +2085,7 @@ static NSString *CellIdentifier = @"SmsCell";
             [self hideVoiceShow];
             NSString *amrName = [self stopAndSaveRecord];
             
-            if(amrName.length>0){
+            if(amrName!=nil && amrName.length>0){
                 
         
                 NSString *tempMsgId = [APPUtils getUniquenessString];

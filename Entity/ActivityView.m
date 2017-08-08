@@ -274,7 +274,7 @@
 //查看活动详情
 -(void)open_activity:(Activity*)cp{
     
-        WebViewController *webview = [[WebViewController alloc] initWithtitle:cp.name url:[NSString stringWithFormat:@"%@%@",originalUrl,cp.activity_id]];
+        WebViewController *webview = [[WebViewController alloc] initWithtitle:cp.name url:[NSString stringWithFormat:@"%@token=%@&id=%@",originalUrl,[AFN_util getToken],cp.activity_id]];
     
         if(cp.cost>0){//代金券类型
             webview.couponType=YES;

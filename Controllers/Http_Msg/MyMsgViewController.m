@@ -215,9 +215,7 @@
                     
                 }
 
-        
-          
-                
+    
                 [dataList addObject:conv];
                 conv = nil;
             }

@@ -20,4 +20,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic)CCActionSheetCellStyle sheetStyle;
 @property (strong, nonatomic)UITableView *boundsTableView;
 @property (assign, nonatomic)BOOL isCancel;
+@property (strong, nonatomic)UIColor *vipColor;
+
+- (void)initSubViews;
 @end

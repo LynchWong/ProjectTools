@@ -38,6 +38,7 @@
 
 @property (assign, nonatomic)  BOOL no_single_click;//没得单击事件
 @property (assign, nonatomic)  BOOL choosed;//选择中的
+@property (assign, nonatomic)  BOOL no_time_interval;//无时间间隔
 
 @property (retain, nonatomic) NSString *searchContent;
 @property (retain, nonatomic) NSString *select_icon_Name;

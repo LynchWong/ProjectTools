@@ -9,10 +9,34 @@
 #import "DES3Util.h"
 #import "GTMBase64.h"
 #import <CommonCrypto/CommonCryptor.h>
-#define gkey            @"myncic_12345601234567890"
-#define gIv             @"01234567"
+
 
 @implementation DES3Util
+
+
++(NSString*)getKey{
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSURL *plistURL = [bundle URLForResource:@"AppInfo" withExtension:@"plist"];
+    NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:plistURL];
+    NSString* gkey = [dictionary objectForKey:@"gkey"];
+    dictionary= nil;
+    bundle = nil;
+    plistURL = nil;
+    
+    return gkey;
+}
+
++(NSString*)getValue{
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSURL *plistURL = [bundle URLForResource:@"AppInfo" withExtension:@"plist"];
+    NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:plistURL];
+    NSString* gIv = [dictionary objectForKey:@"gIv"];
+    dictionary= nil;
+    bundle = nil;
+    plistURL = nil;
+    
+    return gIv;
+}
 
 // 加密方法（+base64）
 + (NSData*)encrypt:(NSData*)data {
@@ -29,8 +53,8 @@
     bufferPtr = malloc( bufferPtrSize * sizeof(uint8_t));
     memset((void *)bufferPtr, 0x0, bufferPtrSize);
     
-    const void *vkey = (const void *) [gkey UTF8String];
-    const void *vinitVec = (const void *) [gIv UTF8String];
+    const void *vkey = (const void *) [[self getKey] UTF8String];
+    const void *vinitVec = (const void *) [[self getValue] UTF8String];
     
     ccStatus = CCCrypt(kCCEncrypt,
                        kCCAlgorithm3DES,
@@ -65,8 +89,8 @@
     bufferPtr = malloc( bufferPtrSize * sizeof(uint8_t));
     memset((void *)bufferPtr, 0x0, bufferPtrSize);
     
-    const void *vkey = (const void *) [gkey UTF8String];
-    const void *vinitVec = (const void *) [gIv UTF8String];
+    const void *vkey = (const void *) [[self getKey] UTF8String];
+    const void *vinitVec = (const void *) [[self getValue] UTF8String];
     
     ccStatus = CCCrypt(kCCDecrypt,
                        kCCAlgorithm3DES,
@@ -101,8 +125,8 @@
     bufferPtr = malloc( bufferPtrSize * sizeof(uint8_t));
     memset((void *)bufferPtr, 0x0, bufferPtrSize);
     
-    const void *vkey = (const void *) [gkey UTF8String];
-    const void *vinitVec = (const void *) [gIv UTF8String];
+    const void *vkey = (const void *) [[self getKey] UTF8String];
+    const void *vinitVec = (const void *) [[self getValue] UTF8String];
     
     ccStatus = CCCrypt(kCCDecrypt,
                        kCCAlgorithm3DES,

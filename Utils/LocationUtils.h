@@ -12,7 +12,7 @@
 #import <MAMapKit/MAMapKit.h>
 #import <AMapSearchKit/AMapSearchKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
-
+#import "GetDeviceIp.h"
 @interface LocationUtils : NSObject<AMapLocationManagerDelegate,AMapSearchDelegate>{
     
     AMapLocationManager *locationManager;
@@ -28,7 +28,7 @@
 -(id)initLocation;
 -(id)initLocationWithNoAlert;
 -(void)startLocation;
-
+-(BOOL)getLocationAuth;//获取定位权限
 @property (assign, nonatomic) BOOL handleLocationCity;//手动定位当前城市
 @property (strong, nonatomic) NSString *check_city;
 @property (assign, nonatomic) double my_lat;

@@ -320,7 +320,12 @@
             
             
             if(share_app){
-                imageArray = @[[UIImage imageNamed:@"share_sina.jpeg"]];
+                UIImage *sinaImg = [UIImage imageNamed:@"share_sina.jpeg"];
+                if(sinaImg != nil){
+                    imageArray = @[sinaImg];
+                }
+                sinaImg = nil;
+                
                 shareBody = [NSString stringWithFormat:@"%@。%@ 下载地址:%@",shareTitle,shareBody,shareUrl];
             }else{
                 shareBody = [NSString stringWithFormat:@"%@。%@ 链接:%@",shareTitle,shareBody,shareUrl];

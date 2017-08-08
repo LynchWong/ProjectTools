@@ -48,6 +48,7 @@ typedef enum : NSUInteger {
 
 @property (strong,nonatomic) NSString *titleText;
 @property (strong,nonatomic) NSString *cancelText;
+@property (strong,nonatomic) UIColor *vipcolor;
 
 @property (strong,nonatomic) NSMutableArray *otherButtons;
 @property (weak, nonatomic) id<CCActionSheetDelegate> delegate;

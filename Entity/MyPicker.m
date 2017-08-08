@@ -40,7 +40,7 @@
 
 -(void)showPicker{
 
-    if(pickerView == nil){
+    if(picker_View == nil){
         
         if(backCoverView == nil){
             backCoverView = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, SCREENHEIGHT)];
@@ -51,14 +51,14 @@
             
         };
         
-        pickerView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREENHEIGHT, SCREENWIDTH, 200)];
-        [pickerView setBackgroundColor:[UIColor getColor:@"fdfdfd"]];
-        [self addSubview:pickerView];
+        picker_View = [[UIView alloc]initWithFrame:CGRectMake(0, SCREENHEIGHT, SCREENWIDTH, 200)];
+        [picker_View setBackgroundColor:[UIColor getColor:@"fdfdfd"]];
+        [self addSubview:picker_View];
         
         
         
         UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 40)];
-        [pickerView addSubview:titleView];
+        [picker_View addSubview:titleView];
         
         UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 3)];
         [topView setBackgroundColor:MAINCOLOR];
@@ -89,11 +89,11 @@
         
         
         
-        picker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, titleView.height+10, SCREENWIDTH, pickerView.height-30-titleView.height)];
+        picker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, titleView.height+10, SCREENWIDTH, picker_View.height-30-titleView.height)];
         picker.delegate = self;
         picker.dataSource = self;
         picker.showsSelectionIndicator = YES;
-        [pickerView addSubview:picker];
+        [picker_View addSubview:picker];
         
         
     }
@@ -104,12 +104,12 @@
     
 
     [self bringSubviewToFront:backCoverView];
-    [self bringSubviewToFront:pickerView];
+    [self bringSubviewToFront:picker_View];
     
     
     [UIView animateWithDuration:0.2 animations:^{
         self.alpha=1;
-        pickerView.y =SCREENHEIGHT-200;
+        picker_View.y =SCREENHEIGHT-200;
     }];
 
 }
@@ -119,7 +119,7 @@
 
     [UIView animateWithDuration:0.2 animations:^{
         self.alpha=0;
-        pickerView.y =SCREENHEIGHT;
+        picker_View.y =SCREENHEIGHT;
     }];
     
 }

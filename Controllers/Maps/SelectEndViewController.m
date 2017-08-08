@@ -485,7 +485,7 @@
         locationUtil = [[LocationUtils alloc] initLocationWithNoAlert];
         locationUtil.callBackBlock = ^(double latt,double lonn,NSString*position,NSString *city,BOOL refresh){
             
-            [weakSelf showLocation:latt lonn:lonn posi:position city:city];
+            [weakSelf showLocation:latt lonn:lonn posi:[APPUtils fixString:position] city:city];
         };
     }
     
@@ -1342,14 +1342,17 @@
         [endDic setObject:@"location_ok" forKey:@"type"];
         
         //截图
-        UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.height-SCREENWIDTH*0.618)/2, SCREENWIDTH, SCREENWIDTH*0.618)];
-        [endDic setObject:snap forKey:@"snap"];
-        snap = nil;
+        @try {
+            UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.height-SCREENWIDTH*0.618)/2, SCREENWIDTH, SCREENWIDTH*0.618)];
+            [endDic setObject:snap forKey:@"snap"];
+            snap = nil;
+        } @catch (NSException *exception) {}
+        
     }
     
     
-    [endDic setObject:location_showAddress forKey:@"poiname"];
-    [endDic setObject:locationAddress forKey:@"address"];
+    [endDic setObject:[APPUtils fixString:location_showAddress] forKey:@"poiname"];
+    [endDic setObject:[APPUtils fixString:locationAddress] forKey:@"address"];
     
     [endDic setObject:[NSString stringWithFormat:@"%f",lat] forKey:@"lat"];
     [endDic setObject:[NSString stringWithFormat:@"%f",lon] forKey:@"lon"];

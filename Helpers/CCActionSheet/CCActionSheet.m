@@ -455,6 +455,11 @@
         }
         cell.boundsTableView = self.tableView;
         
+        if(_vipcolor!=nil && indexPath.row==0){
+            cell.vipColor = _vipcolor;
+        }
+        
+        [cell initSubViews];
         if (!self.customView) {
             // 加上分割线
             UIImageView *sepLine = [[UIImageView alloc]initWithImage:[self imageWithUIColor:[UIColor lightGrayColor]]];

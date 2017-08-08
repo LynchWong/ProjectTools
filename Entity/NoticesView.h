@@ -30,7 +30,8 @@
 
 
 @property(nonatomic,strong) NSMutableArray *noticesArray;
--(void)getNotice;
+//装载
+-(void)setNotice:(NSArray*)arr;
 -(void)showNoticeView;
 
 @end

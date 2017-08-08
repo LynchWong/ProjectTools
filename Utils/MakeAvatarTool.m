@@ -24,8 +24,8 @@
         controller.sourceType = UIImagePickerControllerSourceTypeCamera;
         
         
-        if(not_avatar){
-            if ([MakeAvatarTool isRearCameraAvailable]) {
+        if(not_avatar ||_backCamera){
+            if ([MakeAvatarTool isRearCameraAvailable]) {//后置
                 controller.cameraDevice = UIImagePickerControllerCameraDeviceRear;
             }
         }else{

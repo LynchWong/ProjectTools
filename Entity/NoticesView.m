@@ -28,44 +28,29 @@
 }
 
 
+//装载
+-(void)setNotice:(NSArray*)arr{
 
--(void)getNotice{
-    
-    AFN_util *afn = [[AFN_util alloc] initWithAfnTag:@"getNotice"];
-    
-    afn.afnResult = ^(NSString *afn_tag,NSString*resultString){
-        if([afn_tag isEqualToString:@"getNotice"]){
-            @try {
-                
-                if(self.alpha==0){
-                    noticesArray = [[NSMutableArray alloc] init];
-                    
-                    
-                    NSMutableArray *usersArray = [APPUtils getArrByJson:resultString ];
-                    for(int i=0;i<[usersArray count];i++){
-                        NSDictionary*noticeDic = [usersArray objectAtIndex:i];
-                        [noticesArray addObject:noticeDic];
-                        noticeDic = nil;
-                    }
-                    
-                    
-                    if(noticesArray!=nil&&[noticesArray count]>0){
-                        [self showNoticeView];
-                    }
-                    
-                    
-                    usersArray = nil;
-                    
-                }
-                
-            } @catch (NSException *exception) {
-                
+    @try {
+        
+        if(self.alpha==0){
+            noticesArray = [[NSMutableArray alloc] init];
+       
+            for(int i=0;i<[arr count];i++){
+                NSDictionary*noticeDic = [arr objectAtIndex:i];
+                [noticesArray addObject:noticeDic];
+                noticeDic = nil;
+            }
+            
+            
+            if(noticesArray!=nil&&[noticesArray count]>0){
+                [self showNoticeView];
             }
         }
-    };
-    [afn getNotice];
-    afn = nil;
+        
+    } @catch (NSException *exception) {}
 }
+
 
 
 -(void)showNoticeView{
@@ -230,7 +215,6 @@
 }
 
 -(void)hideNotice{
-   
         
         [UIView animateWithDuration:0.2f delay:0
                             options:(UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState) animations:^(void) {
