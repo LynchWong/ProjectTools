@@ -42,6 +42,8 @@
 
 -(void)startLocation{
     
+     [APPUtils setMethod:@"LocationUtils -> startLocation"];
+    
     NSLog(@"开始定位");
     
     if(locationManager==nil){
@@ -113,7 +115,7 @@
     //key 需要web类型
     
     
-    
+     [APPUtils setMethod:@"LocationUtils -> locationFailed"];
     dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.iplocation",DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(concurrentQueue, ^{
         
@@ -202,12 +204,7 @@
                         
                         UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去开启" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
                             
-                            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-                            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                                //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
-                                [[UIApplication sharedApplication] openURL:url];
-                                
-                            }
+                           [APPUtils intoSetting];
                         }];
                         
                         [alertController addAction:cancel];
@@ -235,6 +232,7 @@
 //高德定位数据代理
 - (void)amapLocationManager:(AMapLocationManager *)manager didUpdateLocation:(CLLocation *)location{
     
+     [APPUtils setMethod:@"LocationUtils -> amapLocationManager"];
     
     //取出当前位置的坐标
     [self stopLocation];
@@ -287,6 +285,8 @@
 - (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
 {
     
+    [APPUtils setMethod:@"LocationUtils -> onReGeocodeSearchDone"];
+    
     if (response.regeocode != nil) {
         
         _locationProvince = response.regeocode.addressComponent.province;
@@ -332,6 +332,8 @@
 //保存定位数据
 -(void)saveLocation:(NSString*)locationCity{
 
+    [APPUtils setMethod:@"LocationUtils -> saveLocation"];
+    
     if(locationCity!=nil){
         if(!noAlert){
             locationCity = [locationCity stringByReplacingOccurrencesOfString:@"市" withString:@""];

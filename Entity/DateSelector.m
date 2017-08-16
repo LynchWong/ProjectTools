@@ -46,11 +46,11 @@
     [dateChooseView setBackgroundColor:[UIColor whiteColor]];
     [showDateView addSubview:dateChooseView];
     
-    [showDateView addSubview:[APPUtils get_line:0 y:dateChooseView.frame.size.height+dateChooseView.frame.origin.y width:SCREENWIDTH]];
+    [showDateView addSubview:[APPUtils get_line:0 y:dateChooseView.height+dateChooseView.y width:SCREENWIDTH]];
     
     
     
-    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, dateChooseView.frame.size.height)];
+    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, dateChooseView.height)];
     [cancelBtn setTitle:@"取消     " forState:UIControlStateNormal];
     cancelBtn.titleLabel.font = [UIFont fontWithName:textDefaultFont size:13];
     
@@ -60,7 +60,7 @@
     
     [cancelBtn addTarget:self action:@selector(hide) forControlEvents:UIControlEventTouchUpInside];
     
-    UIButton *okBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREENWIDTH-80, 0, 80, dateChooseView.frame.size.height)];
+    UIButton *okBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREENWIDTH-80, 0, 80, dateChooseView.height)];
     [okBtn setTitle:@"     确定" forState:UIControlStateNormal];
     okBtn.titleLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
     
@@ -72,7 +72,7 @@
     
     
     
-    UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, dateChooseView.frame.size.height)];
+    UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, dateChooseView.height)];
     dateLabel.text = title;
     dateLabel.textAlignment = NSTextAlignmentCenter;
     dateLabel.textColor = TEXTGRAY;
@@ -80,7 +80,7 @@
     [dateChooseView addSubview:dateLabel];
     
     if([title isEqualToString:@"转到今天"]){
-        MyBtnControl *today = [[MyBtnControl alloc] initWithFrame:CGRectMake((SCREENWIDTH-100)/2, 0, 100, dateChooseView.frame.size.height)];
+        MyBtnControl *today = [[MyBtnControl alloc] initWithFrame:CGRectMake((SCREENWIDTH-100)/2, 0, 100, dateChooseView.height)];
         [dateChooseView addSubview:today];
         today.shareLabel = dateLabel;
         today.not_highlight = YES;
@@ -93,7 +93,7 @@
         
     }
     
-    datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, dateChooseView.frame.size.height+dateChooseView.frame.origin.y+0.5, SCREENWIDTH, 220)];
+    datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, dateChooseView.height+dateChooseView.y+0.5, SCREENWIDTH, 220)];
     [datePicker setTimeZone:[NSTimeZone timeZoneWithName:@"GMT+8"]];
     // 设置当前显示
     
@@ -145,7 +145,7 @@
         
         // 设置view弹出来的位置
         backCoverView.alpha=0.6;
-        showDateView.frame = CGRectMake(0, SCREENHEIGHT-showDateView.frame.size.height, showDateView.frame.size.width, showDateView.frame.size.height);
+        showDateView.frame = CGRectMake(0, SCREENHEIGHT-showDateView.height, showDateView.width, showDateView.height);
     }];
 }
 
@@ -170,7 +170,7 @@
     if(showDateView!=nil){
         [UIView animateWithDuration:0.3 animations:^{
             backCoverView.alpha=0;
-            [showDateView setFrame:CGRectMake(0, SCREENHEIGHT, SCREENWIDTH, showDateView.frame.size.height)];
+            [showDateView setFrame:CGRectMake(0, SCREENHEIGHT, SCREENWIDTH, showDateView.height)];
         } completion:^(BOOL finished){
             self.alpha=0;
         }];

@@ -295,7 +295,7 @@
 {
     self.backgroundColor = [UIColor clearColor];
     
-    _onTintColor = MAINCOLOR;
+    _onTintColor = MAINRED;
     _tintColor = [UIColor colorWithWhite:0.75 alpha:1.0];
     _thumbTintColor = [UIColor colorWithWhite:1.0 alpha:1.0];
     

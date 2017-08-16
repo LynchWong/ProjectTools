@@ -41,8 +41,7 @@
     [super viewDidLoad];
 
     hasOpen = YES;
-    [MainViewController setPosition:@"MyMsgViewController"];
-    
+  
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshMsgList:)  name:@"refreshMsgList" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshUser:)  name:@"refreshUser" object:nil];
@@ -67,6 +66,7 @@
 
 -(void)initController{
 
+    [APPUtils setMethod:@"MyMsgViewController -> initController"];
     
     [[UITextField appearance] setTintColor:MAINCOLOR];
 
@@ -145,7 +145,7 @@
         return;
     }
     
-    [MainViewController setMethod:@"getGroups"];
+     [APPUtils setMethod:@"MyMsgViewController -> getGroups"];
  
     
         if(todayUnixTime == 0){
@@ -271,7 +271,7 @@
 //点击搜索框后
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar{
     
-    [MainViewController setMethod:@"searchBarShouldBeginEditing"];
+   
     
     self.searchBar.showsCancelButton = YES;
     
@@ -300,7 +300,7 @@
 //开始输入搜索条件
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
     
-     [MainViewController setMethod:@"searchBarShouldBeginEditing"];
+
     
    
     if(self.searchBar.text.length == 0){
@@ -323,6 +323,9 @@
 
 //装载搜索数据
 -(void)loadFilterArr{
+    
+    [APPUtils setMethod:@"MyMsgViewController -> loadFilterArr"];
+    
     filteredContact = [[NSMutableArray alloc] init];
     @try {
         for(int j=0;j<[dataList count];j++){
@@ -425,7 +428,7 @@
 
 -(void)refreshOver{
     
-
+    [APPUtils setMethod:@"MyMsgViewController -> refreshOver"];
     dispatch_async(dispatch_get_main_queue(), ^{
         
         [UIView animateWithDuration:0.3f
@@ -482,7 +485,7 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    
+     [APPUtils setMethod:@"MyMsgViewController -> cellForRowAtIndexPath"];
     //定义个静态字符串为了防止与其他类的tableivew重复
  
     static NSString *CellIdentifier = @"CellIndentifer_sms";
@@ -859,6 +862,10 @@
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    [APPUtils setMethod:@"MyMsgViewController -> heightForRowAtIndexPath"];
+    
+    
     if(isEmpty){
         return bodyView.height;
     }else{
@@ -871,7 +878,8 @@
 
 
 -(void)openSendPage:(NSString*)index{
-    [MainViewController setMethod:@"openSendPage"];
+  
+     [APPUtils setMethod:@"MyMsgViewController -> openSendPage"];
     
     @try {
         intoSendMsgPage = YES;
@@ -895,6 +903,8 @@
 
 -(void)setIsRead:(NSInteger)groupId includeVoice:(BOOL)includeVoice{//包含语言
     
+    [APPUtils setMethod:@"MyMsgViewController -> setIsRead"];
+    
     NSString *updateString=[NSString stringWithFormat:@"update MsgGroupList set unread_news_count = '0' where group_id='%d' and username = '%@';",(int)groupId,[AFN_util getUserId]];
     
     [[MainViewController getDatabase] execSql:updateString];
@@ -916,6 +926,8 @@
 
 
 - (void)refreshMsgList:(NSNotification*)notification{
+    
+    [APPUtils setMethod:@"MyMsgViewController -> refreshMsgList"];
     
     if(hasOpen){
         if(notification!=nil){

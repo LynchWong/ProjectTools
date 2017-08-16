@@ -8,12 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import <CoreTelephony/CTCallCenter.h>
+#import <CoreTelephony/CTCall.h>
 
 @interface TXSoundPlayer : NSObject<AVSpeechSynthesizerDelegate>
 {
-    NSMutableDictionary* soundSet;  //声音设置
+
     NSString* path;  //配置文件路径
     AVSpeechSynthesizer* player;
+    
+    NSInteger calling;//通话状态
 }
 
 @property(nonatomic,assign)float rate;   //语速
@@ -24,13 +28,15 @@
 @property(nonatomic,assign)BOOL checkVoice;
 @property(nonatomic,assign)BOOL tts_playing;
 
+@property (nonatomic, strong) CTCallCenter *callCenter;//通话状态
+
+
 +(TXSoundPlayer*)soundPlayerInstance;
 
 -(void)play:(NSString*)text;
--(void)setDefault;
--(void)writeSoundSet;
 -(void)stop;
-
+// 注册电话状态
+-(void)registerPhone;
 
 @property (assign, nonatomic) BOOL playOverAlert;//播放完毕
 typedef void (^TTSOverBlock)();

@@ -7,7 +7,7 @@
 //
 
 #import "UncaughtExceptionHandler.h"
-#import "MainViewController.h"
+#import "APPUtils.h"
 @implementation UncaughtExceptionHandler
 
 
@@ -28,7 +28,7 @@ void uncaughtExceptionHandler(NSException *exception)
         app_Name = @"";
     }
     
-    NSString *exceptionInfo = [NSString stringWithFormat:@"appName: %@ Error_Position:%@ Error_Method:%@  Exception reason：%@\nException name：%@\nException stack：%@",app_Name,[MainViewController getPosition],[MainViewController getMethod],name, reason, stackArray];
+    NSString *exceptionInfo = [NSString stringWithFormat:@"appName: %@  Error_Method:%@  Exception reason：%@\nException name：%@\nException stack：%@",app_Name,[APPUtils getMethod],name, reason, stackArray];
     NSLog(@"%@", exceptionInfo);
     
     NSMutableArray *tmpArr = [NSMutableArray arrayWithArray:stackArray];

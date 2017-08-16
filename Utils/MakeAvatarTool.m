@@ -183,12 +183,7 @@
             
             UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
                 
-                NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-                if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                    //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
-                    [[UIApplication sharedApplication] openURL:url];
-                    
-                }
+                [APPUtils intoSetting];
             }];
             
             [alertController addAction:cancel];

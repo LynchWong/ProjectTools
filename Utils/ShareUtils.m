@@ -42,6 +42,7 @@
 
 -(void)createView{
 
+     [APPUtils setMethod:@"ShareUtils -> createView"];
     
     CGFloat tHeight = 45;
     CGFloat margin = 10;
@@ -172,6 +173,8 @@
 
 -(UIView*)getShareControl:(NSInteger)index imageName:(NSString*)name showName:(NSString*)showName{
     
+    [APPUtils setMethod:@"ShareUtils -> getShareControl"];
+    
     if(xPositionShare >=3 && only_share){
         xPositionShare = 0;
         lineShare++;
@@ -222,6 +225,8 @@
 //分享
 -(void)openShareView:(BOOL)onlyShare title:(NSString*)title share_Title:(NSString*)share_Title share_Body:(NSString*)share_Body share_Url:(NSString*)share_Url shareApp:(BOOL)shareApp shareImg:(UIImage*)shareImg{
     
+    [APPUtils setMethod:@"ShareUtils -> openShareView"];
+    
     only_share = onlyShare;
     share_title_content =title;
     share_app = shareApp;
@@ -247,6 +252,8 @@
 
 //分享
 -(void)readyShare:(NSInteger)index{
+    
+    [APPUtils setMethod:@"ShareUtils -> readyShare"];
     
     if(index == 205){
         
@@ -380,6 +387,8 @@
 
 
 -(void)showQrcode{
+    
+    [APPUtils setMethod:@"ShareUtils -> showQrcode"];
     
     if(shareQRCodeView == nil){
         

@@ -43,7 +43,6 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    [MainViewController setPosition:@"WebViewController"];
     
     [self initController];
 
@@ -57,7 +56,8 @@
 
 -(void)initController{
     
-
+    [APPUtils setMethod:@"WebViewController -> initController"];
+    
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     ZppTitleView *titletView = [[ZppTitleView alloc] initWithTitle:webTitle];
@@ -264,6 +264,8 @@
 
 //------------------------分享-------------------------
 -(void)openShareView{
+    
+    [APPUtils setMethod:@"WebViewController -> openShareView"];
     
     if(!webLoadOK){
         [ToastView showToast:@"请等待页面加载完成"];

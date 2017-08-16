@@ -6,10 +6,10 @@
 //  Copyright (c) 2015年 李狗蛋. All rights reserved.    label 字体描边
 //
 
-#import "shineLabel.h"
+#import "ShineLabel.h"
 #import "UIColor+additions.h"
 
-@implementation shineLabel
+@implementation ShineLabel
 
 - (void)drawTextInRect:(CGRect)rect {
     

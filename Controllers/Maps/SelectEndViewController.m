@@ -49,9 +49,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [MainViewController setPosition:@"SelectEndViewController"];
-    
+
     
     [self initController];
     // Do any additional setup after loading the view.
@@ -60,6 +58,8 @@
 
 
 -(void)initController{
+    
+    [APPUtils setMethod:@"SelectEndViewController -> initController"];
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -526,12 +526,7 @@
     goSetLocationControl.shareLabel.numberOfLines=2;
     
     goSetLocationControl.clickBackBlock = ^(){
-        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
-            [[UIApplication sharedApplication] openURL:url];
-            
-        }
+       [APPUtils intoSetting];
     };
     
     [APPUtils get_line:0 y:goSetLocationControl.height-0.5 width:SCREENWIDTH];
@@ -553,6 +548,7 @@
 //定位结果
 -(void)showLocation:(double)latt lonn:(double)lonn posi:(NSString*)posi city:(NSString*)city{
 
+    [APPUtils setMethod:@"SelectEndViewController -> showLocation"];
     
     if(latt == -1){
         
@@ -599,6 +595,8 @@
 //位置是否可用
 -(void)setDataEnable:(BOOL)enable{
 
+    [APPUtils setMethod:@"SelectEndViewController -> setDataEnable"];
+    
     if(enable){
         end_position_label.textColor = TEXTGRAY;
         [positionControl setEnabled:YES];
@@ -624,7 +622,7 @@
 - (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
 {
     
-    
+    [APPUtils setMethod:@"SelectEndViewController -> onReGeocodeSearchDone"];
     if (response.regeocode != nil) {
         
         myCityName = response.regeocode.addressComponent.city;
@@ -796,7 +794,7 @@
 
 -(void)setPositionShowView {
     
-    
+     [APPUtils setMethod:@"SelectEndViewController -> setPositionShowView"];
     [UIView animateWithDuration:0.2 animations:^{
          prompView.alpha=0.9;
     }];
@@ -821,6 +819,9 @@
 
 //-------------------搜索-------------------------
 -(void)checkText{
+    
+    [APPUtils setMethod:@"SelectEndViewController -> checkText"];
+    
     if(search_input.text.length>0 && locationEnable){
         
         AMapInputTipsSearchRequest *tips = [[AMapInputTipsSearchRequest alloc] init];
@@ -886,6 +887,8 @@
 
 -(void)close_search:(BOOL)clean close:(BOOL)close{
     
+     [APPUtils setMethod:@"SelectEndViewController -> close_search"];
+    
     isSearching = NO;
     
     if(clean){
@@ -929,6 +932,7 @@
 //POI搜索的回调
 - (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response{
     
+     [APPUtils setMethod:@"SelectEndViewController -> onPOISearchDone"];
     
     if(isSearching){ //搜索的poi数组
         [dataList removeAllObjects];
@@ -1008,6 +1012,7 @@
 //建议搜索回调
 - (void)onInputTipsSearchDone:(AMapInputTipsSearchRequest *)request response:(AMapInputTipsSearchResponse *)response{
     
+    [APPUtils setMethod:@"SelectEndViewController -> onInputTipsSearchDone"];
     
     [dataList removeAllObjects];
     
@@ -1123,6 +1128,8 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
+    
+    [APPUtils setMethod:@"SelectEndViewController -> cellForRowAtIndexPath"];
     
     //定义个静态字符串为了防止与其他类的tableivew重复
     
@@ -1321,6 +1328,8 @@
 
 //确定选择
 -(void)selectOk{
+    
+    [APPUtils setMethod:@"SelectEndViewController -> selectOk"];
     
     NSMutableDictionary *endDic = [[NSMutableDictionary alloc] init];
     

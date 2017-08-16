@@ -50,8 +50,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
-    [MainViewController setPosition:@"MapShowViewController"];
+
     hasOpened=YES;
     [self initController];
 
@@ -60,6 +59,7 @@
 
 -(void)initController{
     
+     [APPUtils setMethod:@"MapShowViewController -> initController"];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshMapShowOrder:)  name:@"refreshMapShowOrder" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(MapShowView_back)  name:@"MapShowView_back" object:nil];//后退
@@ -222,6 +222,8 @@
 //添加起终点
 -(void)addAnno{
     
+     [APPUtils setMethod:@"MapShowViewController -> addAnno"];
+    
     if(annotationBegin != nil){
         [_mapView removeAnnotation:annotationBegin];
     }
@@ -298,6 +300,7 @@
 //刷新位置(跑跑用)
 -(void)refreshLocation{
     
+      [APPUtils setMethod:@"MapShowViewController -> refreshLocation"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
@@ -461,6 +464,8 @@
 
 - (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
 {
+    
+     [APPUtils setMethod:@"MapShowViewController -> viewForAnnotation"];
     
     if ([annotation isKindOfClass:[MAPointAnnotation class]])
     {

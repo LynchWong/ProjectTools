@@ -2,8 +2,29 @@
 
 #import "APPUtils.h"
 
+#define PhoneRegularExpression  @"\\d{3}-\\d{8}|\\d{3}-\\d{7}|\\d{4}-\\d{8}|\\d{4}-\\d{7}|1+[3578]+\\d{9}|\\d{8}|\\d{7}" //电话号码正则
 
 @implementation APPUtils
+
++ (NSString *)getMethod{
+    if(method == nil){
+        method = @"";
+    }
+    return  method;
+}
+
+
++ (void)setMethod:(NSString*)m{
+    method = m;
+}
+
+//打开设置
++(void)intoSetting{
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
 
 ///iphone 型号
 + (NSString *)getCurrentDeviceModel{
@@ -74,11 +95,11 @@
     
     if(height == 480){
         version = @"iphone4";
-    }else if(height == 960){
+    }else if(height == 568){
         version = @"iphone5";
-    }else if(height == 1136){
-        version = @"iphone6";
     }else if(height == 1334){
+        version = @"iphone6";
+    }else if(height == 1920){
         version = @"iphone7";
     }
     
@@ -765,47 +786,14 @@
 //将数组里的电话换成*
 +(NSString*)changePhoneNum2Star:(NSString*)string{
     
+    string = [string stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
     
 
-    //数字条件
-    NSRegularExpression *tNumRegularExpression = [NSRegularExpression regularExpressionWithPattern:@"[0-9]" options:NSRegularExpressionCaseInsensitive error:nil];
+    NSRegularExpression *regularExpression = [NSRegularExpression regularExpressionWithPattern:PhoneRegularExpression options:0 error:nil];
     
-    //符合数字条件的有几个字节
-    NSUInteger tNumMatchCount = [tNumRegularExpression numberOfMatchesInString:string
-                                                                       options:NSMatchingReportProgress
-                                                                         range:NSMakeRange(0, string.length)];
+    return  [regularExpression stringByReplacingMatchesInString:string options:0 range:NSMakeRange(0, string.length) withTemplate:@"***"];
     
-    if(tNumMatchCount>0){
-        @try {
-            
-            
-            string = [string stringByReplacingOccurrencesOfString:@" " withString:@""]; //去掉空格
-            
-            NSString *pattern =@"\\d*";
-            NSRegularExpression *regex = [[NSRegularExpression alloc] initWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
-            
-            NSArray *arr = [regex matchesInString:string options:NSMatchingReportProgress range:NSMakeRange(0,string.length)];
-            for(int i=0;i<[arr count];i++){
-                NSTextCheckingResult *result = [arr objectAtIndex:i];
-                if (result.range.length==11) {
-                    
-                    NSString *phone = [string substringWithRange:result.range];
-                    string = [string stringByReplacingOccurrencesOfString:phone withString:@"***"];
-                }
-                result=nil;
-            }
-            
-            arr = nil;
-            return string;
-            
-        } @catch (NSException *exception) {
-            
-            return string;
-        }
-        
-    }else{
-        return string;
-    }
     
 }
 
@@ -1421,7 +1409,6 @@
 }
 
 +(NSInteger)get_ud_int:(NSString*)key{
-
     return [[APPUtils getUserDefault] integerForKey:key];
 }
 
@@ -1606,5 +1593,30 @@
     return sourceString;
 }
 
+//释放音频资源
++ (void)releseAudio{
+    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+}
 
+//释放音频资源 share:与其他分享 将其他音源弱化。用户后台播放
++(void)takeAudio:(BOOL)share{
+    
+    if(share){
+        [[AVAudioSession sharedInstance]setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
+    }else{
+        [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayAndRecord error:nil];
+        [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:nil];
+    }
+    
+     [[AVAudioSession sharedInstance] setActive:YES error:nil];
+}
+
+
+//去打分
++(void)grade:(NSString*)app_id{
+
+    NSString *str = [NSString stringWithFormat:@"itms-apps://itunes.apple.com/app/id%@",app_id];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    
+}
 @end

@@ -11,7 +11,6 @@
 @implementation MyBtnControl
 
 
-
 -(id)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
@@ -23,6 +22,9 @@
         [btnControl addTarget:self action:@selector(btn_up) forControlEvents:UIControlEventTouchUpInside];
         [btnControl addTarget:self action:@selector(restore) forControlEvents:UIControlEventTouchUpOutside];
         [btnControl addTarget:self action:@selector(restore) forControlEvents:UIControlEventTouchCancel];
+        
+ 
+      
     }
     return self;
 }
@@ -154,6 +156,8 @@
 -(void)addImage:(UIImage*)img frame:(CGRect)frame{
 
     UIImageView *addImg = [[UIImageView alloc] initWithFrame:frame];
+    [addImg setContentMode:UIViewContentModeScaleAspectFill];
+    [addImg.layer setMasksToBounds:YES];
     [addImg setImage:img];
     [self addSubview:addImg];
     self.shareImage=addImg;
@@ -168,6 +172,8 @@
 
     UIImageView *addImg = [[UIImageView alloc] initWithFrame:frame];
     [addImg setImage:img];
+    [addImg setContentMode:UIViewContentModeScaleAspectFill];
+    [addImg.layer setMasksToBounds:YES];
     [self addSubview:addImg];
     self.shareImage2=addImg;
     self.shareImage2.layer.shouldRasterize = YES;
@@ -179,6 +185,8 @@
 -(void)addImage:(UIImage*)img{
     UIImageView *addImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, self.height)];
     [addImg setImage:img];
+    [addImg setContentMode:UIViewContentModeScaleAspectFill];
+    [addImg.layer setMasksToBounds:YES];
     [self addSubview:addImg];
     self.shareImage=addImg;
     self.shareImage.layer.shouldRasterize = YES;
@@ -189,8 +197,13 @@
 
 
 -(void)addImage:(UIImage*)img frame:(CGRect)frame url:(NSString*)url{
+    if(url==nil){
+        url = @"";
+    }
     UIImageView *addImg = [[UIImageView alloc] initWithFrame:frame];
     [addImg sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:img];
+    [addImg setContentMode:UIViewContentModeScaleAspectFill];
+    [addImg.layer setMasksToBounds:YES];
     [self addSubview:addImg];
     self.shareImage=addImg;
     self.shareImage.layer.shouldRasterize = YES;

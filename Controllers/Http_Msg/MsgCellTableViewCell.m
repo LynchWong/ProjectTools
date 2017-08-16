@@ -32,6 +32,8 @@
 -(void)setMsg:(OneMsgEntity *)msg{
     
     
+    [APPUtils setMethod:@"MsgCellTableViewCell -> setMsg"];
+    
     MyBtnControl *tableUnder = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, SCREENWIDTH)];
     [self addSubview:tableUnder];
     tableUnder.clickBackBlock = ^(){
@@ -978,6 +980,8 @@
 
 //cell点击事件
 - (void)cell_action{
+    
+    [APPUtils setMethod:@"MsgCellTableViewCell -> cell_action"];
     
     @try {
         

@@ -29,6 +29,8 @@
 //创建回话
 -(void)createGroup:(NSString*)user1 user2:(NSString*)user2{
 
+    [APPUtils setMethod:@"MsgUtil -> createGroup"];
+    
     //根据orderID获取conversation
     
     [ShowWaiting showWaiting:@"会话创建中,请稍后"];
@@ -85,6 +87,7 @@
 //---------------------------------获取消息
 -(void)check_msgs{
 
+    
     if(checking_msg){
         return;
     }
@@ -92,6 +95,7 @@
     if(![AFN_util isLogin]){
         return;
     }
+     [APPUtils setMethod:@"MsgUtil -> check_msgs"];
     
     checking_msg = YES;
     
@@ -185,6 +189,8 @@
 //检查储存更新会话组
 -(void)checkGroupExist:(Conversation*)conv{
     
+    [APPUtils setMethod:@"MsgUtil -> checkGroupExist"];
+    
     FMResultSet *resultSet = [[MainViewController getDatabase] queryDatabase:[NSString stringWithFormat:@"select * from MsgGroupList where group_id = '%d' and username = '%@';",(int)conv.group_id,[AFN_util getUserId]]];
     
     BOOL exist = NO;
@@ -215,6 +221,8 @@
 
 //下载未读消息
 -(void)downloadUnreadMsgs{
+    
+    [APPUtils setMethod:@"MsgUtil -> downloadUnreadMsgs"];
     
     if(_unreadMsgGroupArray != nil && [_unreadMsgGroupArray count]>0){
         
@@ -250,6 +258,7 @@
 //储存未读消息
 -(void)saveUnreadMsgs:(NSString*)msgsString{
     
+    [APPUtils setMethod:@"MsgUtil -> saveUnreadMsgs"];
     
     @try {
         
@@ -386,6 +395,9 @@
 
 //获取消息存msglist表的语句
 +(NSString*)getSave2MsgListSql:(NSMutableDictionary*)jsonDic msgFrom:(NSString*)msgFrom{
+    
+     [APPUtils setMethod:@"MsgUtil -> getSave2MsgListSql"];
+    
     NSString *saveSql = @"";
     
     @try {
@@ -436,6 +448,8 @@
 +(NSString*)getSave2MsgContentSql:(NSMutableDictionary*)dic fromMysefl:(BOOL)fromMyself{
     NSString *saveSql = @"";
     
+    
+     [APPUtils setMethod:@"MsgUtil -> getSave2MsgContentSql"];
     
     //    content：文本
     //    big_url：大图URL
@@ -592,6 +606,7 @@
 //获取消息存MsgGroupList表的语句
 +(NSString*)getSave2MsgGroupListSql:(Conversation*)conv{
     
+     [APPUtils setMethod:@"MsgUtil -> getSave2MsgGroupListSql"];
    
     NSString *nickName = [APPUtils get_ud_string:@"nickname"];
     NSString *realName = [APPUtils get_ud_string:@"realname"];
@@ -646,7 +661,8 @@
 //更新存MsgGroupList表的语句
 +(NSString*)getUpdateMsgGroupListSql:(Conversation*)conv{
     
-   
+   [APPUtils setMethod:@"MsgUtil -> getUpdateMsgGroupListSql"];
+    
     NSString *nickName = [APPUtils get_ud_string:@"nickname"];
     NSString * realName = [APPUtils get_ud_string:@"realname"];
     
@@ -680,6 +696,8 @@
 
 //获取一个conversation对象
 +(Conversation*)getConversation:(NSDictionary*)convDic{
+    
+    [APPUtils setMethod:@"MsgUtil -> getConversation"];
     
     Conversation *conv = [[Conversation alloc] init];
     
@@ -723,6 +741,8 @@
 //发送消息
 -(void)send_msgs:(OneMsgEntity*)msg{
 
+    [APPUtils setMethod:@"MsgUtil -> send_msgs"];
+    
     //组建json数据
     MsgSendContent * model = [[MsgSendContent alloc] init];
     [model setContent:msg.content];
@@ -783,6 +803,8 @@
     if(updateingSend){
         return;
     }
+    
+     [APPUtils setMethod:@"MsgUtil -> updateSendingMsgs"];
     
     updateingSend = YES;
     
@@ -855,6 +877,8 @@
 //-----------------播放声音---------------
 -(void)playVoice:(OneMsgEntity*)msg{
 
+     [APPUtils setMethod:@"MsgUtil -> playVoice"];
+    
     _nowPlayingMsgId = msg.msg_id;
     
     if(player != nil && player.isPlaying){
@@ -884,13 +908,14 @@
             if([APPUtils get_ud_int:@"err_setting"] ==1){
                 //设置听筒模式
                 [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+                [[AVAudioSession sharedInstance] setActive:YES error:nil];
             }else{
                 //设置下扬声器模式
-                [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:nil];
+                [APPUtils takeAudio:NO];
             }
             
             
-            [[AVAudioSession sharedInstance] setActive:YES error:nil];
+            
             
             if(player == nil){
                 player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:playPath] error:nil];
@@ -920,6 +945,7 @@
     if(player != nil && player.isPlaying){
         [player stop];
         voice_playing = NO;
+        [APPUtils releseAudio];
     }
 }
 
@@ -927,6 +953,9 @@
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)playerq successfully:(BOOL)flag{
     NSLog(@"播放完毕");
     voice_playing = NO;
+    [APPUtils releseAudio];
 }
+
+
 
 @end

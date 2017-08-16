@@ -7,7 +7,7 @@
 //
 
 #import "PlayVoiceUtil.h"
-
+#import "AppDelegate.h"
 @implementation PlayVoiceUtil
 @synthesize playingState;
 @synthesize plan_id;
@@ -25,6 +25,8 @@
 
 -(void)setVoice:(BOOL)plan pid:(NSInteger)pid url:(NSString*)url duration:(double)duration pView:(UIImageView*)pView loading:(UIImageView*)loading btn:(MyBtnControl*)btn{
 
+    [APPUtils setMethod:@"PlayVoiceUtil -> setVoice"];
+    
     isPlanType = plan;
     plan_id = pid;
     voiceUrl = url;
@@ -46,6 +48,8 @@
 
 //准备播放
 -(void)readyPlayVoice{
+    
+     [APPUtils setMethod:@"PlayVoiceUtil -> readyPlayVoice"];
     
     [cellPlayShowVoiceControl setEnabled:NO];
     
@@ -83,6 +87,8 @@
 
 -(void)playVoice{
   
+     [APPUtils setMethod:@"PlayVoiceUtil -> playVoice"];
+    
     if(player != nil && playing){
         [self stopPlaying];
         return;
@@ -98,6 +104,8 @@
 //创建圆圈
 - (void)createCircle{
     
+    
+    [APPUtils setMethod:@"PlayVoiceUtil -> createCircle"];
     
     circleSeconds = recordTime;
     
@@ -169,6 +177,8 @@
 //播放语音
 -(void)play{
     
+    [APPUtils setMethod:@"PlayVoiceUtil -> play"];
+    
     if(player!= nil){
         [player stop];
         player = nil;
@@ -176,8 +186,7 @@
     }
 
     //设置下扬声器模式
-    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:nil];
-    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    [APPUtils takeAudio:[AppDelegate getIsBackGround]];
     
     
     player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:recordFilePath] error:nil];
@@ -199,6 +208,8 @@
     [self stopPlaying:NO];
 }
 - (void)stopPlaying:(BOOL)finished{//finished =播放完毕
+    
+     [APPUtils setMethod:@"PlayVoiceUtil -> stopPlaying"];
     
     if(player != nil){
         [player stop];
@@ -225,6 +236,8 @@
                          completion:^(BOOL finished){
                              [circleProgressView removeFromSuperview];
                              circleProgressView = nil;
+                             
+                             [APPUtils releseAudio];
                          }];
     }
     
@@ -239,6 +252,8 @@
 //下载语音
 -(void)download_voice{
 
+    [APPUtils setMethod:@"PlayVoiceUtil -> download_voice"];
+    
     NSInteger now_id = plan_id;
     
     NSData *voiceData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:voiceUrl]];
@@ -280,6 +295,15 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             if(now_id==plan_id){
                 [ToastView showToast:@"语音下载出错,请重试"];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    [cellPlayShowVoiceControl setEnabled:YES];
+                     voiceLoadingImage.alpha = 0;
+                     [self stopPlaying];
+                    
+                    
+                });
+               
             }
         });
     }

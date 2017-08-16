@@ -36,6 +36,7 @@
     goodrate = 0;
     [[UITextField appearance] setTintColor:MAINCOLOR];
     
+    [APPUtils setMethod:@"EvaluateView -> initData"];
     
 }
 
@@ -51,6 +52,8 @@
 
 
 -(void)init_views{
+    
+    [APPUtils setMethod:@"EvaluateView -> init_views"];
     
     self.alpha=0;
     if(blackCoverView == nil){
@@ -310,6 +313,7 @@
                      }
                      completion:NULL];
 }
+
 
 -(void)saveReason:(NSString*)eString{
     evaString = eString;

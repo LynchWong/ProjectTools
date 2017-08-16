@@ -81,6 +81,7 @@
         placeHolderLabel = [[UILabel alloc] initWithFrame:CGRectMake(hpTextView.x+7,0, SCREENWIDTH, sendViewHeight)];
         placeHolderLabel.textAlignment = NSTextAlignmentLeft;
         placeHolderLabel.numberOfLines = 1;
+        placeHolderLabel.alpha=0;
         placeHolderLabel.textColor = [UIColor lightGrayColor];
         placeHolderLabel.font = [UIFont fontWithName:textDefaultFont size:14];
         [sendView addSubview:placeHolderLabel];
@@ -127,6 +128,17 @@
         hpLabel.font =[UIFont fontWithName:textDefaultBoldFont size:15];
         [changeView addSubview:hpLabel];
         
+        
+        placeHolderLabel = [[UILabel alloc] initWithFrame:CGRectMake(hpTextView.x+5,hpTextView.y+7.5, hpTextView.width-10, 0)];
+        placeHolderLabel.numberOfLines = 0;
+        placeHolderLabel.alpha=0;
+        placeHolderLabel.textColor = [UIColor lightGrayColor];
+        placeHolderLabel.font = [UIFont fontWithName:textDefaultFont size:13];
+        
+        
+        [changeView addSubview:placeHolderLabel];
+        
+        
         UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 60, tHeight)];
         
         [cancelBtn setBackgroundColor:[UIColor clearColor]];
@@ -150,7 +162,6 @@
         [sBtn addTarget:self action:@selector(saveEva) forControlEvents:UIControlEventTouchUpInside];
         
         [changeView addSubview:sBtn];
-     
         [changeView addSubview:[APPUtils get_line:0 y:changeView.height-0.5 width:SCREENWIDTH]];
         
         //图片类型
@@ -207,6 +218,7 @@
 //普通显示
 -(void)show:(NSString*)defaultString{
 
+    placeHolderLabel.alpha=0;
     if(defaultString!=nil && defaultString.length>0){
         hpTextView.text = defaultString;
     }
@@ -219,7 +231,32 @@
 //回复类型显示
 -(void)showWithPlace:(NSString*)placeString{
     
-    placeHolderLabel.text = placeString;
+    if(!replyType){
+        
+        NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+        paragraph.alignment = NSLineBreakByWordWrapping;
+        paragraph.alignment = NSTextAlignmentLeft;
+        paragraph.lineSpacing = LINE_MARGIN; //设置行间距
+        
+        NSDictionary *attribute = @{NSFontAttributeName:placeHolderLabel.font, NSParagraphStyleAttributeName:paragraph,NSKernAttributeName:@WORDS_MARGIN};
+        
+        CGSize size = [placeString boundingRectWithSize:CGSizeMake(placeHolderLabel.width, MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+        
+        placeHolderLabel.height = size.height;
+        
+        
+        NSAttributedString *attributeStr_content = [[NSAttributedString alloc] initWithString:placeString attributes:attribute];
+        placeHolderLabel.attributedText = attributeStr_content;
+        attributeStr_content = nil;
+        attribute = nil;
+        paragraph = nil;
+        
+    }else{
+        placeHolderLabel.text = placeString;
+    }
+
+    placeHolderLabel.alpha=1;
+   
     
     [self showMyself];
     
@@ -321,16 +358,9 @@
 -(void)growingTextViewDidChange:(HPGrowingTextView *)growingTextView{
 
     if(growingTextView.text.length>0){
-        
-        if(replyType){
             placeHolderLabel.alpha=0;
-        }
-  
     }else{
-        if(replyType){
             placeHolderLabel.alpha=1;
-        }
-        
     }
 }
 
@@ -349,10 +379,10 @@
 -(void)clearContent{
     hpTextView.text = @"";
     
-    if(replyType){
-        placeHolderLabel.alpha=1;
-    }
+
+    placeHolderLabel.alpha=1;
     
+
     if(_addImages){
         if(imagesList!=nil&&[imagesList count]>0){
             for(int i=0;i<[imagesList count];i++){

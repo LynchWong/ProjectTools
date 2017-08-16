@@ -154,7 +154,7 @@
     self.socketResult(3,@"");
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [ToastView showToast:FAILSTRING];
+//        [ToastView showToast:FAILSTRING];
         [ShowWaiting hideWaiting];
     });
     

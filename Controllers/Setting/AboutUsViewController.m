@@ -47,7 +47,7 @@
 -(void)initViews{
     
     
-
+     [APPUtils setMethod:@"AboutUsViewController -> initViews"];
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     

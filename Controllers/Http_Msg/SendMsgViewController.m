@@ -64,7 +64,6 @@ static NSString *CellIdentifier = @"SmsCell";
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 
-     [MainViewController setPosition:@"SendMsgViewController"];
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -87,8 +86,12 @@ static NSString *CellIdentifier = @"SmsCell";
 //受到信息刷新
 -(void)refreshMsg{
     
+  
+    
     if(hasOpen){
     
+        [APPUtils setMethod:@"SendMsgViewController -> refreshMsg"];
+        
         if(!loadingOldMsg && !loadingNewMsgs){
         
             loadingNewMsgs = YES;
@@ -176,7 +179,7 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)initController{
     
-    [MainViewController setMethod:@"initController"];
+    [APPUtils setMethod:@"SendMsgViewController -> initController"];
     
     self.edgesForExtendedLayout = UIRectEdgeNone;//tableView 上会多出20个像素 去掉
     [self.view setBackgroundColor:[UIColor whiteColor]];
@@ -357,6 +360,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //获取底部菜单
 -(UIView*)getBottomMenuView:(NSInteger)tag name:(NSString*)name icon:(NSString*)icon{
   
+    [APPUtils setMethod:@"SendMsgViewController -> getBottomMenuView"];
+    
     CGFloat btnWidth = menuViewHeight*0.65;
     CGFloat marginWidth = (SCREENWIDTH-btnWidth*3)/4;
     
@@ -429,6 +434,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //初始化数据
 -(void)initData{
 
+      [APPUtils setMethod:@"SendMsgViewController -> initData"];
+    
     hasOpen = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(quit2Main)  name:@"quitMsgPage" object:nil];//被T
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshMsg)  name:@"update_sendMsgPage" object:nil];//刷新
@@ -531,7 +538,7 @@ static NSString *CellIdentifier = @"SmsCell";
 -(void)getMsgs:(BOOL)loadOld jump:(BOOL)jump{//loadOld向上滑 jump跳到最后一行
     lastMsgTime = 0;
     
-    [MainViewController setMethod:@"getMsgs"];
+     [APPUtils setMethod:@"SendMsgViewController -> getMsgs"];
 
     
     [MsgUtil updateSendingMsgs:NO];//更新发送中的消息结果
@@ -712,6 +719,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //从底部获取msg
 -(OneMsgEntity*)getOneMsgFromDb:(FMResultSet*)resultSet{
     
+     [APPUtils setMethod:@"SendMsgViewController -> getOneMsgFromDb"];
         
         OneMsgEntity *oneMSg = [[OneMsgEntity alloc]init];
         oneMSg.isRead = [resultSet intForColumnIndex: 0];
@@ -820,6 +828,8 @@ static NSString *CellIdentifier = @"SmsCell";
 -(OneMsgEntity*)getTimeMsg:(OneMsgEntity*)oneMSg insertType:(BOOL)insertType{//插入新消息类型
 
  
+     [APPUtils setMethod:@"SendMsgViewController -> getTimeMsg"];
+    
     if(abs(oneMSg.createtime - lastMsgTime) >=90){//超过3分钟就显示时间
         
         OneMsgEntity *lastMsg;
@@ -889,6 +899,8 @@ static NSString *CellIdentifier = @"SmsCell";
 
 //不满一页高的处理
 -(void)checkFullOfTable:(float)addHeight{
+    
+    [APPUtils setMethod:@"SendMsgViewController -> checkFullOfTable"];
     
     float nowTableContentHeight = smsTableView.contentSize.height-(smsTableView.tableHeaderView==nil?0:smsTableView.tableHeaderView.height) + addHeight;
     
@@ -981,7 +993,7 @@ static NSString *CellIdentifier = @"SmsCell";
 -(float)getCellHeight:(OneMsgEntity*)msg{
     
 
-    
+     [APPUtils setMethod:@"SendMsgViewController -> getCellHeight"];
     float cellHeight = 0;
     
     @try {
@@ -1049,6 +1061,8 @@ static NSString *CellIdentifier = @"SmsCell";
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    [APPUtils setMethod:@"SendMsgViewController -> cellForRowAtIndexPath"];
     
     MsgCellTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 
@@ -1360,7 +1374,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //判断输入的字是否是回车，即按下return
 -(BOOL)growingTextView:(HPGrowingTextView *)growingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
     
-    [MainViewController setMethod:@"shouldChangeTextInRange"];
+   
     
     if ([text isEqualToString:@"\n"]){ //判断输入的字是否是回车，即按下return
        
@@ -1507,6 +1521,7 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)getSelectedPhoto:(NSMutableArray *)photos{
    
+    [APPUtils setMethod:@"SendMsgViewController -> getSelectedPhoto"];
     
     dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.gcd",DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(concurrentQueue, ^{
@@ -1587,7 +1602,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //保存图片发送信息
 -(OneMsgEntity*)savePic2DB:(UIImage*)tempImg tail:(NSString*)tail{
 
-
+ [APPUtils setMethod:@"SendMsgViewController -> savePic2DB"];
+    
     NSString *msgId = [APPUtils getUniquenessString];
      NSString *fileName = [NSString stringWithFormat:@"%@.%@",msgId,tail];
   
@@ -1651,6 +1667,8 @@ static NSString *CellIdentifier = @"SmsCell";
 
 //点开图片
 - (void)picClicked:(MsgCellTableViewCell*)cell{
+    
+     [APPUtils setMethod:@"SendMsgViewController -> picClicked"];
     
     NSInteger now = [[APPUtils GetCurrentTimeString] integerValue];
     
@@ -1721,12 +1739,6 @@ static NSString *CellIdentifier = @"SmsCell";
 
 
 
-
-
-
-
-
-
 //------------发送位置---------------------
 
 -(void)sendPositions{
@@ -1743,6 +1755,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //位置获取回调
 -(void)passValue:(NSMutableDictionary *)dic
 {
+    
+     [APPUtils setMethod:@"SendMsgViewController -> passValue"];
     
     @try {
         
@@ -1811,6 +1825,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //------------------------------------发送文本消息
 -(void)sendTextMsg{
 
+     [APPUtils setMethod:@"SendMsgViewController -> sendTextMsg"];
+    
         NSString *tempMsgId=[APPUtils getUniquenessString];
         
         NSMutableDictionary *textDic = [[NSMutableDictionary alloc] init];
@@ -1838,7 +1854,7 @@ static NSString *CellIdentifier = @"SmsCell";
 #pragma mark - 录音
 - (void)record {
     
-     [MainViewController setMethod:@"record"];
+     [APPUtils setMethod:@"SendMsgViewController -> record"];
     
     
         //初始化录音
@@ -1869,7 +1885,7 @@ static NSString *CellIdentifier = @"SmsCell";
 -(NSString*)stopAndSaveRecord{
 
     
-      [MainViewController setMethod:@"stopAndSaveRecord"];
+      [APPUtils setMethod:@"SendMsgViewController -> stopAndSaveRecord"];
     
     //停止录音
     [recorder stop];
@@ -1897,10 +1913,6 @@ static NSString *CellIdentifier = @"SmsCell";
 
 - (void)updateMetersss{
     
-      [MainViewController setMethod:@"updateMetersss"];
-    
-    
-
     NSInteger tempTT=-1;
     while (updatingRecordMeters) {
         if (recorder.isRecording){
@@ -1952,7 +1964,6 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)updateTime:(NSString*)time{
     
-     [MainViewController setMethod:@"updateTime"];
     
     voiceShowImage.alpha=0;
     voiceTimeLabel.alpha=1;
@@ -1976,8 +1987,7 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)voiceDown{
     
-    [MainViewController setMethod:@"voicemsgDown"];
-    
+   [APPUtils setMethod:@"SendMsgViewController -> voiceDown"];
     
     if(voiceView == nil){
         
@@ -2057,6 +2067,7 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)voiceUp{
     
+    [APPUtils setMethod:@"SendMsgViewController -> voiceUp"];
   
     [voiceLabel setText:@"按住 说话"];
     sendVoiceBtn.backgroundColor = [UIColor getColor:@"F3F3F6"];
@@ -2143,9 +2154,7 @@ static NSString *CellIdentifier = @"SmsCell";
         voiceView.alpha=0;
     }];
     
-  
 
-    
 }
 
 
@@ -2173,6 +2182,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //插入准备发送的信息到DB  返回表里的
 -(void)insertOneMsg:(NSString*)sendType saveContentsDic:(NSMutableDictionary*)saveContentsDic msg_id:(NSString*)msg_id{
     
+    
+    [APPUtils setMethod:@"SendMsgViewController -> insertOneMsg"];
     
     @try {
         
@@ -2221,6 +2232,8 @@ static NSString *CellIdentifier = @"SmsCell";
 //获取准备发送的Msg
 -(OneMsgEntity*)getTempSendMsg:(NSString*)type{
 
+     [APPUtils setMethod:@"SendMsgViewController -> getTempSendMsg"];
+    
     OneMsgEntity *thisMsg = [[OneMsgEntity alloc] init];
     thisMsg.sendStatus = 3;
     thisMsg.type = type;
@@ -2238,6 +2251,8 @@ static NSString *CellIdentifier = @"SmsCell";
 
 //发送消息 只刷新一条数据 效率提升
 -(void)insertNews2Table:(OneMsgEntity*)msg{
+    
+     [APPUtils setMethod:@"SendMsgViewController -> insertNews2Table"];
     
     if(msg!=nil){
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2341,6 +2356,8 @@ static NSString *CellIdentifier = @"SmsCell";
 
 -(void)menuItem3:(id)control
 {
+    
+     [APPUtils setMethod:@"SendMsgViewController -> menuItem3"];
     
     [self leaveEditMode];
      menuState = YES;
@@ -2526,6 +2543,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //设置消息列表摘要
 -(void)setMsgListSummary{
 
+     [APPUtils setMethod:@"SendMsgViewController -> setMsgListSummary"];
     
     if([dataList count]>0){
         

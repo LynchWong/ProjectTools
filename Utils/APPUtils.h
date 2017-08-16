@@ -7,13 +7,24 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "sys/utsname.h"
+#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 #import "MainViewController.h"
 
 #define FileHashDefaultChunkSizeForReadingData 1024*8 // 8K
 
 static NSUserDefaults *user_Defaults;
+static NSString *method;
 
 @interface APPUtils :NSObject
+
+//应用位置
++ (NSString *)getMethod;
++ (void)setMethod:(NSString*)m;
+
+
+//打开设置
++(void)intoSetting;
 
 //iphone 型号
 + (NSString *)getCurrentDeviceModel;
@@ -262,4 +273,14 @@ static NSUserDefaults *user_Defaults;
 
 //通讯录名字转换
 + (NSString *) nameConvert:(NSString*)sourceString;
+
+
+//释放音频资源
++ (void)releseAudio;
+
+//释放音频资源 share:与其他分享 将其他音源弱化。用户后台播放
++(void)takeAudio:(BOOL)share;
+
+//去打分
++(void)grade:(NSString*)app_id;
 @end

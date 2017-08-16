@@ -417,7 +417,7 @@
                 }
                 
                 for(int j=0;j<[tempArray count];j++){
-                    
+                   
                     Area *area = [tempArray objectAtIndex:j];
                     
                     if([area.city hasPrefix:searchAreaView.text]){

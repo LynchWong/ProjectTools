@@ -281,65 +281,70 @@
                     NSString *tempNum = @"";
                     for (CNLabeledValue *labeledValue in phoneNums) {
                         
-                        //获取电话号码
-                        CNPhoneNumber *phoneNumer = labeledValue.value;
-                        NSString *number = phoneNumer.stringValue;
-                        if(number!=nil&&number.length>0){
+                        @try {
                             
-                            if(number==nil){
-                                continue;
-                            }
-                            
-                            
-                            if([number isEqualToString:tempNum]){//去掉连续重复的号码
-                                number = nil;
-                                continue;
-                            }
-                            tempNum = number;
-                            
-                            
-                            Contact *contact = [[Contact alloc] init];
-                            contact.contact_tel = [NSString stringWithString:number];
-                            contact.contact_name = [NSString stringWithString:contactName];
-                            
-                            
-                            if(avatarData!=nil){
+                            //获取电话号码
+                            CNPhoneNumber *phoneNumer = labeledValue.value;
+                            NSString *number = phoneNumer.stringValue;
+                            if(number!=nil&&number.length>0){
                                 
-                                NSString* imageFilePath = [NSString stringWithFormat:@"%@/%@",[MainViewController sharedMain].avatarPaths,[NSString stringWithFormat:@"contacts_%@.png",number]];
-                                if(![APPUtils fileExist:imageFilePath]){
-                                    [avatarData writeToFile: imageFilePath atomically:YES];
+                                if(number==nil){
+                                    continue;
                                 }
-                                imageFilePath = nil;
+                                
+                                
+                                if([number isEqualToString:tempNum]){//去掉连续重复的号码
+                                    number = nil;
+                                    continue;
+                                }
+                                tempNum = number;
+                                
+                                
+                                Contact *contact = [[Contact alloc] init];
+                                contact.contact_tel = [NSString stringWithString:number];
+                                contact.contact_name = [NSString stringWithString:contactName];
+                                
+                                
+                                if(avatarData!=nil){
+                                    
+                                    NSString* imageFilePath = [NSString stringWithFormat:@"%@/%@",[MainViewController sharedMain].avatarPaths,[NSString stringWithFormat:@"contacts_%@.png",number]];
+                                    if(![APPUtils fileExist:imageFilePath]){
+                                        [avatarData writeToFile: imageFilePath atomically:YES];
+                                    }
+                                    imageFilePath = nil;
+                                }
+                                avatarData = nil;
+                                
+                                
+                                
+                                contact = [self getFullContact:contact];
+                                
+                                
+                                NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+                                paragraph.alignment = NSLineBreakByWordWrapping;
+                                
+                                NSDictionary *attribute = @{NSFontAttributeName: [UIFont fontWithName:textDefaultFont size:14], NSParagraphStyleAttributeName: paragraph};
+                                
+                                CGSize nameSize = [contact.contact_name boundingRectWithSize:CGSizeMake(SCREENWIDTH-(cellHeight*0.7+30), MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+                                
+                                if(nameSize.height>oneLineHeight+3){
+                                    contact.is2Lines=1;
+                                }
+                                
+                                paragraph = nil;
+                                attribute = nil;
+                                
+                                [dataList addObject:contact];
+                                
+                                contact = nil;
+                                number = nil;
+                                
                             }
-                            avatarData = nil;
                             
+                            phoneNumer = nil;
                             
-                            
-                            contact = [self getFullContact:contact];
-                            
-                            
-                            NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
-                            paragraph.alignment = NSLineBreakByWordWrapping;
-                            
-                            NSDictionary *attribute = @{NSFontAttributeName: [UIFont fontWithName:textDefaultFont size:14], NSParagraphStyleAttributeName: paragraph};
-                            
-                            CGSize nameSize = [contact.contact_name boundingRectWithSize:CGSizeMake(SCREENWIDTH-(cellHeight*0.7+30), MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
-                            
-                            if(nameSize.height>oneLineHeight+3){
-                                contact.is2Lines=1;
-                            }
-                            
-                            paragraph = nil;
-                            attribute = nil;
-                            
-                            [dataList addObject:contact];
-                            
-                            contact = nil;
-                            number = nil;
-                            
-                        }
+                        } @catch (NSException *exception) {}
                         
-                        phoneNumer = nil;
                     }
                     phoneNums = nil;
                     
@@ -384,13 +389,7 @@
         
         UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去开启" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
             
-            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                //如果点击打开的话，需要记录当前的状态，从设置回到应用的时候会用到
-                [[UIApplication sharedApplication] openURL:url];
-                
-                
-            }
+            [APPUtils intoSetting];
         }];
         
         [alertController addAction:cancel];

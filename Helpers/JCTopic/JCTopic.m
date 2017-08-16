@@ -57,6 +57,45 @@
             [pic addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
             [self addSubview:pic];
             
+            
+            NSString*tString =[obj objectForKey:@"title"];
+            if(tString!=nil && tString.length>0){
+                
+                UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(i*self.width, self.height-25, self.width, 25)];
+                [self addSubview:titleView];
+                
+                UIView *under = [[UIView alloc] initWithFrame:CGRectMake(0, -0.5, titleView.width, titleView.height)];
+                [under setBackgroundColor:[UIColor blackColor]];
+                under.alpha = 0.7;
+                [titleView addSubview:under];
+                under = nil;
+                
+                NSString *isVideo = [obj objectForKey:@"isVideo"];
+                
+                UILabel * titleLabel = [[UILabel alloc]init];
+                if(isVideo!=nil && isVideo.length>0){
+                    [titleLabel setFrame:CGRectMake(22, 0, titleView.width-70,titleView.height)];
+                }else{
+                    [titleLabel setFrame:CGRectMake(5, 0, titleView.width-55,titleView.height)];
+                }
+                [titleLabel setText:tString];
+                [titleLabel setTextColor:[UIColor whiteColor]];
+                [titleLabel setFont:[UIFont fontWithName:@"Helvetica" size:11]];
+                [titleView addSubview:titleLabel];
+                
+                
+                if(isVideo!=nil && isVideo.length>0){
+                    UIImageView *videoImage = [[UIImageView alloc] initWithFrame:CGRectMake(5, (titleView.height-13)/2, 13, 13)];
+                    videoImage.layer.cornerRadius = videoImage.height/2;
+                    videoImage.layer.borderColor = [[UIColor whiteColor]CGColor];
+                    videoImage.layer.borderWidth = 1.0;
+                    videoImage.contentMode = UIViewContentModeScaleAspectFit;
+                    [videoImage setImage:[UIImage imageNamed:@"video_little.png"]];
+                    [titleView addSubview:videoImage];
+                }
+            }
+            
+    
             i ++;
         }
         
@@ -68,6 +107,7 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if(!scrollTimer && [self.pics count]>1){
+                [JCdelegate currentPage:0 total:[self.pics count]-2];
                 scrollTimer = [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(scrollTopic) userInfo:nil repeats:YES];
             }
         });

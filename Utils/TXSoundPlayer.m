@@ -7,14 +7,19 @@
 //
 
 #import "TXSoundPlayer.h"
-static TXSoundPlayer* soundplayer=nil;
+#import "APPUtils.h"
+#import "AppDelegate.h"
+static TXSoundPlayer* soundplayer;
 
 @implementation TXSoundPlayer
 
 +(TXSoundPlayer*)soundPlayerInstance{
+    
+    
   if(soundplayer==nil){
-      
+    
         soundplayer=[[TXSoundPlayer alloc]init];
+        [soundplayer registerPhone];
         [soundplayer initSoundSet];
      }
    return soundplayer;
@@ -22,11 +27,28 @@ static TXSoundPlayer* soundplayer=nil;
 
 //播放声
 -(void)play:(NSString*)text{
+    
+    if(calling==1){//电话中 不播放
+        _tts_playing = NO;
+        return;
+    }
+
+    [self stop];
+    
+    if(soundplayer==nil){
+      soundplayer=[[TXSoundPlayer alloc]init];
+      [soundplayer initSoundSet];
+    }
+   
+   
     if(text!= nil && text.length>0){
+        
+        //压低其他资源声音
+        [APPUtils takeAudio:YES];
+        
         player=[[AVSpeechSynthesizer alloc]init];
         player.delegate = self;
     
-       
         AVSpeechUtterance* u=[[AVSpeechUtterance alloc]initWithString:text];//设置要朗读的字符串
         u.voice=[AVSpeechSynthesisVoice voiceWithLanguage:@"ZH-TW"];//设置语言
         u.volume=1.0;  //设置音量（0.0~1.0）默认为1.0
@@ -35,6 +57,7 @@ static TXSoundPlayer* soundplayer=nil;
         
         [player speakUtterance:u];
         _tts_playing=YES;
+        u = nil;
     }else{
         _tts_playing = NO;
     }
@@ -42,49 +65,77 @@ static TXSoundPlayer* soundplayer=nil;
 }
 
 -(void)stop{
- 
-    [player stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
-    player = nil;
+    if(player!=nil){
+        [player stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+        player = nil;
+    }
+    
     
 }
 
 //初始化配置
 -(void)initSoundSet{
-    path=[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"SoundSet.plist"];
-    soundSet=[NSMutableDictionary dictionaryWithContentsOfFile:path];
-    if(soundSet==nil){
-        soundSet=[NSMutableDictionary dictionary];
-        [soundplayer setDefault];
-        [soundplayer writeSoundSet];
-    }else{
-        self.autoPlay=[[soundSet valueForKeyPath:@"autoPlay"] boolValue];
-        self.volume=[[soundSet valueForKeyPath:@"volume"] floatValue];
-        self.rate=[[soundSet valueForKeyPath:@"rate"] floatValue];
-        self.pitchMultiplier=[[soundSet valueForKeyPath:@"pitchMultiplier"] floatValue];
-        
-    }
     
-}
-
-//恢复默认设置
--(void)setDefault{
     self.volume=0.7;
     self.rate=0.166;
     self.pitchMultiplier=1.0;
+    
+    //注册被打断
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
 }
 
-//将设置写入配置文件
--(void)writeSoundSet{
-    [soundSet setValue:[NSNumber numberWithBool:self.autoPlay] forKey:@"autoPlay"];
-    [soundSet setValue:[NSNumber numberWithFloat:self.volume] forKey:@"volume"];
-    [soundSet setValue:[NSNumber numberWithFloat:self.rate] forKey:@"rate"];
-    [soundSet setValue:[NSNumber numberWithFloat:self.pitchMultiplier] forKey:@"pitchMultiplier"];
-    [soundSet writeToFile:path atomically:YES];
+
+ // 注册电话状态
+-(void)registerPhone{
+    __weak typeof(self) weakSelf = self;
+    //电话状态
+    _callCenter = [[CTCallCenter alloc] init];
+    _callCenter.callEventHandler = ^(CTCall *call) {
+        
+        if ([call.callState isEqualToString:CTCallStateDisconnected])
+        {
+            NSLog(@"Call has been disconnected");
+            calling = 0;
+        }
+        else if ([call.callState isEqualToString:CTCallStateConnected])
+        {
+            NSLog(@"Call has just been connected");
+            calling = 1;
+        }
+        else if([call.callState isEqualToString:CTCallStateIncoming])
+        {
+            NSLog(@"Call is incoming");
+            calling = 1;
+        }
+        else if ([call.callState isEqualToString:CTCallStateDialing])
+        {
+            NSLog(@"call is dialing");
+            calling = 1;
+        }
+        else
+        {
+            NSLog(@"Nothing is done");
+            calling = 0;
+        }
+        
+        if(calling==1 && _tts_playing && player!=nil){
+            [weakSelf stop];//通知播放
+        }
+        
+    };
+
 }
+
+
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance *)utteranc
 {
     _tts_playing = NO;
+   
+    if(!_checkVoice){
+        //释放音频资源
+        [APPUtils releseAudio];
+    }
    
     
     if(_playOverAlert){
@@ -93,5 +144,24 @@ static TXSoundPlayer* soundplayer=nil;
 
 }
 
+
+//音频被打断
+-(void)handleInterruption:(NSNotification *)notification
+{
+    NSDictionary *info = notification.userInfo;
+    
+    AVAudioSessionInterruptionType type = [info[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
+    if(type == AVAudioSessionInterruptionTypeBegan){//被打断
+       
+        _tts_playing = NO;
+        if(_playOverAlert){
+            self.playOverBlock();
+        }
+        
+    }else{//恢复
+     
+    }
+    
+}
 
 @end

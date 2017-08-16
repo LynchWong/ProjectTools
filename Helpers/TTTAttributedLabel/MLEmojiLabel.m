@@ -203,7 +203,7 @@ static CGFloat widthCallback(void *refCon) {
     
     self.numberOfLines = 0;
     self.font = [UIFont fontWithName:textDefaultFont size:14.0];
-    self.textColor = [UIColor blackColor];
+    self.textColor = [UIColor darkGrayColor];
     self.backgroundColor = [UIColor clearColor];
     
     self.lineBreakMode = NSLineBreakByCharWrapping;
@@ -215,7 +215,7 @@ static CGFloat widthCallback(void *refCon) {
     
     NSMutableDictionary *mutableActiveLinkAttributes = [@{(NSString *)kCTUnderlineStyleAttributeName:@(NO)}mutableCopy];
     
-    UIColor *commonLinkColor = MAINCOLOR;
+    UIColor *commonLinkColor = LINKCOLOR;
     
     //点击时候的背景色
     [mutableActiveLinkAttributes setValue:(__bridge id)[[UIColor colorWithWhite:0.631 alpha:1.000] CGColor] forKey:(NSString *)kTTTBackgroundFillColorAttributeName];
