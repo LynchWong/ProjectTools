@@ -14,6 +14,7 @@
 
 @property (copy, nonatomic) NSString *dz_id;
 @property (copy, nonatomic) NSString *dz_uid; //dz用户id;
+@property (copy, nonatomic) NSString *dz_tid; //隶属
 
 @property (copy, nonatomic) NSString *newsNickName;
 

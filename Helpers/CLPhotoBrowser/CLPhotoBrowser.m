@@ -47,8 +47,16 @@ static NSTimeInterval const duration = 0.3;
     
 }
 
++ (BOOL)getPhotoOpening{
+    return opening;
+}
++ (void)setPhotoOpening:(BOOL)open{
+    opening = open;
+}
+
 - (void)show
 {
+    [CLPhotoBrowser setPhotoOpening:YES];
     [[UIApplication sharedApplication].keyWindow endEditing:YES];
 
     UIViewController *rootViewCtl = [UIApplication sharedApplication].keyWindow.rootViewController;
@@ -270,6 +278,7 @@ static NSTimeInterval const duration = 0.3;
     } completion:^(BOOL finished) {
         [self.view removeFromSuperview];
         [self removeFromParentViewController];
+        [CLPhotoBrowser setPhotoOpening:NO];
     }];
     
 }

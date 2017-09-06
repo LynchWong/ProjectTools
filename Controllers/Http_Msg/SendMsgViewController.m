@@ -434,7 +434,7 @@ static NSString *CellIdentifier = @"SmsCell";
 //初始化数据
 -(void)initData{
 
-      [APPUtils setMethod:@"SendMsgViewController -> initData"];
+    [APPUtils setMethod:@"SendMsgViewController -> initData"];
     
     hasOpen = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(quit2Main)  name:@"quitMsgPage" object:nil];//被T

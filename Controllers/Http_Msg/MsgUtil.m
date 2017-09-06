@@ -10,7 +10,7 @@
 #import "APPUtils.h"
 #import "SendMsgViewController.h"
 @implementation MsgUtil
-@synthesize checking_msg;
+
 @synthesize afn;
 @synthesize unreadMsgCount;
 @synthesize lastMsgType;
@@ -69,7 +69,6 @@
                 }
                 
                 SendMsgViewController *secondView = [[SendMsgViewController alloc] initWithConversation:conv show:YES];
-                
                 [[MainViewController sharedMain].navigationController pushViewController:secondView animated:YES];
                 secondView = nil;
                 
@@ -123,7 +122,7 @@
                     
                     if(tepArray == nil || [tepArray isEqual:[NSNull null]]){//无会话
                         
-                        [weakSelf check_over:NO];
+                   
                         
                     }else{
                         
@@ -236,12 +235,9 @@
             
             if([afn_tag isEqualToString:@"getUnReadMessage"]){
                 
-                dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.zpp.msg",DISPATCH_QUEUE_CONCURRENT);
-                dispatch_async(concurrentQueue, ^{
-                    [weakSelf saveUnreadMsgs:resultString];//保存消息
-                });
-                concurrentQueue = nil;
-
+             
+                [weakSelf saveUnreadMsgs:resultString];//保存消息
+              
             }else{
                 [weakSelf check_over:NO];
             }
@@ -804,9 +800,14 @@
         return;
     }
     
+    
      [APPUtils setMethod:@"MsgUtil -> updateSendingMsgs"];
     
     updateingSend = YES;
+    
+    NSString *sql0 = @"update MsgContents set downloading = '0' where downloading == '1';";
+    [[MainViewController getDatabase] execSql:sql0];
+    sql0 = nil;
     
     NSString *sqlResultQuery = [NSString stringWithFormat:@"select msg_id from MsgsList where sendStatus='3' and username='%@';",[AFN_util getUserId]];
     FMResultSet *updateresultSet = [[MainViewController getDatabase] queryDatabase:sqlResultQuery];

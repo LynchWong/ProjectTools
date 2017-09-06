@@ -25,12 +25,12 @@
     return self;
 }
 
--(id)initLocationWithNoAlert{
+-(id)initLocationWithShowAlert{
     self = [super init];
     if (self) {
         
         [self initData];
-        noAlert = YES;
+        showAlert = YES;
     }
     return self;
 }
@@ -44,7 +44,14 @@
     
      [APPUtils setMethod:@"LocationUtils -> startLocation"];
     
+    if(locationIng){
+        return;
+    }
+    
+    locationIng = YES;
     NSLog(@"开始定位");
+    
+    locationAuth = [APPUtils getLocationAuth];
     
     if(locationManager==nil){
         locationManager = [[AMapLocationManager alloc] init];
@@ -75,20 +82,7 @@
     }
 }
 
-//获取定位权限
--(BOOL)getLocationAuth{
-    
-    if ([CLLocationManager locationServicesEnabled] && ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized)) {
-        NSLog(@"可以定位");
-        //定位功能可用
-        return YES;
-        
-    }else{
-         NSLog(@"未开启定位权限");
-        //定位不能用
-        return NO;
-    }
-}
+
 
 //停止定位
 -(void)stopLocation
@@ -177,45 +171,47 @@
         if(!ipLocationOk){
             [APPUtils userDefaultsDelete:@"location_city"];
             [APPUtils userDefaultsDelete:@"location_province"];
-            
+             locationIng = NO;
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 self.callBackBlock(-1, -1, nil, nil, NO);
                 
                 
-                if(_handleLocationCity||noAlert){
+                [ShowWaiting hideWaiting];
+                
+                if(_handleLocationCity||showAlert){
                     
-                    [ShowWaiting hideWaiting];
-                    
-                    if(noAlert){
-                        
+                    if(locationAuth){
+                        _error_string = @"定位异常,请重试";
                     }else{
                         if(_error_string==nil){
                             _error_string = @"定位失败,请开启定位权限重试";
                         }
-                        
-                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
-                                                                                                 message:_error_string
-                                                                                          preferredStyle:UIAlertControllerStyleAlert];
-                        
-                        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
-                        
-                        
-                        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去开启" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
-                            
-                           [APPUtils intoSetting];
-                        }];
-                        
-                        [alertController addAction:cancel];
-                        [alertController addAction:confirm];
-                        
-                        
-                        [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:nil];
-                        cancel = nil;
-                        confirm = nil;
-                        alertController = nil;
                     }
+                    
+                    
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
+                                                                                             message:_error_string
+                                                                                      preferredStyle:UIAlertControllerStyleAlert];
+                    
+                    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
+                    
+                    
+                    UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去开启" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+                        
+                        [APPUtils intoSetting];
+                    }];
+                    
+                    [alertController addAction:cancel];
+                    [alertController addAction:confirm];
+                    
+                    
+                    [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:nil];
+                    cancel = nil;
+                    confirm = nil;
+                    alertController = nil;
+                    
                 }
                 _handleLocationCity=NO;
             });
@@ -269,6 +265,7 @@
         //定位失败
         _handleLocationCity=NO;
         [self locationFailed];
+        
     }
     
 }
@@ -335,9 +332,9 @@
     [APPUtils setMethod:@"LocationUtils -> saveLocation"];
     
     if(locationCity!=nil){
-        if(!noAlert){
-            locationCity = [locationCity stringByReplacingOccurrencesOfString:@"市" withString:@""];
-        }
+        
+        locationCity = [locationCity stringByReplacingOccurrencesOfString:@"市" withString:@""];
+        
         [APPUtils userDefaultsSet : locationCity forKey:@"location_city"];//定位城市
     }
     
@@ -393,10 +390,31 @@
         }
         [APPUtils userDefaultsSet :check_city forKey:@"check_city"];
         
-        self.callBackBlock(my_lat, my_lon, my_position,(noAlert?locationCity:check_city),refresh);
+        self.callBackBlock(my_lat, my_lon, my_position,locationCity,refresh);
         
         
     }
     
+    locationIng = NO;
+    
+}
+
+
+//获取定位权限
++(BOOL)getLocationAuth{
+    NSLog(@"%d",[CLLocationManager authorizationStatus]);
+    
+    //    [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined 未选择
+    
+    if ([CLLocationManager locationServicesEnabled] && ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways|| [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized)) {
+        //        NSLog(@"可以定位");
+        //定位功能可用
+        return YES;
+        
+    }else{
+        //        NSLog(@"未开启定位权限");
+        //定位不能用
+        return NO;
+    }
 }
 @end

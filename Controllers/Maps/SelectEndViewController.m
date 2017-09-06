@@ -43,8 +43,9 @@
         
     }
     return self;
-    
 }
+
+
 
 
 - (void)viewDidLoad {
@@ -379,7 +380,7 @@
         [weakSelf selectOk];
     };
     
-    [okControl addLabel:sendPositionType?@"发送":@"确定" color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:13]];
+    [okControl addLabel:(sendPositionType && !_getSnap)?@"发送":@"确定" color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:13]];
     
     
     
@@ -482,7 +483,7 @@
   
 
     if(locationUtil==nil){
-        locationUtil = [[LocationUtils alloc] initLocationWithNoAlert];
+        locationUtil = [[LocationUtils alloc] initLocationWithShowAlert];
         locationUtil.callBackBlock = ^(double latt,double lonn,NSString*position,NSString *city,BOOL refresh){
             
             [weakSelf showLocation:latt lonn:lonn posi:[APPUtils fixString:position] city:city];
@@ -521,7 +522,7 @@
     [self.view addSubview:goSetLocationControl];
     
     [goSetLocationControl addImage:[UIImage imageNamed:@"location_white.png"] frame:CGRectMake(10, (50-25)/2, 25, 25)];
-    [goSetLocationControl addLabel:[NSString stringWithFormat:@"若要指定位置,请允许「%@」访问您的位置 点击去设置->",mapType] color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:12] txtAlignment:NSTextAlignmentLeft frame:CGRectMake(45, 0, SCREENWIDTH-55, 50)
+    [goSetLocationControl addLabel:@"若要指定位置,请允许本应用访问您的位置 点击去设置->" color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:12] txtAlignment:NSTextAlignmentLeft frame:CGRectMake(45, 0, SCREENWIDTH-55, 50)
      ];
     goSetLocationControl.shareLabel.numberOfLines=2;
     
@@ -954,7 +955,8 @@
                         }
                         
                         POIData *poi = [[POIData alloc]init];
-                        if([tip.address rangeOfString:tip.district].location !=NSNotFound)//去掉.0km格式
+                        
+                        if([APPUtils stringinstring:tip.address found:tip.district])//去掉.0km格式
                         {
                             poi.poiaddress = tip.address;
                         }else{
@@ -1032,7 +1034,7 @@
                     }
                     
                     POIData *poi = [[POIData alloc]init];
-                    if([tip.address rangeOfString:tip.district].location !=NSNotFound)//去掉.0km格式
+                    if([APPUtils stringinstring:tip.address found:tip.district])//去掉.0km格式
                     {
                         poi.poiaddress = tip.address;
                     }else{
@@ -1352,7 +1354,11 @@
         
         //截图
         @try {
-            UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.height-SCREENWIDTH*0.618)/2, SCREENWIDTH, SCREENWIDTH*0.618)];
+            float snapHeight = SCREENWIDTH*0.618;
+            if(_getSnap){
+                snapHeight = _mapView.height;
+            }
+            UIImage *snap = [_mapView takeSnapshotInRect:CGRectMake(0, (_mapView.height-snapHeight)/2, SCREENWIDTH, snapHeight)];
             [endDic setObject:snap forKey:@"snap"];
             snap = nil;
         } @catch (NSException *exception) {}

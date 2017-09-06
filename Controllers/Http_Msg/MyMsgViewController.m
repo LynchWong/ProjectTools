@@ -9,14 +9,9 @@
 #import "MyMsgViewController.h"
 
 #import "MainViewController.h"
-#import "UIColor+additions.h"
-
 #import "SendMsgViewController.h"
-#import "APPUtils.h"
 #import "OneMsgEntity.h"
-#import "APPUtils.h"
-#import "AppDelegate.h"
-#import "LoginViewController.h"
+
 @interface MyMsgViewController ()
 
 @end
@@ -44,24 +39,16 @@
   
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshMsgList:)  name:@"refreshMsgList" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshUser:)  name:@"refreshUser" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMsgPageclosed)  name:@"sendMsgPageclosed" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(quit2Main)  name:@"quitMsgPage" object:nil];//被T
     
-    [self getuserID];
+
     [self initController];
     [self getGroups];
     
 }
 
--(void)getuserID{
-    
-   
-    nickName = [APPUtils get_ud_string:@"nickname"];
-    realName = [APPUtils get_ud_string:@"realname"];
-         
-}
 
 
 -(void)initController{
@@ -947,11 +934,6 @@
 
 
 
-- (void)refreshUser:(NSNotification*)notification{
-    
-    [self getuserID];
-}
-
 
 
 - (void)didReceiveMemoryWarning {
@@ -987,7 +969,6 @@
 
     [[NSNotificationCenter  defaultCenter] removeObserver:self  name:@"quitMsgPage" object:nil];
     [[NSNotificationCenter  defaultCenter] removeObserver:self  name:@"refreshMsgList" object:nil];
-    [[NSNotificationCenter  defaultCenter] removeObserver:self  name:@"refreshUser" object:nil];
      [[NSNotificationCenter  defaultCenter] removeObserver:self  name:@"sendMsgPageclosed" object:nil];
 }
 

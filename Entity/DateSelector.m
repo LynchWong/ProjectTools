@@ -132,6 +132,15 @@
 }
 
 
+-(void)show:(NSDate*)date dateType:(NSInteger)dateType{
+   
+    [datePicker setDatePickerMode:dateType];
+    
+    
+    [self show:date];
+}
+
+
 -(void)show:(NSDate*)date{
     
     if(date!=nil){

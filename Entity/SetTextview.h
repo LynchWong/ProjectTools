@@ -63,4 +63,8 @@ typedef void (^SetTextviewBlock)(NSString *titleString,NSString *contentString);
 typedef void (^SetTextAndImagesBlock)(NSMutableArray* imgArr,NSString *contentString);
 @property (nonatomic,strong)SetTextAndImagesBlock setImgback;
 
+
+@property (nonatomic,assign)BOOL tableJump;//输入法弹出后，table调整
+typedef void (^SetTextJumpBlock)(float keyboardHeight,float sendHeight);
+@property (nonatomic,strong)SetTextJumpBlock jumpBack;
 @end

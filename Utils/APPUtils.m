@@ -97,9 +97,9 @@
         version = @"iphone4";
     }else if(height == 568){
         version = @"iphone5";
-    }else if(height == 1334){
+    }else if(height == 667){
         version = @"iphone6";
-    }else if(height == 1920){
+    }else if(height == 736){
         version = @"iphone7";
     }
     
@@ -216,6 +216,16 @@
 }
 
 
+//重命名文件
++(BOOL)renameFile:(NSString*)path newPath:(NSString*)newPath{
+
+    [[NSFileManager defaultManager] createDirectoryAtPath:[path stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:nil];
+    NSError *error;
+  
+    return [[NSFileManager defaultManager] moveItemAtPath:path toPath:newPath error:&error];
+    
+}
+
 
 //uiimage->base64
 + (BOOL) imageHasAlpha: (UIImage *) image
@@ -250,11 +260,16 @@
 ///Base64图片 -> UIImage
 + (UIImage *) dataURL2Image: (NSString *) imgSrc
 {
-    NSData *_decodedImageData   = [[NSData alloc] initWithBase64Encoding:imgSrc];
+    @try {
+        NSData *_decodedImageData   = [[NSData alloc] initWithBase64Encoding:imgSrc];
+        
+        UIImage *_decodedImage      = [UIImage imageWithData:_decodedImageData];
+        
+        return _decodedImage;
+    } @catch (NSException *exception) {
+        return nil;
+    }
     
-    UIImage *_decodedImage      = [UIImage imageWithData:_decodedImageData];
-    
-    return _decodedImage;
 }
 
 //文本数据格式字符串转换为base64
@@ -647,10 +662,15 @@
 //修复单引号
 +(NSString*)fixString:(NSString*)str{
     
-    if(str == nil||[str isEqual:[NSNull null]]||str.length==0){
+    @try {
+        if(str == nil||[str isEqual:[NSNull null]]||str.length==0){
+            str = @"";
+        }
+        str = [str stringByReplacingOccurrencesOfString:@"'" withString:@"''"];
+    } @catch (NSException *exception) {
         str = @"";
     }
-    str = [str stringByReplacingOccurrencesOfString:@"'" withString:@"''"];
+    
     
     return  str;
 }
@@ -766,6 +786,15 @@
 }
 
 
+//去掉空白
++(NSString*)clearString:(NSString*)string{
+    if(string== nil){
+        return @"";
+    }
+    string = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet ]];;
+    string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
+    return string;
+}
 //去掉特殊符号
 +(NSString*)clearSpecialSymbols:(NSString*)string{
     
@@ -908,10 +937,16 @@
  */
 +(NSString*)get_file_type:(NSString*)fileType{
 
-    fileType = [fileType lowercaseString];
+    NSString *type = @"other";
+    
+    if(fileType == nil){
+        return  type;
+    }
+    
+    fileType = [[APPUtils fixString:fileType] lowercaseString];
     BOOL exist = NO;
     
-    NSString *type = @"other";
+    
     
     NSArray *pic = [NSArray arrayWithObjects:@"pic",@"bmp",@"jpg",@"jpeg",@"png",@"gif",nil];
     
@@ -964,6 +999,20 @@
     }
     
     if(!exist){
+        NSArray *audio = [NSArray arrayWithObjects:@"amr",nil];
+        
+        for(NSString *a in  audio){
+            if([a isEqualToString:fileType]){
+                type = @"voice";
+                exist = YES;
+                break;
+            }
+        }
+        audio = nil;
+    }
+    
+    
+    if(!exist){
         NSArray *zip = [NSArray arrayWithObjects:@"zip",@"7z",@"rar",nil];
         
         for(NSString *a in  zip){
@@ -981,6 +1030,32 @@
 }
 
 
+//文件类型中文
++(NSString*)get_file_type_name:(NSString*)type{
+
+    type = [APPUtils fixString:type];
+     NSString *name;
+    if([type isEqualToString:@"pos"]){
+        name = @"位置";
+    }else if([type isEqualToString:@"voice"]){
+        name = @"语音";
+    }else if([type isEqualToString:@"write"]){
+        name = @"手写";
+    }else if([type isEqualToString:@"tuya"]){
+        name = @"涂鸦";
+    }else{
+        type = [APPUtils get_file_type:type];
+        if([type isEqualToString:@"pic"]){
+             name = @"图片";
+        }else if([type isEqualToString:@"video"]){
+            name = @"视频";
+        }else{
+            name = @"文件";
+        }
+    }
+    return name;
+
+}
 
 
 
@@ -1023,6 +1098,17 @@
 }
 
 
+//nsdata base64 ->nsstring
++(NSString*)dataBase64String:(NSData*)data{
+    return [data base64EncodedStringWithOptions: 0];
+}
+
+//nsstring base64 ->nsdata
++(NSData*)stringBase64Data:(NSString*)string{
+    return [[NSData alloc] initWithBase64Encoding:string];
+}
+
+
 //nsdata->nsstring
 +(NSString*)data2String:(NSData*)data{
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -1031,6 +1117,15 @@
 //nsstring->nsdata
 +(NSData*)string2Data:(NSString*)string{
     return [string dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+//字符串里存在字符
++(BOOL)stringinstring:(NSString*)mainString found:(NSString*)found{
+    if([mainString rangeOfString:found].location !=NSNotFound){
+        return YES;
+    }else{
+        return NO;
+    }
 }
 
 //当前时间
@@ -1132,11 +1227,46 @@
 
 
 
+//判断是否闰年
++(BOOL)bissextile:(int)year {
+    if ((year%4==0 && year %100 !=0) || year%400==0) {
+        return YES;
+    }else {
+        return NO;
+    }
+    return NO;
+}
+
+//unix时间转nsdate
++(NSDate*)unixTime2Date:(NSInteger)unix{
+    double unixTimeStamp = unix;
+    NSTimeInterval _interval=unixTimeStamp;
+    return  [NSDate dateWithTimeIntervalSince1970:_interval];
+}
+
+//nsdate时间转unix
++(NSInteger)date2Unixtime:(NSDate*)date{
+    NSTimeInterval a=[date timeIntervalSince1970];
+    return a;
+}
+
+//获取日期细节
++(NSDateComponents*)getDateInfo:(NSDate*)date{
+    //获取时分秒（24小时制度）
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekdayCalendarUnit |
+    NSHourCalendarUnit | NSMinuteCalendarUnit;
+    
+    NSDateComponents *comps  = [calendar components:unitFlags fromDate:date];
+    
+    return comps;
+}
 
 
 //获取文件图标
 +(UIImage *)getFileIcon:(NSString*)tail{
    
+    tail = [APPUtils fixString:tail];
     UIImage *typeImage;
     
     if([tail hasPrefix:@"txt"]){
@@ -1619,4 +1749,66 @@
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
     
 }
+
+//相机权限判断
++(NSInteger)checkAVAuthorizationStatus {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus ==AVAuthorizationStatusDenied){
+        //无权限
+        if (authStatus == AVAuthorizationStatusRestricted || authStatus ==AVAuthorizationStatusDenied){
+            //无权限
+            
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
+                                                                                     message:@"请在Iphone的 设置-隐私-相机 选项中，允许本应用访问您的相机"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
+            
+            
+            UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+                
+                [APPUtils intoSetting];
+            }];
+            
+            [alertController addAction:cancel];
+            [alertController addAction:confirm];
+            
+            
+            [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:nil];
+            cancel = nil;
+            confirm = nil;
+            alertController = nil;
+        }
+        
+        return 0;
+        
+    }else if(authStatus == AVAuthorizationStatusNotDetermined){//询问中
+        return 2;
+    }else{
+        return 1;
+    }
+}
+
+//图片切换效果
++(void)changeImg:(UIImageView*)imgView img:(UIImage*)img duration:(float)duration type:(NSString*)type{
+  
+    
+    [imgView setImage:img];
+    CATransition *transition = [CATransition animation];
+    transition.duration = 0.2f;
+    if(type==nil){
+        type = kCATransitionFade;
+        transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    }else{
+        if([type isEqualToString:@"oglFlip"]){//水平翻转
+            transition.subtype = kCATransitionFromRight;
+        }
+    }
+    transition.type = type;
+    [imgView.layer addAnimation:transition forKey:nil];
+}
+
+
+
 @end

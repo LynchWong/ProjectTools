@@ -16,6 +16,8 @@
 - (void)collectionViewCell:(PhotoBrowserCell *)cell cellForItemAtIndexPath:(NSIndexPath *)indexPath;
 @end
 
+static BOOL opening = NO;
+
 @interface CLPhotoBrowser : UIViewController
 @property (nonatomic, strong) NSMutableArray *photos;
 @property (nonatomic ,assign) NSUInteger selectImageIndex;
@@ -27,4 +29,7 @@
 
 @property (nonatomic ,assign) id<BrowerCellDelegate> delegate;
 - (void)show;
+
++ (BOOL)getPhotoOpening;
++ (void)setPhotoOpening:(BOOL)open;
 @end

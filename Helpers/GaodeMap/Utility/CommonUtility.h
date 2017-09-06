@@ -17,19 +17,7 @@
                                       parseToken:(NSString *)token;
 
 + (MAPolyline *)polylineForCoordinateString:(NSString *)coordinateString;
-
-+ (MAPolyline *)polylineForStep:(AMapStep *)step;
-
 + (MAPolyline *)polylineForBusLine:(AMapBusLine *)busLine;
-
-+ (NSArray *)polylinesForWalking:(AMapWalking *)walking;
-
-+ (NSArray *)polylinesForSegment:(AMapSegment *)segment;
-
-+ (NSArray *)polylinesForPath:(AMapPath *)path;
-
-+ (NSArray *)polylinesForTransit:(AMapTransit *)transit;
-
 
 + (MAMapRect)unionMapRect1:(MAMapRect)mapRect1 mapRect2:(MAMapRect)mapRect2;
 
@@ -41,5 +29,10 @@
 + (MAMapRect)minMapRectForMapPoints:(MAMapPoint *)mapPoints count:(NSUInteger)count;
 
 + (MAMapRect)minMapRectForAnnotations:(NSArray *)annotations;
+
++ (NSString *)getApplicationScheme;
++ (NSString *)getApplicationName;
+
++ (double)distanceToPoint:(MAMapPoint)p fromLineSegmentBetween:(MAMapPoint)l1 and:(MAMapPoint)l2;
 
 @end

@@ -184,13 +184,16 @@
 }
 
 +(void)showToast:(NSString*)toastString{
-    if(!toastShowing){
-        toastShowing = YES;
-        ToastView *toast = [[[ToastView alloc] initWithText:toastString] autorelease];
-        [toast setDuration:2.0];
-        [toast showFromBottomOffset:60];
-    }
     
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(!toastShowing){
+            toastShowing = YES;
+            ToastView *toast = [[[ToastView alloc] initWithText:toastString] autorelease];
+            [toast setDuration:2.0];
+            [toast showFromBottomOffset:60];
+        }
+    });
+ 
 }
 
 @end

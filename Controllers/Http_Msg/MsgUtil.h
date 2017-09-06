@@ -16,14 +16,14 @@
 @class OneMsgEntity;
 
 static BOOL updateingSend;//正在更新发送中的消息到数据库
-
+static BOOL checking_msg;//获取中
 @interface MsgUtil : NSObject<AVAudioPlayerDelegate>{
     
      AVAudioPlayer *player;
     
 }
 
-@property(nonatomic,assign) BOOL checking_msg;//获取中
+
 @property(nonatomic,assign) NSInteger unreadMsgCount;//未读消息数
 @property(nonatomic,retain) NSMutableArray *unreadMsgGroupArray;//未读消息组
 @property(nonatomic,strong) NSString *lastMsgType; //上一次获取消息的最新msg类型

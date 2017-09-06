@@ -83,7 +83,7 @@
     [self.view addSubview:self.overlayView];
     
     self.ratioView = [[UIView alloc] initWithFrame:self.cropFrame];
-    self.ratioView.layer.borderColor = MAINRED.CGColor;
+    self.ratioView.layer.borderColor = MAINCOLOR.CGColor;
     self.ratioView.layer.borderWidth = 1.0f;
     self.ratioView.autoresizingMask = UIViewAutoresizingNone;
     [self.view addSubview:self.ratioView];
@@ -94,7 +94,7 @@
 - (void)initControlBtn {
     UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, self.view.height - 50.0f, 100, 50)];
     [cancelBtn setBackgroundColor:[UIColor whiteColor]];
-    [cancelBtn setTitleColor:MAINRED forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:MAINCOLOR forState:UIControlStateNormal];
     [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
     cancelBtn.layer.cornerRadius = 4;
     cancelBtn.alpha = 0.9;
@@ -108,7 +108,8 @@
     
     UIButton *confirmBtn = [[UIButton alloc] initWithFrame:CGRectMake(self.view.width - 100.0f, self.view.height - 50.0f, 100, 50)];
     [confirmBtn setBackgroundColor:[UIColor whiteColor]];
-     [confirmBtn setTitleColor:MAINRED forState:UIControlStateNormal];
+     [confirmBtn setTitleColor:MAINCOLOR
+                      forState:UIControlStateNormal];
     [confirmBtn setTitle:@"完成" forState:UIControlStateNormal];
     confirmBtn.layer.cornerRadius = 4;
     confirmBtn.alpha = 0.9;

@@ -7,7 +7,7 @@
 //
 
 #import "CommonUtility.h"
-#import "LineDashPolyline.h"
+//#import "LineDashPolyline.h"
 
 @implementation CommonUtility
 
@@ -63,16 +63,6 @@
     return polyline;
 }
 
-+ (MAPolyline *)polylineForStep:(AMapStep *)step
-{
-    if (step == nil)
-    {
-        return nil;
-    }
-    
-    return [self polylineForCoordinateString:step.polyline];
-}
-
 + (MAPolyline *)polylineForBusLine:(AMapBusLine *)busLine
 {
     if (busLine == nil)
@@ -81,256 +71,6 @@
     }
     
     return [self polylineForCoordinateString:busLine.polyline];
-}
-
-+(void)replenishPolylinesForWalkingWiht:(MAPolyline *)stepPolyline
-                           LastPolyline:(MAPolyline *)lastPolyline
-                              Polylines:(NSMutableArray *)polylines
-                                Walking:(AMapWalking *)walking
-{
-    CLLocationCoordinate2D startCoor ;
-    CLLocationCoordinate2D endCoor;
-    
-    CLLocationCoordinate2D points[2];
-    
-    [stepPolyline getCoordinates:&endCoor   range:NSMakeRange(0, 1)];
-    [lastPolyline getCoordinates:&startCoor range:NSMakeRange(lastPolyline.pointCount -1, 1)];
-    
-    if (endCoor.latitude != startCoor.latitude || endCoor.longitude != startCoor.longitude)
-    {
-        points[0] = startCoor;
-        points[1] = endCoor;
-        
-        MAPolyline *polyline = [MAPolyline polylineWithCoordinates:points count:2];
-        LineDashPolyline *dathPolyline = [[LineDashPolyline alloc] initWithPolyline:polyline];
-        dathPolyline.polyline = polyline;
-        [polylines addObject:dathPolyline];
-        
-    }
-    
-}
-
-+ (NSArray *)polylinesForWalking:(AMapWalking *)walking
-{
-    if (walking == nil || walking.steps.count == 0)
-    {
-        return nil;
-    }
-    
-    NSMutableArray *polylines = [NSMutableArray array];
-    
-    [walking.steps enumerateObjectsUsingBlock:^(AMapStep *step, NSUInteger idx, BOOL *stop) {
-        
-        MAPolyline *stepPolyline = [self polylineForStep:step];
-        
-        
-        if (stepPolyline != nil)
-        {
-            [polylines addObject:stepPolyline];
-            if (idx > 0)
-            {
-                [self replenishPolylinesForWalkingWiht:stepPolyline LastPolyline:[self polylineForStep:[walking.steps objectAtIndex:idx - 1]] Polylines:polylines Walking:walking];
-            }
-        }
-        
-    }];
-    
-    return polylines;
-}
-
-+ (void)replenishPolylinesForSegment:(NSArray *)walkingPolylines
-                     busLinePolyline:(MAPolyline *)busLinePolyline
-                             Segment:(AMapSegment *)segment
-                           polylines:(NSMutableArray *)polylines
-{
-    if (walkingPolylines.count != 0)
-    {
-        AMapGeoPoint *walkingEndPoint = segment.walking.destination ;
-        
-        if (busLinePolyline)
-        {
-            CLLocationCoordinate2D startCoor;
-            CLLocationCoordinate2D endCoor ;
-            [busLinePolyline getCoordinates:&startCoor range:NSMakeRange(0, 1)];
-            [busLinePolyline getCoordinates:&endCoor range:NSMakeRange(busLinePolyline.pointCount-1, 1)];
-            
-            if (startCoor.latitude != walkingEndPoint.latitude || startCoor.longitude != walkingEndPoint.longitude)
-            {
-                CLLocationCoordinate2D points[2];
-                points[0] = CLLocationCoordinate2DMake(walkingEndPoint.latitude, walkingEndPoint.longitude);
-                points[1] = startCoor ;
-                
-                MAPolyline *polyline = [MAPolyline polylineWithCoordinates:points count:2];
-                LineDashPolyline *dathPolyline = [[LineDashPolyline alloc] initWithPolyline:polyline];
-                dathPolyline.polyline = polyline;
-                [polylines addObject:dathPolyline];
-            }
-        }
-    }
-    
-}
-
-+ (NSArray *)polylinesForSegment:(AMapSegment *)segment
-{
-    if (segment == nil)
-    {
-        return nil;
-    }
-    
-    NSMutableArray *polylines = [NSMutableArray array];
-    
-    NSArray *walkingPolylines = [self polylinesForWalking:segment.walking];
-    if (walkingPolylines.count != 0)
-    {
-        [polylines addObjectsFromArray:walkingPolylines];
-    }
-    
-    MAPolyline *busLinePolyline = [self polylineForBusLine:[segment.buslines firstObject]];
-    if (busLinePolyline != nil)
-    {
-        [polylines addObject:busLinePolyline];
-    }
-    [self replenishPolylinesForSegment:walkingPolylines busLinePolyline:busLinePolyline Segment:segment polylines:polylines];
-    
-    return polylines;
-}
-
-+ (void)replenishPolylinesForPathWith:(MAPolyline *)stepPolyline
-                         lastPolyline:(MAPolyline *)lastPolyline
-                            Polylines:(NSMutableArray *)polylines
-{
-    CLLocationCoordinate2D startCoor ;
-    CLLocationCoordinate2D endCoor;
-    
-    [stepPolyline getCoordinates:&endCoor range:NSMakeRange(0, 1)];
-    
-    [lastPolyline getCoordinates:&startCoor range:NSMakeRange(lastPolyline.pointCount -1, 1)];
-    
-    
-    if ((endCoor.latitude != startCoor.latitude || endCoor.longitude != startCoor.longitude ))
-    {
-        CLLocationCoordinate2D points[2];
-        points[0] = startCoor;
-        points[1] = endCoor;
-        
-        MAPolyline *polyline = [MAPolyline polylineWithCoordinates:points count:2];
-        LineDashPolyline *dathPolyline = [[LineDashPolyline alloc] initWithPolyline:polyline];
-        dathPolyline.polyline = polyline;
-        [polylines addObject:dathPolyline];
-    }
-}
-
-+ (NSArray *)polylinesForPath:(AMapPath *)path
-{
-    if (path == nil || path.steps.count == 0)
-    {
-        return nil;
-    }
-    
-    NSMutableArray *polylines = [NSMutableArray array];
-    
-    [path.steps enumerateObjectsUsingBlock:^(AMapStep *step, NSUInteger idx, BOOL *stop) {
-        
-        MAPolyline *stepPolyline = [self polylineForStep:step];
-        
-        if (stepPolyline != nil)
-        {
-            [polylines addObject:stepPolyline];
-            
-            if (idx > 0 )
-            {
-                [self replenishPolylinesForPathWith:stepPolyline lastPolyline:[self polylineForStep:[path.steps objectAtIndex:idx-1]]  Polylines:polylines];
-            }
-        }
-    }];
-    
-    return polylines;
-}
-
-+ (void)replenishPolylinesForTransit:(AMapSegment *)lastSegment
-                      CurrentSegment:(AMapSegment * )segment
-                           Polylines:(NSMutableArray *)polylines
-{
-    if (lastSegment)
-    {
-        CLLocationCoordinate2D startCoor;
-        CLLocationCoordinate2D endCoor;
-        
-        MAPolyline *busLinePolyline = [self polylineForBusLine:[(lastSegment).buslines firstObject]];
-        if (busLinePolyline != nil)
-        {
-            [busLinePolyline getCoordinates:&startCoor range:NSMakeRange(busLinePolyline.pointCount-1, 1)];
-        }
-        else
-        {
-            if ((lastSegment).walking && [(lastSegment).walking.steps count] != 0)
-            {
-                startCoor.latitude  = (lastSegment).walking.destination.latitude;
-                startCoor.longitude = (lastSegment).walking.destination.longitude;
-            }
-            else
-            {
-                return;
-            }
-        }
-        
-        if ((segment).walking && [(segment).walking.steps count] != 0)
-        {
-            AMapStep *step = [(segment).walking.steps objectAtIndex:0];
-            MAPolyline *stepPolyline = [self polylineForStep:step];
-            
-            [stepPolyline getCoordinates:&endCoor range:NSMakeRange(0 , 1)];
-        }
-        else
-        {
-            
-            MAPolyline *busLinePolyline = [self polylineForBusLine:[(segment).buslines firstObject]];
-            if (busLinePolyline != nil)
-            {
-                [busLinePolyline getCoordinates:&endCoor range:NSMakeRange(0 , 1)];
-            }
-            else
-            {
-                return;
-            }
-        }
-        
-        CLLocationCoordinate2D points[2];
-        points[0] = startCoor;
-        points[1] = endCoor ;
-        
-        MAPolyline *polyline = [MAPolyline polylineWithCoordinates:points count:2];
-        LineDashPolyline *dathPolyline = [[LineDashPolyline alloc] initWithPolyline:polyline];
-        dathPolyline.polyline = polyline;
-        [polylines addObject:dathPolyline];
-    }
-}
-
-+ (NSArray *)polylinesForTransit:(AMapTransit *)transit
-{
-    if (transit == nil || transit.segments.count == 0)
-    {
-        return nil;
-    }
-    
-    NSMutableArray *polylines = [NSMutableArray array];
-    
-    [transit.segments enumerateObjectsUsingBlock:^(AMapSegment *segment, NSUInteger idx, BOOL *stop) {
-        
-        NSArray *segmentPolylines = [self polylinesForSegment:segment];
-        
-        if (segmentPolylines.count != 0)
-        {
-            [polylines addObjectsFromArray:segmentPolylines];
-        }
-        if (idx >0)
-        {
-            [self replenishPolylinesForTransit:[transit.segments objectAtIndex:idx-1] CurrentSegment:segment Polylines:polylines];
-            
-        }
-    }];
-    
-    return polylines;
 }
 
 + (MAMapRect)unionMapRect1:(MAMapRect)mapRect1 mapRect2:(MAMapRect)mapRect2
@@ -446,4 +186,58 @@
     return minMapRect;
 }
 
++ (NSString *)getApplicationName
+{
+    NSDictionary *bundleInfo = [[NSBundle mainBundle] infoDictionary];
+    return [bundleInfo valueForKey:@"CFBundleDisplayName"] ?: [bundleInfo valueForKey:@"CFBundleName"];
+}
+
++ (NSString *)getApplicationScheme
+{
+    NSDictionary *bundleInfo    = [[NSBundle mainBundle] infoDictionary];
+    NSString *bundleIdentifier  = [[NSBundle mainBundle] bundleIdentifier];
+    NSArray *URLTypes           = [bundleInfo valueForKey:@"CFBundleURLTypes"];
+    
+    NSString *scheme;
+    for (NSDictionary *dic in URLTypes)
+    {
+        NSString *URLName = [dic valueForKey:@"CFBundleURLName"];
+        if ([URLName isEqualToString:bundleIdentifier])
+        {
+            scheme = [[dic valueForKey:@"CFBundleURLSchemes"] objectAtIndex:0];
+            break;
+        }
+    }
+    
+    return scheme;
+}
+
++ (double)distanceToPoint:(MAMapPoint)p fromLineSegmentBetween:(MAMapPoint)l1 and:(MAMapPoint)l2
+{
+    double A = p.x - l1.x;
+    double B = p.y - l1.y;
+    double C = l2.x - l1.x;
+    double D = l2.y - l1.y;
+    
+    double dot = A * C + B * D;
+    double len_sq = C * C + D * D;
+    double param = dot / len_sq;
+    
+    double xx, yy;
+    
+    if (param < 0 || (l1.x == l2.x && l1.y == l2.y)) {
+        xx = l1.x;
+        yy = l1.y;
+    }
+    else if (param > 1) {
+        xx = l2.x;
+        yy = l2.y;
+    }
+    else {
+        xx = l1.x + param * C;
+        yy = l1.y + param * D;
+    }
+    
+    return MAMetersBetweenMapPoints(p, MAMapPointMake(xx, yy));
+}
 @end

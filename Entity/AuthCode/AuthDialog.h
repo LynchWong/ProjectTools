@@ -15,12 +15,14 @@
     AuthCodeView *authCodeView;//验证码区域
     UITextField *authInput;
     BOOL authOK;//验证成功
+    NSInteger maxNumber;
 }
 
 typedef void (^AuthCodeBlock)();
 @property (nonatomic,strong)AuthCodeBlock authBackBlock;
 
 
+-(id)initWithMax:(NSInteger)max;
 //显示验证码
 -(void)showAuthCode;
 @end

@@ -13,6 +13,7 @@
 @interface NewsPLEntity : NSObject
 
 @property (copy, nonatomic) NSString *news_pl_id;
+@property (copy, nonatomic) NSString *news_pid;//隶属
 @property (copy, nonatomic) NSString *parentid; //被评论的评论父级id
 
 @property (copy, nonatomic) NSString *plContent;

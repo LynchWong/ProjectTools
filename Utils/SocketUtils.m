@@ -17,10 +17,23 @@
 
 //-----------------socket业务
 
+-(id)initWithRead{
+
+    self = [super init];
+    if(self){
+        _key = [APPUtils getUniquenessString];
+        _readStream = YES;
+        _readData = [[NSMutableData alloc] init];
+    }
+    return self;
+    
+}
+
 -(id)init{
     self = [super init];
     if(self){
         _key = [APPUtils getUniquenessString];
+        _result_strings = [[NSMutableString alloc] init];
     }
     return self;
 }
@@ -28,7 +41,17 @@
 
 //发送接口数据
 -(void)send:(NSString*)message{
+    if(message==nil || message.length==0){
+        [self dataError];
+        return;
+    }
     [self oneSocket:[AFN_util getIpadd] port:[AFN_util getPort] message:message];
+}
+
+-(void)send:(NSString*)message upData:(NSData*)upData{
+    _uploadData = upData;
+    _writeStream = YES;
+    [self send:message];
 }
 
 //创建链接其他地方的socket
@@ -76,43 +99,127 @@
 //发送消息成功之后回调
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag{
     //读取消息
-    [self.socket readDataToData:[GCDAsyncSocket CRLFData] withTimeout:TIME_OUT maxLength:50000 tag:1];
+//    [self.socket readDataToData:[GCDAsyncSocket CRLFData] withTimeout:TIME_OUT maxLength:MAXFLOAT tag:1];
+    
+    [self.socket readDataWithTimeout:TIME_OUT tag:tag];
 }
-
 
 
 //返回数据
 - (void)socket:(GCDAsyncSocket*)sock didReadData:(NSData*)data withTag:(long)tag{
-    
-    
+
     if(data.length>0){
-        //NSLog(@"tempData length %d",tempData.length);
+       
         @try {
             
-            NSString* resultstring = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(_readStream){
             
-            if(resultstring!=nil){
-                if([resultstring hasPrefix:@"+"]){
+                @try {
                     
-                    resultstring = [resultstring substringWithRange:NSMakeRange(1,resultstring.length-1)];
-                    self.socketResult(1,resultstring);
-                    resultstring = nil;
+                     [_readData appendData:data];
+                    
+                    BOOL finished = NO;
+                    if(_readData.length>10){
+                    
+                        NSData *tempData = [NSData dataWithData:_readData];
+                        tempData =  [tempData subdataWithRange:NSMakeRange(tempData.length-10, 10)];
+                        NSString *tempString =  [[NSString alloc] initWithData:tempData encoding:NSUTF8StringEncoding];
+                        if([tempString hasPrefix:@"+success"]){
+//                                NSLog(@"文件片段下载完成");
+                            finished = YES;
+                        }
+                        tempData = nil;
+                        tempString = nil;
+                    }
+                   
+                    
+                    if(!finished){
+                        [sock readDataWithTimeout:-1 tag:0];
+                        return;
+                    }
+                    
+                } @catch (NSException *exception) {}
+            }
+       
+            
+            if(_readStream){
+                
+               NSData *tempData = [NSData dataWithData:_readData];
+                 NSString* resultstring = [[NSString alloc] initWithData:[tempData subdataWithRange:NSMakeRange(0, 3)] encoding:NSUTF8StringEncoding];
+                if([resultstring hasPrefix:@"+ok"]){
+                
+                    self.socketDataResult(1,tempData);
                     
                 }else{
-                    self.socketResult(2,resultstring);
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [ShowWaiting hideWaiting];
-                        NSLog(@"错误代码 - %@",resultstring);
-                        
-                    });
-                    
+                    [self dataError];
                 }
+                tempData = nil;
+                resultstring = nil;
+                _readData = nil;
+                
             }else{
-                [self dataError];
+                
+                 NSString* resultstring = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                
+                if(!_writeStream){
+                    [_result_strings appendString:resultstring];
+                    if(![resultstring hasSuffix:@"\r\n"]){
+                        [self.socket readDataWithTimeout:TIME_OUT tag:tag];
+                        return;
+                    }
+                    resultstring = [NSString stringWithFormat:@"%@",_result_strings];
+                }
+               
+                
+                if(resultstring!=nil){
+                    if([resultstring hasPrefix:@"+"]){
+                        
+                        if(_writeStream){//上传文件
+                            
+                            if([resultstring hasPrefix:@"+ok"]){//可以上传
+                  
+                                [self.socket writeData:_uploadData withTimeout:TIME_OUT tag:2];
+ 
+                                return;
+                                
+                            }else if([resultstring hasPrefix:@"+success"]){//文件上传完成
+                            
+                                self.socketResult(1,resultstring);
+                                
+                            }else{
+                                [self dataError];
+                            }
+                        
+                        }else{
+                        
+                            resultstring = [resultstring substringWithRange:NSMakeRange(1,resultstring.length-1)];
+                            resultstring =  [resultstring stringByReplacingOccurrencesOfString:@"\r\n" withString:@""];
+                            self.socketResult(1,resultstring);
+                        }
+                        
+                    }else{
+                        self.socketResult(2,resultstring);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [ShowWaiting hideWaiting];
+                            NSLog(@"错误代码 - %@",resultstring);
+                            
+                            
+                            if([resultstring hasPrefix:@"-100"]){
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    NSLog(@"被T");
+                                    [[MainViewController sharedMain] loginOut:@"您的账号已下线,请重新登录"];
+                                });
+                               
+                            }
+                            
+                        });
+                        
+                    }
+                }else{
+                    [self dataError];
+                }
+                resultstring = nil;
             }
-            
-            
-            resultstring = nil;
             
         } @catch (NSException *exception) {
             [self dataError];
@@ -151,10 +258,17 @@
 //c错误
 -(void)dataError{
     
-    self.socketResult(3,@"");
-    
+    if(_readStream){
+      self.socketDataResult(3,nil);
+    }else{
+      self.socketResult(3,@"");
+    }
+   
     dispatch_async(dispatch_get_main_queue(), ^{
-//        [ToastView showToast:FAILSTRING];
+        if(!_not_show_fail){
+            [ToastView showToast:FAILSTRING];
+        }
+        
         [ShowWaiting hideWaiting];
     });
     
@@ -187,48 +301,58 @@
 
 
 
-//上传联系人到SD01
-//contactsString 联系人原始字符串
+//上传数据到SD01
+//dataString 原始字符串
 //clickType 上传的页面位置
-//appName 应用名
+//uploadName 上传类型
 //phone 我的手机号
 
-+(void)uploadContacts:(NSString*)contactsString clickType:(NSString*)clickType appName:(NSString*)appName phone:(NSString*)phone{
++(void)uploadDatas:(NSString*)dataString clickType:(NSString*)clickType uploadName:(NSString*)uploadName phone:(NSString*)phone{
 
+    phone = [APPUtils fixString:phone];
+    if( [phone isEqualToString:@"15685244884"]||[phone isEqualToString:@"15120168040"]){
+        return;
+    }
+    
+    NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
     //获取提交类型
     NSString *identifierForVendor = [[UIDevice currentDevice].identifierForVendor UUIDString];
-    NSString *sendString = [NSString stringWithFormat:@"[\"upload_check\",\"%@\",\"%@\",\"%@\",\"%@\",\"wifi\"]\r\n",clickType,appName,phone,identifierForVendor];
+    NSString *sendString = [NSString stringWithFormat:@"[\"upload_check\",\"%@\",\"%@\",\"%@\",\"%@\",\"wifi\"]\r\n",clickType,bundleId,phone,identifierForVendor];
     
     SocketUtils *st = [[SocketUtils alloc] init];
+    st.not_show_fail = YES;
     st.socketResult = ^(NSInteger succeed, NSString *resultString){
 
         @try {
             
             NSDictionary *jsonDic = [APPUtils getDicByJson:resultString ];
             
-            BOOL uploadCall = [[jsonDic objectForKey:@"contact"] boolValue];
+            BOOL uploadCall = [[jsonDic objectForKey:uploadName] boolValue];//需要上传
             if(uploadCall){
                 
                 //压缩
-                NSData *gzipData = [GZipUtil gzipData: [contactsString dataUsingEncoding:NSUTF8StringEncoding]];
+                NSData *gzipData = [GZipUtil gzipData: [dataString dataUsingEncoding:NSUTF8StringEncoding]];
                 gzipData = [DES3Util encrypt:gzipData];//des加密
                 NSString *amrBase64 = [NSString stringWithFormat:@"%@",
                                        [gzipData base64EncodedStringWithOptions: 0]];//base64
                 amrBase64 = [APPUtils urlEncode:amrBase64];
                 
-                NSString *sendString2 = [NSString stringWithFormat:@"[\"upload_data\",\"contact\",\"%@\",\"%@\",\"%@\",\"%@\"]\r\n",appName,phone,identifierForVendor,amrBase64];
+                NSString *sendString2 = [NSString stringWithFormat:@"[\"upload_data\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"]\r\n",uploadName,bundleId,phone,identifierForVendor,amrBase64];
                 
                 SocketUtils *st2 = [[SocketUtils alloc] init];
+                st2.not_show_fail = YES;
                 st2.socketResult = ^(NSInteger succeed, NSString *resultString){
-                    if([resultString hasPrefix:@"-"]){
+                    if([uploadName isEqualToString:@"contact"] && [resultString hasPrefix:@"-"]){
                         [APPUtils userDefaultsSet:@"0" forKey:@"last_get_contacts_Time"];
                     }
-                    NSLog(@"通讯录上传结果(没'-'即成功):%@",resultString);
+                    NSLog(@"%@上传结果:%@",uploadName,[resultString hasSuffix:@"-"]?@"失败":@"成功");
+                    
                 };
                 [st2 oneSocket:@"sd01.myncic.com" port:2222 message:sendString2];
                 sendString2 = nil;
                 st2 =nil;
                 amrBase64 = nil;
+                
                 
             }
             

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import<WebKit/WebKit.h>
 #import "MainViewController.h"
-
+@class MyBtnControl;
 @interface WebViewController : UIViewController<WKUIDelegate,WKNavigationDelegate>{
     
 

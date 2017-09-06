@@ -10,14 +10,17 @@
 #import <UIKit/UIKit.h>
 #import "VPImageCropperViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
-@interface MakeAvatarTool : NSObject<UIImagePickerControllerDelegate,VPImageCropperDelegate,UINavigationControllerDelegate>
+@interface MakeAvatarTool : NSObject<UIImagePickerControllerDelegate,VPImageCropperDelegate,UINavigationControllerDelegate>{
+
+    UIImagePickerController *controller;
+}
 
 
 typedef void (^AvatarBlock)(UIImage *avatar_img);
 @property (nonatomic,copy)AvatarBlock callBackBlock;
 
 
-typedef void (^VideoBlock)(NSData *video_data);
+typedef void (^VideoBlock)(NSData *video_data,UIImage *snap);
 @property (nonatomic,copy)VideoBlock video_callBackBlock;
 
 //拍照
@@ -30,7 +33,6 @@ typedef void (^VideoBlock)(NSData *video_data);
 @property (nonatomic,assign)BOOL support_video;//支持录像
 @property (nonatomic,assign)NSInteger record_time;//最大录制时长
 @property (nonatomic,assign)NSInteger record_quality;//录制质量
-//相机权限判断
-+(BOOL)checkAVAuthorizationStatus;
+
 
 @end

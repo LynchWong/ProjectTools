@@ -14,9 +14,6 @@
 @interface MyMsgViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UISearchBarDelegate,AVAudioPlayerDelegate>{
 
 
-    NSString *nickName;
-    NSString *realName;
-  
     //search
     NSMutableArray *filteredContact;
     UIRefreshControl *refreshControl;

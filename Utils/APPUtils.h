@@ -47,6 +47,9 @@ static NSString *method;
 //计算大文件的MD5值
 +(NSString*)fileMD5:(NSString*)path;
 
+//重命名文件
++(BOOL)renameFile:(NSString*)path newPath:(NSString*)newPath;
+
 //uiimage ->base64
 + (BOOL) imageHasAlpha: (UIImage *) image;
 + (NSString *) image2DataURL: (UIImage *) image;
@@ -67,6 +70,9 @@ static NSString *method;
 
 //NSdic -> jsonstring
 +(NSString*)data2jsonString:(id)object;
+
+//字符串里存在字符
++(BOOL)stringinstring:(NSString*)mainString found:(NSString*)found;
 
 //图片缩放
 +(UIImage *)scaleToSize:(UIImage *)img size:(CGSize)size;
@@ -139,6 +145,9 @@ static NSString *method;
 //获取唯一字符串
 +(NSString*)getUniquenessString;
 
+//去掉空白
++(NSString*)clearString:(NSString*)string;
+
 //去掉特殊符号
 +(NSString*)clearSpecialSymbols:(NSString*)string;
 
@@ -178,12 +187,20 @@ static NSString *method;
  */
 +(NSString*)get_file_type:(NSString*)fileType;
 
+//文件类型中文
++(NSString*)get_file_type_name:(NSString*)type;
 
 //json解析array
 +(NSMutableArray*)getArrByJson:(NSString*)string;
 
 //json解析jsondic
 +(NSDictionary*)getDicByJson:(NSString*)string;
+
+//nsdata base64 ->nsstring
++(NSString*)dataBase64String:(NSData*)data;
+
+//nsstring base64 ->nsdata
++(NSData*)stringBase64Data:(NSString*)string;
 
 //nsdata->nsstring
 +(NSString*)data2String:(NSData*)data;
@@ -202,6 +219,18 @@ static NSString *method;
 +(NSString*)seconds2Time:(float)second;
 +(NSString*)seconds2Time2:(float)second;
 +(NSInteger)time2Second:(NSString*)time;
+
+//判断是否闰年
++(BOOL)bissextile:(int)year;
+
+//unix时间转nsdate
++(NSDate*)unixTime2Date:(NSInteger)unix;
+
+//nsdate时间转unix
++(NSInteger)date2Unixtime:(NSDate*)date;
+
+//获取日期细节
++(NSDateComponents*)getDateInfo:(NSDate*)date;
 
 //获取文件图标
 +(UIImage *)getFileIcon:(NSString*)tail;
@@ -268,7 +297,7 @@ static NSString *method;
 //获取定位按钮
 +(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width;
 
-//转圈
+
 +(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view;
 
 //通讯录名字转换
@@ -283,4 +312,12 @@ static NSString *method;
 
 //去打分
 +(void)grade:(NSString*)app_id;
+
+//相机权限判断
++(NSInteger)checkAVAuthorizationStatus;
+
+//图片切换效果
++(void)changeImg:(UIImageView*)imgView img:(UIImage*)img duration:(float)duration type:(NSString*)type;
+
+
 @end

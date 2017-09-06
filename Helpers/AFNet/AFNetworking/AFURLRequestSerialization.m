@@ -325,7 +325,7 @@ forHTTPHeaderField:(NSString *)field
     return value;
 }
 
-- (void)setAuthorizationHeaderFieldWithUsername:(NSString *)username
+- (void)setAuthorizationHeaderFieldWithUserPhone:(NSString *)username
                                        password:(NSString *)password
 {
     NSData *basicAuthCredentials = [[NSString stringWithFormat:@"%@:%@", username, password] dataUsingEncoding:NSUTF8StringEncoding];

@@ -9,7 +9,7 @@
 #import "MakeAvatarTool.h"
 #import "APPUtils.h"
 #import "MainViewController.h"
-
+#import <MediaPlayer/MPMoviePlayerController.h>
 #define ORIGINAL_MAX_WIDTH 640.0f
 
 @implementation MakeAvatarTool
@@ -20,7 +20,7 @@
 -(void)takePhoto{
     
     if ([MakeAvatarTool isCameraAvailable] && [MakeAvatarTool doesCameraSupportTakingPhotos]) {
-        UIImagePickerController *controller = [[UIImagePickerController alloc] init];
+        controller = [[UIImagePickerController alloc] init];
         controller.sourceType = UIImagePickerControllerSourceTypeCamera;
         
         
@@ -57,10 +57,13 @@
     
 }
 
+
+
 //打开相册
 -(void)openAlbum{
     if ([MakeAvatarTool isPhotoLibraryAvailable]) {
-        UIImagePickerController *controller = [[UIImagePickerController alloc] init];
+        
+        controller = [[UIImagePickerController alloc] init];
         controller.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         NSMutableArray *mediaTypes = [[NSMutableArray alloc] init];
         [mediaTypes addObject:(__bridge NSString *)kUTTypeImage];
@@ -94,6 +97,7 @@
             
             
             portraitImg = [MakeAvatarTool imageByScalingToMaxSize:portraitImg];
+        
             
             if(not_avatar){
                 self.callBackBlock(portraitImg);
@@ -109,19 +113,27 @@
         
             
             //保存视频到本地
-//            NSURL *url = [info objectForKey:UIImagePickerControllerMediaURL];
-//            BOOL compatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum([url path]);
-//            if (compatible){
-//                UISaveVideoAtPathToSavedPhotosAlbum([url path], self, nil, NULL);
-//            }
+            NSURL *url = [info objectForKey:UIImagePickerControllerMediaURL];
+            BOOL compatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum([url path]);
+            if (compatible){
+                UISaveVideoAtPathToSavedPhotosAlbum([url path], self, nil, NULL);
+            }
             
             NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
             NSData *videoData = [NSData dataWithContentsOfURL:videoURL];
             
             if(videoData!=nil){
-                self.video_callBackBlock(videoData);
+                //截图
+                MPMoviePlayerController *playerr = [[MPMoviePlayerController alloc] initWithContentURL:videoURL];
+                UIImage  *thumbnail = [playerr thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
+                [playerr stop];
+                playerr = nil;
+                
+                self.video_callBackBlock(videoData,thumbnail);
+                thumbnail = nil;
             }
             videoData = nil;
+            
             videoURL = nil;
         }
        
@@ -157,54 +169,13 @@
 //拍照用
 +(BOOL) isCameraAvailable{
     
-    if(![self checkAVAuthorizationStatus]){
+    if([APPUtils checkAVAuthorizationStatus] ==0){
         return NO;
     }
     
     return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera];
 }
 
-//相机权限判断
-+(BOOL)checkAVAuthorizationStatus {
-    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    
-    if (authStatus == AVAuthorizationStatusRestricted || authStatus ==AVAuthorizationStatusDenied)
-    {
-        //无权限
-        if (authStatus == AVAuthorizationStatusRestricted || authStatus ==AVAuthorizationStatusDenied){
-            //无权限
-
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
-                                                                                     message:@"请在Iphone的 设置-隐私-相机 选项中，允许 '吾能OA' 访问您的相机"
-                                                                              preferredStyle:UIAlertControllerStyleAlert];
-            
-            UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
-            
-            
-            UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
-                
-                [APPUtils intoSetting];
-            }];
-            
-            [alertController addAction:cancel];
-            [alertController addAction:confirm];
-            
-            
-            [[MainViewController sharedMain] presentViewController:alertController animated:YES completion:nil];
-            cancel = nil;
-            confirm = nil;
-            alertController = nil;
-            
-          
-            
-        }
-        
-        return NO;
-        
-    }else{
-        return YES;
-    }
-}
 
 +(BOOL) isRearCameraAvailable{
     return [UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear];

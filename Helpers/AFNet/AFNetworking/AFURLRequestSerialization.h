@@ -185,7 +185,7 @@ forHTTPHeaderField:(NSString *)field;
  @param username The HTTP basic auth username
  @param password The HTTP basic auth password
  */
-- (void)setAuthorizationHeaderFieldWithUsername:(NSString *)username
+- (void)setAuthorizationHeaderFieldWithUserPhone:(NSString *)username
                                        password:(NSString *)password;
 
 /**

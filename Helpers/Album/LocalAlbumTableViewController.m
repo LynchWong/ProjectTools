@@ -25,7 +25,7 @@
 
     
     titleView = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 64)];
-    [titleView setBackgroundColor:MAINRED];
+    [titleView setBackgroundColor:MAINCOLOR];
     
     [self.view addSubview:titleView];
     [self.view bringSubviewToFront:bodyView];

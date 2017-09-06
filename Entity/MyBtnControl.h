@@ -23,6 +23,7 @@
 @property (retain, nonatomic) UIImageView *shareImage;
 @property (retain, nonatomic) UIImageView *shareImage2;
 @property (retain, nonatomic) UIView *shareView;
+@property (retain, nonatomic) UIView *shareView2;
 @property (retain, nonatomic) UILabel *shareLabel;
 @property (retain, nonatomic) UILabel *shareLabel2;
 
@@ -43,6 +44,9 @@
 @property (retain, nonatomic) NSString *searchContent;
 @property (retain, nonatomic) NSString *select_icon_Name;
 @property (retain, nonatomic) NSString *unselect_icon_Name;
+
+@property (retain, nonatomic) NSString *select_txt_color;
+@property (retain, nonatomic) NSString *unselect_txt_color;
 
 @property (assign, nonatomic)  BOOL functype;//应用点击类型
 

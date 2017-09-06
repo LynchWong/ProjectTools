@@ -22,13 +22,15 @@
 
     
     NSInteger locationTime;
-    BOOL noAlert;//没有错误弹出
+    BOOL showAlert;//错误弹出
+    BOOL locationIng;
+    BOOL locationAuth;//定位权限
 }
 
 -(id)initLocation;
--(id)initLocationWithNoAlert;
+-(id)initLocationWithShowAlert;
 -(void)startLocation;
--(BOOL)getLocationAuth;//获取定位权限
+
 @property (assign, nonatomic) BOOL handleLocationCity;//手动定位当前城市
 @property (strong, nonatomic) NSString *check_city;
 @property (assign, nonatomic) double my_lat;
@@ -45,4 +47,6 @@
 typedef void (^LocationBlock)(double lat,double lon,NSString*position,NSString *city,BOOL refresh);
 @property (nonatomic,strong)LocationBlock callBackBlock;
 
+//获取定位权限
++(BOOL)getLocationAuth;
 @end

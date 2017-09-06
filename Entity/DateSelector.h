@@ -24,6 +24,7 @@
 
 -(void)show:(NSDate*)date;
 -(void)show2:(double)date;
+-(void)show:(NSDate*)date dateType:(NSInteger)dateType;
 -(void)hide;
 
 

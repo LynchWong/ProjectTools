@@ -14,117 +14,123 @@
 //发送消息
 -(void)sendMsg{
 
-    if(_sendStatus == 3&&!_sending){//发送中
-        _sending = YES;
-       
-        if([_type isEqualToString:@"pic"] && ![_big_url hasPrefix:@"upload/"]){//图片还未发送
-            //上传图片
+    dispatch_queue_t concurrentQueue = dispatch_queue_create("com.myncic.send",DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(concurrentQueue, ^{
+        
+        if(_sendStatus == 3&&!_sending){//发送中
+            _sending = YES;
             
-            __weak typeof(self) weakSelf = self;//防止block循环
-            AFN_util *afn = [[AFN_util alloc] initWithAfnTag:@"upload_msg_pic"];
-            
-            //上传进度回调
-            afn.progressResult= ^(NSString *progress){
-                self.progressResult(progress);
-            };
-            
-            //上传结果
-            afn.afnResult = ^(NSString *afn_tag,NSString*resultString){
-                if([afn_tag isEqualToString:@"upload_msg_pic"]){
-            
-                    @try {
-                        NSDictionary *jsonDic =  [APPUtils getDicByJson:resultString];
+            if([_type isEqualToString:@"pic"] && ![_big_url hasPrefix:@"upload/"]){//图片还未发送
+                //上传图片
+                
+                __weak typeof(self) weakSelf = self;//防止block循环
+                AFN_util *afn = [[AFN_util alloc] initWithAfnTag:@"upload_msg_pic"];
+                
+                //上传进度回调
+                afn.progressResult= ^(NSString *progress){
+                    self.progressResult(progress);
+                };
+                
+                //上传结果
+                afn.afnResult = ^(NSString *afn_tag,NSString*resultString){
+                    if([afn_tag isEqualToString:@"upload_msg_pic"]){
                         
-                        _big_url = [jsonDic objectForKey:@"url"];
-                        _thumb_url = [jsonDic objectForKey:@"thumb"];
-                        _sending = NO;
-                        jsonDic = nil;
+                        @try {
+                            NSDictionary *jsonDic =  [APPUtils getDicByJson:resultString];
+                            
+                            _big_url = [jsonDic objectForKey:@"url"];
+                            _thumb_url = [jsonDic objectForKey:@"thumb"];
+                            _sending = NO;
+                            jsonDic = nil;
+                            
+                            [weakSelf sendMsg];
+                        } @catch (NSException *exception) {
+                            [weakSelf sendFail];
+                        }
                         
-                        [weakSelf sendMsg];
-                    } @catch (NSException *exception) {
+                    }else{
+                        //图片上传失败
                         [weakSelf sendFail];
                     }
                     
-                }else{
-                    //图片上传失败
-                    [weakSelf sendFail];
-                }
+                };
                 
-            };
-            
-            [afn upload_msg_pic:[[[MainViewController sharedMain] conversationPaths] stringByAppendingPathComponent:_fileName] fileName:_fileName width_height:[NSString stringWithFormat:@"%.2f,%.2f",SCREENWIDTH*0.4*_imageDirection,SCREENWIDTH*0.4]];
-            
-            afn = nil;
-        
-        }else if(([_type isEqualToString:@"pos"]||[_type isEqualToString:@"voice"]) && ![_thumb_url hasPrefix:@"upload/"]){//位置截图还未发送
-        
-            __weak typeof(self) weakSelf = self;//防止block循环
-            AFN_util *afn = [[AFN_util alloc] initWithAfnTag:@"uploadSnap"];
-            
-            //上传结果
-            afn.afnResult = ^(NSString *afn_tag,NSString*resultString){
-                if([afn_tag isEqualToString:@"uploadSnap"]){
-            
-                    _thumb_url = resultString;
+                [afn upload_msg_pic:[[[MainViewController sharedMain] conversationPaths] stringByAppendingPathComponent:_fileName] fileName:_fileName width_height:[NSString stringWithFormat:@"%.2f,%.2f",SCREENWIDTH*0.4*_imageDirection,SCREENWIDTH*0.4]];
+                
+                afn = nil;
+                
+            }else if(([_type isEqualToString:@"pos"]||[_type isEqualToString:@"voice"]) && ![_thumb_url hasPrefix:@"upload/"]){//位置截图还未发送
+                
+                __weak typeof(self) weakSelf = self;//防止block循环
+                AFN_util *afn = [[AFN_util alloc] initWithAfnTag:@"uploadSnap"];
+                
+                //上传结果
+                afn.afnResult = ^(NSString *afn_tag,NSString*resultString){
+                    if([afn_tag isEqualToString:@"uploadSnap"]){
+                        
+                        _thumb_url = resultString;
+                        _sending = NO;
+                        
+                        [weakSelf sendMsg];
+                        
+                    }else{
+                        //截图上传失败
+                        [weakSelf sendFail];
+                    }
+                    
+                };
+                
+                [afn uploadRecord:[[[MainViewController sharedMain] conversationPaths] stringByAppendingPathComponent:_fileName] fileName:_fileName];
+                
+                afn = nil;
+                
+                
+            }else{
+                
+                //发送
+                _msgUtil = [[MsgUtil alloc] initMsgUtil];
+                
+                __weak typeof(self) weakSelf = self;//防止block循环
+                _msgUtil.sendBackBlock = ^(NSString *resultString){
+                    
+                    NSInteger errorcode = -1;
+                    
+                    if(resultString!=nil && resultString.length>0 && ![resultString isEqualToString:@"error"]){
+                        errorcode = 0;
+                    }
+                    
+                    if(errorcode==0){//发送成功
+                        
+                        
+                        _sendStatus = 1;
+                        
+                        NSDictionary *save2plist = [NSDictionary dictionaryWithObjectsAndKeys:resultString,@"id",
+                                                    weakSelf.big_url==nil?@"":weakSelf.big_url,@"big_url",
+                                                    weakSelf.thumb_url==nil?@"":weakSelf.thumb_url,@"thumb_url",nil];
+                        
+                        [APPUtils userDefaultsSet :save2plist forKey:weakSelf.msg_id];
+                        
+                        _msg_id = resultString;
+                        
+                        
+                        save2plist = nil;
+                        
+                        weakSelf.sendOverBlock(weakSelf);
+                        
+                    }else{
+                        [weakSelf sendFail];
+                    }
+                    
                     _sending = NO;
-            
-                    [weakSelf sendMsg];
                     
-                }else{
-                    //截图上传失败
-                    [weakSelf sendFail];
-                }
+                };
                 
-            };
-            
-            [afn uploadRecord:[[[MainViewController sharedMain] conversationPaths] stringByAppendingPathComponent:_fileName] fileName:_fileName];
-            
-            afn = nil;
-            
-            
-        }else{
-            
-            //发送
-            _msgUtil = [[MsgUtil alloc] initMsgUtil];
-            
-            __weak typeof(self) weakSelf = self;//防止block循环
-            _msgUtil.sendBackBlock = ^(NSString *resultString){
-                
-                NSInteger errorcode = -1;
-                
-                if(resultString!=nil && resultString.length>0 && ![resultString isEqualToString:@"error"]){
-                    errorcode = 0;
-                }
-        
-                if(errorcode==0){//发送成功
-                    
-                   
-                    _sendStatus = 1;
-                    
-                    NSDictionary *save2plist = [NSDictionary dictionaryWithObjectsAndKeys:resultString,@"id",
-                        weakSelf.big_url==nil?@"":weakSelf.big_url,@"big_url",
-                        weakSelf.thumb_url==nil?@"":weakSelf.thumb_url,@"thumb_url",nil];
-                    
-                    [APPUtils userDefaultsSet :save2plist forKey:weakSelf.msg_id];
-                    
-                    _msg_id = resultString;
-                    
-                    
-                    save2plist = nil;
-                    
-                    weakSelf.sendOverBlock(weakSelf);
-                    
-                }else{
-                    [weakSelf sendFail];
-                }
-                
-                _sending = NO;
-               
-            };
-            
-            [_msgUtil send_msgs:self];
+                [_msgUtil send_msgs:self];
+            }
         }
-    }
+        
+    });
+
 }
 
 

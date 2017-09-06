@@ -255,7 +255,12 @@
         placeHolderLabel.text = placeString;
     }
 
-    placeHolderLabel.alpha=1;
+    if(hpTextView.text.length>0){
+        placeHolderLabel.alpha=0;
+    }else{
+        placeHolderLabel.alpha=1;
+    }
+   
    
     
     [self showMyself];
@@ -269,6 +274,11 @@
 
     // Need to translate the bounds to account for rotation.
     keyboardBounds = [self convertRect:keyboardBounds toView:nil];
+    
+    
+    if(_jumpBack){
+        self.jumpBack(keyboardBounds.size.height, sendView.height);
+    }
     
     // get a rect for the textView frame
     CGRect containerFrame;

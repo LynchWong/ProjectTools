@@ -11,6 +11,10 @@
 @implementation ContactsList
 
 
+- (UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleDefault;
+}
+
 + (ContactsList*)contacts{
     
     static dispatch_once_t onceToken;
@@ -47,8 +51,6 @@
 //初始化ui
 -(void)showList:(ContactsType)type{
 
-    
-   
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
@@ -374,14 +376,11 @@
     //无权限
     dispatch_async(dispatch_get_main_queue(), ^{
         [ShowWaiting hideWaiting];
-        
-        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-        NSString *appCurName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
-        infoDictionary = nil;
+      
         
         
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@""
-                                                                                 message:[NSString stringWithFormat:@"若要获取联系人，请允许<%@>读取您的通讯录，谢谢！",appCurName]
+                                                                                 message:@"若要获取联系人，请允许本应用读取您的通讯录，谢谢！"
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){}];
@@ -644,7 +643,7 @@
         NSMutableArray *wordArray = [[NSMutableArray alloc]init];
         for(int i=0;i<[sections count];i++){
             @try {
-                if([[sections objectAtIndex:i]count]>0){
+                if([((NSMutableArray*)[sections objectAtIndex:i]) count]>0){
                     [wordArray addObject:[[[UILocalizedIndexedCollation currentCollation] sectionIndexTitles] objectAtIndex:i]];
                 }
             } @catch (NSException *exception) {
@@ -672,7 +671,10 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if (searchBar.text.length == 0) {
         @try {
-            if ([[sections objectAtIndex:section] count] > 0) {
+            
+            
+            
+            if ([((NSMutableArray*)sections) count] > 0) {
                 return [[[UILocalizedIndexedCollation currentCollation] sectionTitles] objectAtIndex:section];
             } else {
                 return nil;
@@ -742,7 +744,10 @@
     }else{
         if(searchBar.text.length == 0) {
             @try {
-                return [[sections objectAtIndex:section] count];
+                
+                
+                
+                return [((NSMutableArray*)[sections objectAtIndex:section]) count];
             } @catch (NSException *exception) {
                 isEmpty = YES;
                 return 1;

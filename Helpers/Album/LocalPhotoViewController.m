@@ -39,7 +39,7 @@
     picWidth = (SCREENWIDTH-25)/4;
     
     titleView = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 64)];
-    [titleView setBackgroundColor:MAINRED];
+    [titleView setBackgroundColor:MAINCOLOR];
     
     [self.view addSubview:titleView];
     [self.view bringSubviewToFront:bodyView];
@@ -377,7 +377,7 @@
     }
     else{
         lbAlert.text=[NSString stringWithFormat:@"已经选择%lu张照片",(unsigned long)self.selectPhotos.count];
-        [okBtn setBackgroundColor:MAINRED];
+        [okBtn setBackgroundColor:MAINCOLOR];
         [okBtn setEnabled:YES];
     }
     

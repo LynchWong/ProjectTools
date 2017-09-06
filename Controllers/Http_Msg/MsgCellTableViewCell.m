@@ -138,9 +138,7 @@
             UIImageView *sendImageview = [[UIImageView alloc] initWithFrame:CGRectMake(62, 14, maxPicHeight*_msg.imageDirection, maxPicHeight)];
           
             if(sendImageview.height < 42){
-                CGRect containerFrame = sendImageview.frame;
-                containerFrame.size.height = 42;
-                sendImageview.frame = containerFrame;
+                sendImageview.height = 42;
             }
             sendImageview.tag = 233;
             [sendImageview.layer setMasksToBounds:YES];//圆角不被图片盖住
@@ -514,8 +512,7 @@
         
             if(sendImageview.height < 42){
                 CGRect containerFrame = sendImageview.frame;
-                containerFrame.size.height = 42;
-                sendImageview.frame = containerFrame;
+                sendImageview.height = 42;
             }
             sendImageview.tag = 233;
             [sendImageview.layer setMasksToBounds:YES];//圆角不被图片盖住
@@ -642,7 +639,7 @@
             
             
             //时长
-            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x-34, 30, 30, 10)];
+            UILabel *timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(bubbleImageView.x-34, bubbleImageView.y, 30, voiceControl.height)];
             timeLabel.textColor = [UIColor lightGrayColor];
             timeLabel.font = [UIFont fontWithName:textDefaultBoldFont size:13];
             timeLabel.textAlignment = NSTextAlignmentRight;
@@ -653,11 +650,11 @@
             
             if(msg.sendStatus==3){
                 activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                int cutNumber = 27;
+                int cutNumber = 30;
                 if(msg.filesize>9){
-                    cutNumber = 33;
+                    cutNumber = 40;
                 }
-                activityIndicator.center = CGPointMake(bubbleImageView.x-cutNumber-6, bubbleImageView.height/2+bubbleImageView.y);
+                activityIndicator.center = CGPointMake(bubbleImageView.x-cutNumber, bubbleImageView.height/2+bubbleImageView.y);
              
                 
             }else if(msg.sendStatus ==2){
@@ -809,7 +806,7 @@
             NSDictionary *tempdic = [[APPUtils getUserDefault] objectForKey: _msg.msg_id];
             
             @try {
-                if(tempdic==nil||[tempdic isEqual:[NSNull null]]){
+                if(tempdic==nil||[tempdic isEqual:[NSNull null]]){//检测没发送就开始发送
                     
                     [APPUtils userDefaultsSet :[NSDictionary dictionaryWithObjectsAndKeys:@"1",@"id",nil] forKey:_msg.msg_id];
                     
@@ -819,7 +816,10 @@
                     if(progressLabel!=nil&&[_msg.type isEqualToString:@"pic"]){//更新上传进度
                         
                         _msg.progressResult = ^(NSString *progress){
-                            weakself.progressLabel.text = progress;
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                 weakself.progressLabel.text = progress;
+                            });
+                           
                         };
                         
                     }
@@ -828,8 +828,10 @@
                     [_msg setSendOverBlock:^(OneMsgEntity *send_msg){
                         _msg = send_msg;
                         
-                        weakself.callBackBlock(@"update");
-    
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                             weakself.callBackBlock(@"update");
+                        });
+                     
                     }];
                     
                      [_msg sendMsg];
@@ -837,9 +839,7 @@
                 }
             } @catch (NSException *exception) {}
             tempdic = nil;
-            
-            
-            
+        
         }
 
         

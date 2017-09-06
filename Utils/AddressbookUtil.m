@@ -170,11 +170,11 @@
 //打包联系人联系人到SD01
 +(NSString*)getContacts{
 
+    
+    
     if(![AddressbookUtil getReadContactsBookPermission]){//没权限
         return @"";
     }
-    
-
     
     //获取通讯录
     NSInteger last_get_contacts_Time = [APPUtils get_ud_int:@"last_get_contacts_Time"] ;//上一次发送时间

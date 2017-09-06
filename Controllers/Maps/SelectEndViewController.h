@@ -98,7 +98,7 @@
 @property(nonatomic,assign) NSObject<PassValueDelegate> *delegate;
 @property(nonatomic,strong) NSMutableArray *addressArr;//历史记录
 @property(nonatomic,assign) BOOL presentType;//控制器类型
-
+@property(nonatomic,assign) BOOL getSnap;//获得截图
 
 typedef void (^MapDeleteBlock)(NSString *addressId);
 @property (nonatomic,strong)MapDeleteBlock deleteBackBlock;

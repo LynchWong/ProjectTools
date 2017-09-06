@@ -170,7 +170,6 @@
 -(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler{
     if(navigationAction.request.URL.host==nil){
         decisionHandler(WKNavigationActionPolicyCancel);
-         [self webError];
     }else{
         decisionHandler(WKNavigationActionPolicyAllow);
     }
