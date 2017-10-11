@@ -22,6 +22,7 @@
 //分享用
 @property (retain, nonatomic) UIImageView *shareImage;
 @property (retain, nonatomic) UIImageView *shareImage2;
+@property (retain, nonatomic) UIImageView *shareImage3;
 @property (retain, nonatomic) UIView *shareView;
 @property (retain, nonatomic) UIView *shareView2;
 @property (retain, nonatomic) UILabel *shareLabel;

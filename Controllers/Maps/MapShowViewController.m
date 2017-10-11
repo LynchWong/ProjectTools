@@ -150,13 +150,13 @@
     
     UIImageView *backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(25, (backView.height-18)/2, 18, 18)];
     [backImageView setImage:[UIImage imageNamed:@"goBack_white.png"]];
-    [backView addSubview:backImageView];
+    [backView.contentView addSubview:backImageView];
     backImageView = nil;
     
     UIControl *backControl = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, backView.width, backView.height)];
     [backControl addTarget:self action:@selector(beback) forControlEvents:UIControlEventTouchUpInside];
     [backControl addSubview:backImageView];
-    [backView addSubview:backControl];
+    [backView.contentView addSubview:backControl];
     backControl = nil;
     
     CGFloat locationYAdd = 60;

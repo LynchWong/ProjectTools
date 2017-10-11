@@ -45,7 +45,8 @@ static ContactsList *contactsList;
     NSInteger totalPeople;//总人数
     MyBtnControl *makeOkBtn;
     BOOL cleanSelect;//清理选择
-    
+
+    BOOL selectOk;
 }
 
 typedef enum : NSInteger {
@@ -60,6 +61,7 @@ typedef enum : NSInteger {
 
 //显示
 -(void)showList:(ContactsType)type;
+
 
 
 typedef void (^ContactsBlock)(Contact* contact,NSMutableArray*selectArr);

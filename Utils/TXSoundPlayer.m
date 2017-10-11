@@ -121,9 +121,16 @@ static TXSoundPlayer* soundplayer;
         if(calling==1 && _tts_playing && player!=nil){
             [weakSelf stop];//通知播放
         }
-        
+        //挂了后处理
+        if(calling==0){
+            if([APPUtils get_ud_int:@"slient_back"]==1){
+                //会影响后台静默播放
+                if([AppDelegate getIsBackGround]){
+                    [APPUtils unlimitedPlay];
+                }
+            }
+        }
     };
-
 }
 
 

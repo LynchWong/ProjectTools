@@ -916,8 +916,6 @@
             }
             
             
-            
-            
             if(player == nil){
                 player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:playPath] error:nil];
                 player.delegate =self;

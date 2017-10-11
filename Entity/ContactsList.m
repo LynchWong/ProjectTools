@@ -11,9 +11,6 @@
 @implementation ContactsList
 
 
-- (UIStatusBarStyle)preferredStatusBarStyle{
-    return UIStatusBarStyleDefault;
-}
 
 + (ContactsList*)contacts{
     
@@ -671,10 +668,8 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if (searchBar.text.length == 0) {
         @try {
-            
-            
-            
-            if ([((NSMutableArray*)sections) count] > 0) {
+       
+            if ([((NSMutableArray*)[sections objectAtIndex:section]) count] > 0) {
                 return [[[UILocalizedIndexedCollation currentCollation] sectionTitles] objectAtIndex:section];
             } else {
                 return nil;
@@ -714,6 +709,7 @@
     label.font=[UIFont fontWithName:textDefaultBoldFont size:13];
     label.text = sectionTitle;
     label.textColor = TEXTGRAY;
+    
     UIView * sectionView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, 22)] ;
     [sectionView setBackgroundColor:[UIColor whiteColor]];
     [sectionView addSubview:label];
@@ -744,8 +740,6 @@
     }else{
         if(searchBar.text.length == 0) {
             @try {
-                
-                
                 
                 return [((NSMutableArray*)[sections objectAtIndex:section]) count];
             } @catch (NSException *exception) {
@@ -940,7 +934,7 @@
             cellBtn.clickBackBlock = ^(){
                 
                 if(controllerType==CONTACTS_PAGE){
-                    
+                    selectOk = YES;
                     self.callBackBlock(user, nil);
                     [self closeContactView];
                     
@@ -1043,6 +1037,7 @@
 //返回组数据
 -(void)callBackArr{
     self.callBackBlock(nil, [selectContactsArr mutableCopy]);
+    selectOk = YES;
      [self closeContactView];
 }
 
@@ -1062,6 +1057,11 @@
                              [self clickCover];
                              _reloading = NO;
                              [selectContactsArr removeAllObjects];
+                             
+                             if(!selectOk){
+                                 self.callBackBlock(nil, nil);
+                             }
+                             selectOk = NO;
                          }];
     });
     

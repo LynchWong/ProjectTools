@@ -64,8 +64,7 @@
 }
 
 - (instancetype)initWithTitle:(NSString *)title
-               clickedAtIndex:(ClickedIndexBlock)block
-            cancelButtonTitle:(NSString *)cancelButtonTitle
+               clickedAtIndex:(ClickedIndexBlock)block            cancelButtonTitle:(NSString *)cancelButtonTitle
             otherButtonTitles:(NSString *)otherButtonTitles, ...
 {
     self = [super init];
@@ -108,6 +107,12 @@
     return self;
 }
 
+//自动点击
+-(void)click:(NSInteger)index{
+    
+    self.block(index);
+    
+}
 - (void)dealloc {
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -377,7 +382,7 @@
         [label setTextColor:[UIColor lightGrayColor]];
         [label setAdjustsFontSizeToFitWidth:YES];
         
-        [blurEffectView addSubview:label];
+        [blurEffectView.contentView addSubview:label];
         
         
         UIImageView *sepLine = [[UIImageView alloc]initWithImage:[self imageWithUIColor:[UIColor lightGrayColor]]];

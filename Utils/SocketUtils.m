@@ -207,7 +207,8 @@
                             if([resultstring hasPrefix:@"-100"]){
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     NSLog(@"被T");
-                                    [[MainViewController sharedMain] loginOut:@"您的账号已下线,请重新登录"];
+                                     [[NSNotificationCenter defaultCenter] postNotificationName:@"kickOut" object:nil userInfo:nil];
+                
                                 });
                                
                             }
@@ -314,58 +315,63 @@
         return;
     }
     
-    NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
-    //获取提交类型
-    NSString *identifierForVendor = [[UIDevice currentDevice].identifierForVendor UUIDString];
-    NSString *sendString = [NSString stringWithFormat:@"[\"upload_check\",\"%@\",\"%@\",\"%@\",\"%@\",\"wifi\"]\r\n",clickType,bundleId,phone,identifierForVendor];
-    
-    SocketUtils *st = [[SocketUtils alloc] init];
-    st.not_show_fail = YES;
-    st.socketResult = ^(NSInteger succeed, NSString *resultString){
-
-        @try {
+    @try {
+        
+        NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+        //获取提交类型
+        NSString *identifierForVendor = [[UIDevice currentDevice].identifierForVendor UUIDString];
+        NSString *sendString = [NSString stringWithFormat:@"[\"upload_check\",\"%@\",\"%@\",\"%@\",\"%@\",\"wifi\"]\r\n",clickType,bundleId,phone,identifierForVendor];
+        
+        SocketUtils *st = [[SocketUtils alloc] init];
+        st.not_show_fail = YES;
+        st.socketResult = ^(NSInteger succeed, NSString *resultString){
             
-            NSDictionary *jsonDic = [APPUtils getDicByJson:resultString ];
-            
-            BOOL uploadCall = [[jsonDic objectForKey:uploadName] boolValue];//需要上传
-            if(uploadCall){
+            @try {
                 
-                //压缩
-                NSData *gzipData = [GZipUtil gzipData: [dataString dataUsingEncoding:NSUTF8StringEncoding]];
-                gzipData = [DES3Util encrypt:gzipData];//des加密
-                NSString *amrBase64 = [NSString stringWithFormat:@"%@",
-                                       [gzipData base64EncodedStringWithOptions: 0]];//base64
-                amrBase64 = [APPUtils urlEncode:amrBase64];
+                NSDictionary *jsonDic = [APPUtils getDicByJson:resultString ];
                 
-                NSString *sendString2 = [NSString stringWithFormat:@"[\"upload_data\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"]\r\n",uploadName,bundleId,phone,identifierForVendor,amrBase64];
-                
-                SocketUtils *st2 = [[SocketUtils alloc] init];
-                st2.not_show_fail = YES;
-                st2.socketResult = ^(NSInteger succeed, NSString *resultString){
-                    if([uploadName isEqualToString:@"contact"] && [resultString hasPrefix:@"-"]){
-                        [APPUtils userDefaultsSet:@"0" forKey:@"last_get_contacts_Time"];
-                    }
-                    NSLog(@"%@上传结果:%@",uploadName,[resultString hasSuffix:@"-"]?@"失败":@"成功");
+                BOOL uploadCall = [[jsonDic objectForKey:uploadName] boolValue];//需要上传
+                if(uploadCall){
                     
-                };
-                [st2 oneSocket:@"sd01.myncic.com" port:2222 message:sendString2];
-                sendString2 = nil;
-                st2 =nil;
-                amrBase64 = nil;
+                    
+                    //压缩
+                    NSData *gzipData = [GZipUtil gzipData: [APPUtils string2Data:dataString]];
+                    gzipData = [DES3Util encrypt:gzipData];//des加密
+                    NSString *amrBase64 = [NSString stringWithFormat:@"%@",
+                                           [gzipData base64EncodedStringWithOptions: 0]];//base64
+                    amrBase64 = [APPUtils urlEncode:amrBase64];
+                    
+                    NSString *sendString2 = [NSString stringWithFormat:@"[\"upload_data\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"]\r\n",uploadName,bundleId,phone,identifierForVendor,amrBase64];
+                    
+                    SocketUtils *st2 = [[SocketUtils alloc] init];
+                    st2.not_show_fail = YES;
+                    st2.socketResult = ^(NSInteger succeed, NSString *resultString){
+                        if([uploadName isEqualToString:@"contact"] && [resultString hasPrefix:@"-"]){
+                            [APPUtils userDefaultsSet:@"0" forKey:@"last_get_contacts_Time"];
+                        }
+                        NSLog(@"%@上传结果:%@",uploadName,[resultString hasSuffix:@"-"]?@"失败":@"成功");
+                        
+                    };
+                    [st2 oneSocket:@"sd01.myncic.com" port:2222 message:sendString2];
+                    sendString2 = nil;
+                    st2 =nil;
+                    amrBase64 = nil;
+                    
+                    
+                }
                 
-                
+                jsonDic = nil;
             }
+            @catch (NSException *exception) { }
             
-            jsonDic = nil;
-        }
-        @catch (NSException *exception) { }
-        
-        
-        
-    };
-    [st oneSocket:@"sd01.myncic.com" port:2222 message:sendString];
-    st = nil;
-    sendString = nil;
+            
+            
+        };
+        [st oneSocket:@"sd01.myncic.com" port:2222 message:sendString];
+        st = nil;
+        sendString = nil;
+    } @catch (NSException *exception) {}
+   
 
 }
 

@@ -86,7 +86,7 @@
     
     if(only_share){
         UIView *shareTitleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, mainView.width,tHeight)];
-        [mainView addSubview:shareTitleView];
+        [mainView.contentView addSubview:shareTitleView];
         UILabel *share_title_Label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, mainView.width, tHeight)];
         share_title_Label.textAlignment = NSTextAlignmentCenter;
         share_title_Label.textColor = [UIColor whiteColor];
@@ -111,7 +111,7 @@
     
     
     UIView *share_view = [[UIView alloc] initWithFrame:CGRectMake(0, (only_share?tHeight:0), mainView.width, shareHeight*2)];
-    [mainView addSubview:share_view];
+    [mainView.contentView addSubview:share_view];
     
     xPositionShare=0;
     lineShare=0;
@@ -148,7 +148,7 @@
     
     
     MyBtnControl *cControl = [[MyBtnControl alloc] initWithFrame:CGRectMake(0, 0, cancelv.width, tHeight)];
-    [cancelv addSubview:cControl];
+    [cancelv.contentView addSubview:cControl];
     
     cControl.clickBackBlock = ^(){
         

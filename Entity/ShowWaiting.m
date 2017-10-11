@@ -59,7 +59,7 @@
         [waitingImageview setImage:[UIImage imageNamed:@"waiting.png"]];
         [waitingView addSubview:waitingImageview];
         
-        [APPUtils takeAround:0 duration:1.2 view:waitingImageview];
+        [APPUtils takeAround:0 duration:1.2 view:waitingImageview toLeft:NO];
       
 
         _showLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, waitingView.height-30, waitingView.width, 20)];

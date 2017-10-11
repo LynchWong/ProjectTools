@@ -55,7 +55,7 @@
     
     if (![APPUtils fileExist:recordFilePath]) {//未下载
         
-        [APPUtils takeAround:0 duration:1.0 view:voiceLoadingImage];
+        [APPUtils takeAround:0 duration:1.0 view:voiceLoadingImage toLeft:NO];
        
          playingState = 1;
         

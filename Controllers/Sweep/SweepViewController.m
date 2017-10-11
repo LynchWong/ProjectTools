@@ -184,11 +184,8 @@
 
 
 
--(void)initScan
-{
-    
+-(void)initScan{
 
-    
     // Device
     _device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     

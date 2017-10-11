@@ -234,10 +234,10 @@
     [backImageView setContentMode:UIViewContentModeScaleAspectFill];
     [backControl addTarget:self action:@selector(beBack) forControlEvents:UIControlEventTouchUpInside];
     [backControl addSubview:backImageView];
-    [titletView addSubview:backControl];
+    [titletView.contentView addSubview:backControl];
     
     
-    [titletView addSubview:[APPUtils get_line:0 y:TITLE_HEIGHT-0.5 width:SCREENWIDTH]];
+    [titletView.contentView addSubview:[APPUtils get_line:0 y:TITLE_HEIGHT-0.5 width:SCREENWIDTH]];
     
     
     
@@ -249,7 +249,7 @@
     search_Under.layer.shadowOffset = CGSizeMake(0,0);//shadowOffset阴影偏移
     search_Under.layer.shadowOpacity = 0.4;//阴影透明度，默认0
     search_Under.layer.shadowRadius = 3;//阴影半径，默认3
-    [titletView addSubview:search_Under];
+    [titletView.contentView addSubview:search_Under];
     search_Under = nil;
     
     
@@ -262,7 +262,7 @@
     [searchView setClipsToBounds:YES];//减掉超出部分
     searchView.layer.borderColor = [LINECOLOR2 CGColor];
     searchView.layer.borderWidth = 0.3f;
-    [titletView addSubview:searchView];
+    [titletView.contentView addSubview:searchView];
     
     
     search_input = [[UITextField alloc] initWithFrame:CGRectMake(10, 0, searchView.width-45, searchView.height)];

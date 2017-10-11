@@ -1678,12 +1678,10 @@
 
 
 //转圈
-+(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view{
-    
++(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view toLeft:(BOOL)toLeft{
 
-    
     CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
+    rotationAnimation.toValue = [NSNumber numberWithFloat: (toLeft?M_PI * -2.0:M_PI * 2.0)];
     rotationAnimation.duration =duration;
     rotationAnimation.cumulative = YES;
     rotationAnimation.repeatCount = count==0?CGFLOAT_MAX:count;
@@ -1692,6 +1690,8 @@
     rotationAnimation = nil;
     
 }
+
+
 
 
 //通讯录名字转换
@@ -1725,10 +1725,18 @@
 
 //释放音频资源
 + (void)releseAudio{
+   
     [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+    
+    if([APPUtils get_ud_int:@"slient_back"]==1){
+         //会影响后台静默播放
+        if([AppDelegate getIsBackGround]){
+            [APPUtils unlimitedPlay];
+        }
+    }
 }
 
-//释放音频资源 share:与其他分享 将其他音源弱化。用户后台播放
+//释放音频资源 share:与其他分享 将其他音源弱化。用户后台播放 share与其他音频共享
 +(void)takeAudio:(BOOL)share{
     
     if(share){
@@ -1810,5 +1818,217 @@
 }
 
 
+//获取名字的首字母、全拼等
++(NSMutableDictionary*)getLettersOfName:(NSString*)name{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
+    @try {
+        
 
+        NSString *firstWord;//第一个字的完整拼音
+        
+        NSMutableString *lettersString = [[NSMutableString alloc] init]; //每个字首字母的拼音组合
+        NSMutableString *wordsString = [[NSMutableString alloc] init]; //每个字的拼音组合
+        NSMutableString *wordsArrayString = [[NSMutableString alloc] init];
+        
+        
+        for(int i=0;i<name.length;i++){
+            NSString *word = [name substringWithRange:NSMakeRange(i,1)];
+            word = [APPUtils  nameConvert: word];
+            if(i==0){
+                firstWord = word;
+            }
+            
+            NSMutableString *letterNumString = [[NSMutableString alloc] init];
+            
+            for(int j=0;j<word.length;j++){
+                @try {
+                    [letterNumString appendString:[APPUtils getNumByLetter:[word substringWithRange:NSMakeRange(j,1)]]];
+                } @catch (NSException *exception) {
+                }
+            }
+            @try {
+                [wordsArrayString appendString:[NSString stringWithFormat:@"%@,",[NSString stringWithFormat:@"%@",letterNumString]]];
+            } @catch (NSException *exception) {
+                
+            }
+            
+            letterNumString = nil;
+            
+            @try {
+                [wordsString appendString:word];
+                word = [word substringWithRange:NSMakeRange(0,1)];
+                [lettersString appendString:word];
+            } @catch (NSException *exception) {}
+            
+            
+            word = nil;
+        }
+        
+      
+        [dic setObject:[APPUtils fixString:firstWord] forKey:@"firstWord"];//chang
+        
+        NSString *firstLetter=@"";
+        @try {
+            firstLetter = [firstWord substringWithRange:NSMakeRange(0,1)];
+        } @catch (NSException *exception) {}
+        
+        [dic setObject:[APPUtils fixString:firstLetter] forKey:@"firstLetter"];//c
+        [dic setObject:[NSString stringWithFormat:@"%@",lettersString] forKey:@"allLetters"];//cyq
+        [dic setObject:[NSString stringWithFormat:@"%@",wordsString] forKey:@"allWords"];//changyouquan
+        
+  
+        firstWord = nil;
+        lettersString = nil;
+        wordsArrayString = nil;
+        wordsString = nil;
+    } @catch (NSException *exception) {
+        return nil;
+    }
+    
+    return dic;
+}
+
+
+//创建普通二维码
++(void)createQRCode:(NSString*)string imgView:(UIImageView*)imgView centerImg:(UIImage*)centerImg{
+    // 1. 创建一个二维码滤镜实例(CIFilter)
+    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    // 滤镜恢复默认设置
+    [filter setDefaults];
+    
+    // 2. 给滤镜添加数据
+    
+    NSData *data = [APPUtils string2Data:string];
+    // 使用KVC的方式给filter赋值
+    [filter setValue:data forKeyPath:@"inputMessage"];
+    
+    // 3. 生成二维码
+    CIImage *image = [filter outputImage];
+    UIImage *qrImage = [self excludeFuzzyImageFromCIImage:image size:imgView.width];
+    [imgView setImage:qrImage];
+    
+    //中间图片
+    if(centerImg!=nil){
+        CGFloat headWidth = imgView.width*0.23;
+        UIView *headView = [[UIView alloc] initWithFrame:CGRectMake((imgView.width-headWidth)/2, (imgView.height-headWidth)/2, headWidth, headWidth)];
+        headView.layer.cornerRadius = 5;
+        [headView.layer setMasksToBounds:YES];
+        [headView setBackgroundColor:[UIColor whiteColor]];
+        [imgView addSubview:headView];
+        
+        UIImageView *headImage = [[UIImageView alloc] initWithFrame:CGRectMake(3, 3, headWidth-6, headWidth-6)];
+        headImage.layer.cornerRadius = 5;
+        [headImage.layer setMasksToBounds:YES];
+        [headImage setImage:centerImg];
+        [headView addSubview:headImage];
+        headImage = nil;
+        headView = nil;
+    }
+}
+
+//-- 对图像进行清晰处理，很关键！
++(UIImage *)excludeFuzzyImageFromCIImage: (CIImage *)image size: (CGFloat)size{
+    CGRect extent = CGRectIntegral(image.extent);
+    
+    //通过比例计算，让最终的图像大小合理（正方形是我们想要的）
+    CGFloat scale = MIN(size / CGRectGetWidth(extent), size / CGRectGetHeight(extent));
+    
+    size_t width = CGRectGetWidth(extent) * scale;
+    
+    size_t height = CGRectGetHeight(extent) * scale;
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+    
+    CGContextRef bitmapRef = CGBitmapContextCreate(nil, width, height, 8, 0, colorSpace, (CGBitmapInfo)kCGImageAlphaNone);
+    
+    CIContext * context = [CIContext contextWithOptions: nil];
+    
+    CGImageRef bitmapImage = [context createCGImage: image fromRect: extent];
+    
+    CGContextSetInterpolationQuality(bitmapRef, kCGInterpolationNone);
+    
+    CGContextScaleCTM(bitmapRef, scale, scale);
+    
+    CGContextDrawImage(bitmapRef, extent, bitmapImage);
+    
+    CGImageRef scaledImage = CGBitmapContextCreateImage(bitmapRef);
+    
+    //切记ARC模式下是不会对CoreFoundation框架的对象进行自动释放的，所以要我们手动释放
+    CGContextRelease(bitmapRef);
+    
+    CGImageRelease(bitmapImage);
+    
+    CGColorSpaceRelease(colorSpace);
+    
+    return [UIImage imageWithCGImage: scaledImage];
+}
+
+
+//打乱数组顺序
++(NSMutableArray*)chaosArray:(NSMutableArray *)arry{
+    // 对数组乱序
+    
+    //随机数产生结果
+    NSMutableArray *resultArray=[[NSMutableArray alloc] initWithCapacity:0];
+    //随机数个数
+    NSInteger m=8;
+    for (int i=0; i<m; i++) {
+        int t=arc4random()%arry.count;
+        resultArray[i]=arry[t];
+        arry[t]=[arry lastObject]; //为更好的乱序，故交换下位置
+        [arry removeLastObject];
+    }
+    return resultArray;
+}
+
+//制造个异常
++(void)makeException{
+    NSArray *a = [[NSArray alloc] init];
+    [a objectAtIndex:1];
+    [ShowWaiting hideWaiting];
+}
+
+
+//无限播放音频  保持后台
++(void)unlimitedPlay{
+    
+    if(unlimitePlayer!=nil){
+        [unlimitePlayer stop];
+        unlimitePlayer = nil;
+    }
+
+    dispatch_queue_t dispatchQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(dispatchQueue, ^(void) {
+    
+        [[AVAudioSession sharedInstance]setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+        
+        NSBundle *mainBundle = [NSBundle mainBundle];
+        NSString *filePath = [mainBundle pathForResource:@"quite" ofType:@"mp3"];
+        NSData *fileData = [NSData dataWithContentsOfFile:filePath];
+        NSError *error = nil;
+        
+        unlimitePlayer = [[AVAudioPlayer alloc] initWithData:fileData error:&error];
+        unlimitePlayer.volume = 0.2;
+        if (unlimitePlayer != nil){
+            [unlimitePlayer setNumberOfLoops:-1];
+            if ([unlimitePlayer prepareToPlay] && [unlimitePlayer play]){
+                NSLog(@"开启无限..");
+            }
+        }
+    });
+}
+
+//设定一个不重复的本地推送
++(void)make_A_local_notification:(NSDate*)alarmDate string:(NSString*)string{
+    
+    UILocalNotification *notification=[[UILocalNotification alloc] init];
+    if (notification!=nil){
+        notification.repeatInterval = 0;//不重复
+        notification.fireDate=alarmDate;//距现在多久后触发代理方法
+        notification.timeZone=[NSTimeZone timeZoneWithName:@"GMT+8"];
+        notification.alertBody = string;
+        [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    }
+    notification = nil;
+}
 @end

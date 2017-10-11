@@ -227,7 +227,8 @@
         isEmpty = YES;
     }
     
-//    [[MainViewController sharedMain] setUnreadMsgs:NO];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"menu_news_refresh" object:nil userInfo:nil];
+
     
     dispatch_async(dispatch_get_main_queue(), ^{
         

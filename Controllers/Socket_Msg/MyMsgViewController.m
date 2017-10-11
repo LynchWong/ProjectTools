@@ -147,7 +147,7 @@
         [loginBtn addLabel:@"点击登录" color:[UIColor whiteColor] font:[UIFont fontWithName:textDefaultBoldFont size:13]];
         loginBtn.clickBackBlock = ^(){
         
-            [[MainViewController sharedMain]openLogin];
+            [[MainViewController sharedMain] openLogin];
         };
         noLabel = nil;
     }

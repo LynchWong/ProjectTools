@@ -251,10 +251,12 @@
             }];
       
         }
+        if(!_not_ShareHighlight){
+            self.shareImage.alpha=1;
+            self.shareLabel.alpha=1;
+            self.shareView.alpha=1;
+        }
         
-        self.shareImage.alpha=1;
-        self.shareLabel.alpha=1;
-        self.shareView.alpha=1;
     } @catch (NSException *exception) {
         
     }

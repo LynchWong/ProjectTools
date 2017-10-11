@@ -126,6 +126,7 @@
 
 -(void)selectPicker{
     [self closePicker];
+    default_index = select_index;
     self.callBackBlock(select_index);
     
 }

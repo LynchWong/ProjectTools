@@ -51,12 +51,13 @@
     locationIng = YES;
     NSLog(@"开始定位");
     
-    locationAuth = [APPUtils getLocationAuth];
+    locationAuth = [LocationUtils getLocationAuth];
     
     if(locationManager==nil){
         locationManager = [[AMapLocationManager alloc] init];
         [locationManager setDelegate:self];
-        [locationManager setPausesLocationUpdatesAutomatically:NO];
+        [locationManager setAllowsBackgroundLocationUpdates:YES];
+        [locationManager setPausesLocationUpdatesAutomatically:NO];//设置允许后台定位参数，保持不会被系统挂起
     }
     
     
@@ -183,7 +184,10 @@
                 if(_handleLocationCity||showAlert){
                     
                     if(locationAuth){
-                        _error_string = @"定位异常,请重试";
+                        
+                        [ToastView showToast:@"定位异常,请重试"];
+                        
+                        return;
                     }else{
                         if(_error_string==nil){
                             _error_string = @"定位失败,请开启定位权限重试";

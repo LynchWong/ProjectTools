@@ -110,6 +110,8 @@ typedef enum : NSUInteger {
  */
 - (NSInteger)addButtonWithTitle:(NSString *)title;
 
+//自动点击
+-(void)click:(NSInteger)index;
 
 @end
 

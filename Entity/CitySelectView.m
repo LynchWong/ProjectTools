@@ -134,7 +134,7 @@
         //搜索area
         UIControl *closeAreaInputControl = [[UIControl alloc] initWithFrame:CGRectMake(0, 0, SCREENWIDTH, SCREENHEIGHT)];
         [closeAreaInputControl addTarget:self action:@selector(closeAreaInput) forControlEvents:UIControlEventTouchDown];
-        [areaPickerView addSubview:closeAreaInputControl];
+        [areaPickerView.contentView addSubview:closeAreaInputControl];
         closeAreaInputControl = nil;
         
         
@@ -142,7 +142,7 @@
         searchMirror.layer.shouldRasterize = YES;
         searchMirror.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         [searchMirror setImage:[UIImage imageNamed:@"search_area_mirror.png"]];
-        [areaPickerView addSubview:searchMirror];
+        [areaPickerView.contentView addSubview:searchMirror];
         
         
         searchAreaView  = [[UITextField alloc] initWithFrame:CGRectMake(17*2+searchMirror.width, searchMirror.y-10, SCREENWIDTH-(12*4+searchMirror.width), 40)];
@@ -159,12 +159,12 @@
         searchAreaView.returnKeyType = UIReturnKeyDone;
         [searchAreaView setClearButtonMode:UITextFieldViewModeAlways];
         searchAreaView.enablesReturnKeyAutomatically = YES;//无文字就灰色
-        [areaPickerView addSubview:searchAreaView];
+        [areaPickerView.contentView addSubview:searchAreaView];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(checkText) name:UITextFieldTextDidChangeNotification object:searchAreaView];
         
         UIView *searchUnderLine = [[UIView alloc] initWithFrame:CGRectMake(15, searchAreaView.y+searchAreaView.height-5, SCREENWIDTH-30, 1)];
         [searchUnderLine setBackgroundColor:MAINCOLOR];
-        [areaPickerView addSubview:searchUnderLine];
+        [areaPickerView.contentView addSubview:searchUnderLine];
         
         searchMirror = nil;
         searchUnderLine = nil;
@@ -177,7 +177,7 @@
         gpsAreaNotice.textColor = MAINCOLOR;
         gpsAreaNotice.text = @"定位城市";
         gpsAreaNotice.font = [UIFont fontWithName:textDefaultBoldFont size:13];
-        [areaPickerView addSubview:gpsAreaNotice];
+        [areaPickerView.contentView addSubview:gpsAreaNotice];
         
         CGFloat areaBtnWidth;
         if(LESSIP5){
@@ -192,7 +192,7 @@
         location_city_img.layer.shouldRasterize = YES;
         location_city_img.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         [location_city_img setImage:[UIImage imageNamed:@"location_city.png"]];
-        [areaPickerView addSubview:location_city_img];
+        [areaPickerView.contentView addSubview:location_city_img];
         location_city_img = nil;
         
         __weak typeof(self) weakSelf = self;
@@ -205,7 +205,7 @@
         relocationArea.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         relocationArea.layer.borderColor = [MAINCOLOR CGColor];
         relocationArea.layer.borderWidth=0.7;
-        [areaPickerView addSubview:relocationArea];
+        [areaPickerView.contentView addSubview:relocationArea];
         relocationArea.clickBackBlock = ^(){
             [weakSelf selectGPSCity:YES];
         };
@@ -224,7 +224,7 @@
             all_area.layer.rasterizationScale = [[UIScreen mainScreen] scale];
             all_area.layer.borderColor = [MAINCOLOR CGColor];
             all_area.layer.borderWidth=0.7;
-            [areaPickerView addSubview:all_area];
+            [areaPickerView.contentView addSubview:all_area];
             all_area.clickBackBlock = ^(){
                 [weakSelf selectGPSCity:NO];
             };
@@ -242,7 +242,7 @@
         allAreaNotice.textColor = MAINCOLOR;
         allAreaNotice.text = @"城市列表";
         allAreaNotice.font = [UIFont fontWithName:textDefaultBoldFont size:13];
-        [areaPickerView addSubview:allAreaNotice];
+        [areaPickerView.contentView addSubview:allAreaNotice];
         
         //热门城市
         float hotCityArrayCount = [hotCityArray count];
@@ -278,7 +278,7 @@
         }
         
         areaTable = [[UITableView alloc] initWithFrame:CGRectMake(0, allAreaNotice.y+allAreaNotice.height, SCREENWIDTH, SCREENHEIGHT-allAreaNotice.height-allAreaNotice.y-60)];
-        [areaPickerView addSubview:areaTable];
+        [areaPickerView.contentView addSubview:areaTable];
         areaTable.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero]; //隐藏tableview多余行数的线条
         [areaTable setBounces:NO];
         [areaTable setBackgroundColor:[UIColor clearColor]];
@@ -295,12 +295,12 @@
         //关闭area
         UIImageView *closeImg = [[UIImageView alloc] initWithFrame:CGRectMake((SCREENWIDTH-20)/2, SCREENHEIGHT-40, 20, 20)];
         [closeImg setImage:[UIImage imageNamed:@"close_view.png"]];
-        [areaPickerView addSubview:closeImg];
+        [areaPickerView.contentView addSubview:closeImg];
         
         
         UIControl *closeAreaControl = [[UIControl alloc] initWithFrame:CGRectMake((SCREENWIDTH-80)/2, SCREENHEIGHT-50, 80, 50)];
         [closeAreaControl addTarget:self action:@selector(closePickerView) forControlEvents:UIControlEventTouchDown];
-        [areaPickerView addSubview:closeAreaControl];
+        [areaPickerView.contentView addSubview:closeAreaControl];
         closeImg = nil;
         
     }
@@ -489,7 +489,7 @@
         NSMutableArray *wordArray = [[NSMutableArray alloc]init];
         for(int i=0;i<[serviceAreaArray count];i++){
             @try {
-                if([[serviceAreaArray objectAtIndex:i]count]>0){
+                if([((NSMutableArray*)[serviceAreaArray objectAtIndex:i])count]>0){
                     [wordArray addObject:[[[UILocalizedIndexedCollation currentCollation] sectionIndexTitles] objectAtIndex:i]];
                 }
             } @catch (NSException *exception) {
@@ -517,7 +517,8 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if (searchAreaView.text.length == 0) {
         @try {
-            if ([[serviceAreaArray objectAtIndex:section] count] > 0) {
+            
+            if ([((NSMutableArray*)[serviceAreaArray objectAtIndex:section]) count] > 0) {
                 return [[[UILocalizedIndexedCollation currentCollation] sectionTitles] objectAtIndex:section];
             } else {
                 return nil;
@@ -571,7 +572,7 @@
     if(searchAreaView.text.length>0){
         return [serviceAreaFliterArray count];
     }else{
-        return [[serviceAreaArray objectAtIndex:section] count];
+        return [((NSMutableArray*)[serviceAreaArray objectAtIndex:section]) count];
     }
 }
 

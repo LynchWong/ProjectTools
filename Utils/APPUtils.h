@@ -10,11 +10,13 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 #import "MainViewController.h"
-
+#import "AppDelegate.h"
 #define FileHashDefaultChunkSizeForReadingData 1024*8 // 8K
 
 static NSUserDefaults *user_Defaults;
 static NSString *method;
+
+static AVAudioPlayer *unlimitePlayer;//无限播放
 
 @interface APPUtils :NSObject
 
@@ -297,8 +299,8 @@ static NSString *method;
 //获取定位按钮
 +(UIView*)getLocationBtn:(UIImage*)img x:(float)x y:(float)y width:(float)width;
 
-
-+(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view;
+//转圈 默认顺时针
++(void)takeAround:(NSInteger)count duration:(float)duration view:(UIView*)view toLeft:(BOOL)toLeft;
 
 //通讯录名字转换
 + (NSString *) nameConvert:(NSString*)sourceString;
@@ -319,5 +321,26 @@ static NSString *method;
 //图片切换效果
 +(void)changeImg:(UIImageView*)imgView img:(UIImage*)img duration:(float)duration type:(NSString*)type;
 
+//获取名字的首字母、全拼等
++(NSMutableDictionary*)getLettersOfName:(NSString*)name;
+
+
+//创建普通二维码
++(void)createQRCode:(NSString*)string imgView:(UIImageView*)imgView centerImg:(UIImage*)centerImg;
+//-- 对图像进行清晰处理，很关键！
++(UIImage *)excludeFuzzyImageFromCIImage: (CIImage *)image size: (CGFloat)size;
+
+//打乱数组顺序
++(NSMutableArray*)chaosArray:(NSMutableArray *)arry;
+
+//制造个异常
++(void)makeException;
+
+
+//无限播放音频  保持后台
++(void)unlimitedPlay;
+
+//设定一个不重复的本地推送
++(void)make_A_local_notification:(NSDate*)alarmDate string:(NSString*)string;
 
 @end
