@@ -26,7 +26,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ZJSwitch : UIControl
+@interface ZJSwitch : UIControl{
+    float ZJSwitchKnobSize;//开关按钮宽
+}
 
 @property (nonatomic, assign, getter = isOn) BOOL on;
 

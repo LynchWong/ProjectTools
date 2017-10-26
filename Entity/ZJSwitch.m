@@ -26,12 +26,12 @@
 
 #import "ZJSwitch.h"
 #import "UIColor+additions.h"
-#define ZJSwitchMaxHeight 31.0f
-#define ZJSwitchMinHeight 31.0f
-
-#define ZJSwitchMinWidth 51.0f
-
-#define ZJSwitchKnobSize 28.0f
+//#define ZJSwitchMaxHeight 31.0f
+//#define ZJSwitchMinHeight 31.0f
+//
+//#define ZJSwitchMinWidth 51.0f
+//
+//#define ZJSwitchKnobSize 28.0f
 #import "MainViewController.h"
 
 @interface ZJSwitch ()
@@ -59,6 +59,7 @@
 {
     self = [super initWithFrame:[self roundRect:frame]];
     if (self) {
+         ZJSwitchKnobSize = frame.size.height - 3;
         [self commonInit];
     }
     return self;
@@ -316,7 +317,9 @@
     
     _knobView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ZJSwitchKnobSize, ZJSwitchKnobSize)];
     _knobView.backgroundColor = _thumbTintColor;
-    _knobView.layer.cornerRadius = ZJSwitchKnobSize / 2.0;
+    [_knobView.layer setMasksToBounds:YES];
+    [_knobView setClipsToBounds:YES];
+    _knobView.layer.cornerRadius = ZJSwitchKnobSize/2;
     [_containerView addSubview:_knobView];
     
     _onLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -348,17 +351,17 @@
 {
     CGRect newRect = frameOrBounds;
     
-    if (newRect.size.height > ZJSwitchMaxHeight) {
-        newRect.size.height = ZJSwitchMaxHeight;
-    }
-    
-    if (newRect.size.height < ZJSwitchMinHeight) {
-        newRect.size.height = ZJSwitchMinHeight;
-    }
-    
-    if (newRect.size.width < ZJSwitchMinWidth) {
-        newRect.size.width = ZJSwitchMinWidth;
-    }
+//    if (newRect.size.height > ZJSwitchMaxHeight) {
+//        newRect.size.height = ZJSwitchMaxHeight;
+//    }
+//
+//    if (newRect.size.height < ZJSwitchMinHeight) {
+//        newRect.size.height = ZJSwitchMinHeight;
+//    }
+//
+//    if (newRect.size.width < ZJSwitchMinWidth) {
+//        newRect.size.width = ZJSwitchMinWidth;
+//    }
     
     return newRect;
 }
